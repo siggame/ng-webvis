@@ -43,10 +43,6 @@ module.exports = function (grunt) {
         files: ['<%= yeoman.app %>/styles/{,*/}*.less'],
         tasks: ['less:server', 'autoprefixer']
       },
-      styles: {
-        files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
-        tasks: ['newer:copy:styles', 'autoprefixer']
-      },
       gruntfile: {
         files: ['Gruntfile.js']
       },
@@ -145,7 +141,7 @@ module.exports = function (grunt) {
         ignorePath: '<%= yeoman.app %>/'
       },
       less: {
-        src: ['<%= yeoman.app %>/styles/{,*/}*.{less}'],
+        src: ['<%= yeoman.app %>/styles/{,*/}*.less'],
         ignorePath: '<%= yeoman.app %>/bower_components/'
       }
     },
@@ -181,18 +177,21 @@ module.exports = function (grunt) {
       },
       dist: {
         options: {
-          cleancss: true
         },
-        files: {
-          ".tmp/styles": "<%= yeoman.app %>/styles/{,*/}*.less"
-        }
+        expand: true,
+        cwd: "<%= yeoman.app %>/styles",
+        src: "*.less",
+        ext: ".css",
+        dest: ".tmp/styles"
       },
       server: {
         options: {
         },
-        files: {
-          ".tmp/styles": "<%= yeoman.app %>/styles/{,*/}*.less"
-        }
+        expand: true,
+        cwd: "<%= yeoman.app %>/styles",
+        src: "*.less",
+        ext: ".css",
+        dest: ".tmp/styles"
       }
     },
 
@@ -335,29 +334,20 @@ module.exports = function (grunt) {
           src: ['generated/*']
         }]
       },
-      styles: {
-        expand: true,
-        cwd: '<%= yeoman.app %>/styles',
-        dest: '.tmp/styles/',
-        src: '{,*/}*.css'
-      }
     },
 
     // Run some tasks in parallel to speed up the build process
     concurrent: {
       server: [
         'coffee:dist',
-        'copy:styles',
         'less:server'
       ],
       test: [
         'coffee',
-        'copy:styles',
         'less'
       ],
       dist: [
         'coffee',
-        'copy:styles',
         'less:dist',
         'imagemin',
         'svgmin'
