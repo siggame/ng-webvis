@@ -39,9 +39,9 @@ module.exports = function (grunt) {
         files: ['test/spec/{,*/}*.{coffee,litcoffee,coffee.md}'],
         tasks: ['newer:coffee:test', 'karma']
       },
-      styles: {
-        files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
-        tasks: ['newer:copy:styles', 'autoprefixer']
+      less: {
+        files: ['<%= yeoman.app %>/styles/{,*/}*.less'],
+        tasks: ['less:server', 'autoprefixer']
       },
       gruntfile: {
         files: ['Gruntfile.js']
@@ -139,6 +139,10 @@ module.exports = function (grunt) {
       app: {
         src: ['<%= yeoman.app %>/index.html'],
         ignorePath: '<%= yeoman.app %>/'
+      },
+      less: {
+        src: ['<%= yeoman.app %>/styles/{,*/}*.less'],
+        ignorePath: '<%= yeoman.app %>/bower_components/'
       }
     },
 
@@ -165,6 +169,29 @@ module.exports = function (grunt) {
           dest: '.tmp/spec',
           ext: '.js'
         }]
+      }
+    },
+
+    less: {
+      options: {
+      },
+      dist: {
+        options: {
+        },
+        expand: true,
+        cwd: "<%= yeoman.app %>/styles",
+        src: "*.less",
+        ext: ".css",
+        dest: ".tmp/styles"
+      },
+      server: {
+        options: {
+        },
+        expand: true,
+        cwd: "<%= yeoman.app %>/styles",
+        src: "*.less",
+        ext: ".css",
+        dest: ".tmp/styles"
       }
     },
 
@@ -307,27 +334,21 @@ module.exports = function (grunt) {
           src: ['generated/*']
         }]
       },
-      styles: {
-        expand: true,
-        cwd: '<%= yeoman.app %>/styles',
-        dest: '.tmp/styles/',
-        src: '{,*/}*.css'
-      }
     },
 
     // Run some tasks in parallel to speed up the build process
     concurrent: {
       server: [
         'coffee:dist',
-        'copy:styles'
+        'less:server'
       ],
       test: [
         'coffee',
-        'copy:styles'
+        'less'
       ],
       dist: [
         'coffee',
-        'copy:styles',
+        'less:dist',
         'imagemin',
         'svgmin'
       ]
