@@ -6,13 +6,27 @@
 module.exports = (config) ->
   config.set
     # base path, that will be used to resolve files and exclude
-    basePath: ''
+    basePath: '../'
 
     # testing framework to use (jasmine/mocha/qunit/...)
     frameworks: ['jasmine']
 
     # list of files / patterns to load in the browser
-    files: [],
+    files: [
+          'app/bower_components/angular/angular.js',
+          'app/bower_components/angular-mocks/angular-mocks.js',
+          'app/bower_components/angular-cookies/angular-cookies.js',
+          'app/bower_components/angular-resource/angular-resource.js',
+          'app/bower_components/angular-sanitize/angular-sanitize.js',
+          'app/bower_components/angular-route/angular-route.js',
+          'app/bower_components/underscore/underscore.js',
+          'app/scripts/*.js',
+          'app/scripts/**/*.js',
+          'test/spec/**/*.js',
+          '.tmp/scripts/*.js',
+          '.tmp/scripts/**/*.js',
+          '.tmp/spec/**/*.js'
+    ]
 
     # list of files / patterns to exclude
     exclude: []
