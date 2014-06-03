@@ -39,6 +39,10 @@ module.exports = function (grunt) {
         files: ['test/spec/{,*/}*.{coffee,litcoffee,coffee.md}'],
         tasks: ['newer:coffee:test', 'karma']
       },
+      less: {
+        files: ['<%= yeoman.app %>/styles/{,*/}*.less'],
+        tasks: ['less:server', 'autoprefixer']
+      },
       styles: {
         files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
         tasks: ['newer:copy:styles', 'autoprefixer']
@@ -139,6 +143,10 @@ module.exports = function (grunt) {
       app: {
         src: ['<%= yeoman.app %>/index.html'],
         ignorePath: '<%= yeoman.app %>/'
+      },
+      less: {
+        src: ['<%= yeoman.app %>/styles/{,*/}*.{less}'],
+        ignorePath: '<%= yeoman.app %>/bower_components/'
       }
     },
 
@@ -165,6 +173,26 @@ module.exports = function (grunt) {
           dest: '.tmp/spec',
           ext: '.js'
         }]
+      }
+    },
+
+    less: {
+      options: {
+      },
+      dist: {
+        options: {
+          cleancss: true
+        },
+        files: {
+          ".tmp/styles": "<%= yeoman.app %>/styles/{,*/}*.less"
+        }
+      },
+      server: {
+        options: {
+        },
+        files: {
+          ".tmp/styles": "<%= yeoman.app %>/styles/{,*/}*.less"
+        }
       }
     },
 
@@ -319,15 +347,18 @@ module.exports = function (grunt) {
     concurrent: {
       server: [
         'coffee:dist',
-        'copy:styles'
+        'copy:styles',
+        'less:server'
       ],
       test: [
         'coffee',
-        'copy:styles'
+        'copy:styles',
+        'less'
       ],
       dist: [
         'coffee',
         'copy:styles',
+        'less:dist',
         'imagemin',
         'svgmin'
       ]
