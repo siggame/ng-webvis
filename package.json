@@ -39,5 +39,19 @@
   },
   "scripts": {
     "test": "grunt test"
-  }
+  },
+  "description": "A web-based visualizer for ACM SIG-Game",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/siggame/webvis"
+  },
+  "author": "Missouri S&T ACM SIG-Game",
+  "license": "3-Clause BSD",
+  "bugs": {
+    "url": "https://github.com/siggame/webvis/issues"
+  },
+  "homepage": "https://github.com/siggame/webvis"
 }
