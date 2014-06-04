@@ -179,19 +179,19 @@ module.exports = function (grunt) {
         options: {
         },
         expand: true,
-        cwd: "<%= yeoman.app %>/styles",
-        src: "*.less",
-        ext: ".css",
-        dest: ".tmp/styles"
+        cwd: '<%= yeoman.app %>/styles',
+        src: '*.less',
+        ext: '.css',
+        dest: '.tmp/styles'
       },
       server: {
         options: {
         },
         expand: true,
-        cwd: "<%= yeoman.app %>/styles",
-        src: "*.less",
-        ext: ".css",
-        dest: ".tmp/styles"
+        cwd: '<%= yeoman.app %>/styles',
+        src: '*.less',
+        ext: '.css',
+        dest: '.tmp/styles'
       }
     },
 
