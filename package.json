@@ -6,6 +6,7 @@
     "grunt": "~0.4.1",
     "grunt-autoprefixer": "~0.4.0",
     "grunt-bower-install": "~1.0.0",
+    "grunt-coffeelint": "0.0.10",
     "grunt-concurrent": "~0.5.0",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-coffee": "~0.7.0",
@@ -39,5 +40,19 @@
   },
   "scripts": {
     "test": "grunt test"
-  }
+  },
+  "description": "A web-based visualizer for ACM SIG-Game",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/siggame/webvis"
+  },
+  "author": "Missouri S&T ACM SIG-Game",
+  "license": "3-Clause BSD",
+  "bugs": {
+    "url": "https://github.com/siggame/webvis/issues"
+  },
+  "homepage": "https://github.com/siggame/webvis"
 }

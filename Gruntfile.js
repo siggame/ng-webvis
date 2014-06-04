@@ -104,6 +104,19 @@ module.exports = function (grunt) {
       ]
     },
 
+    coffeelint: {
+      options: {
+        configFile: '.coffeelintrc'
+      },
+      files: {
+        src: [
+          '<%= yeoman.app %>/scripts/{,*/}*.{coffee,litcoffee,coffee.md}',
+          'test/{,*/}*.{coffee,litcoffee,coffee.md}',
+          'test/spec/{,*/}*.{coffee,litcoffee,coffee.md}'
+        ]
+      }
+    },
+
     // Empties folders to start fresh
     clean: {
       dist: {
@@ -179,19 +192,19 @@ module.exports = function (grunt) {
         options: {
         },
         expand: true,
-        cwd: "<%= yeoman.app %>/styles",
-        src: "*.less",
-        ext: ".css",
-        dest: ".tmp/styles"
+        cwd: '<%= yeoman.app %>/styles',
+        src: '*.less',
+        ext: '.css',
+        dest: '.tmp/styles'
       },
       server: {
         options: {
         },
         expand: true,
-        cwd: "<%= yeoman.app %>/styles",
-        src: "*.less",
-        ext: ".css",
-        dest: ".tmp/styles"
+        cwd: '<%= yeoman.app %>/styles',
+        src: '*.less',
+        ext: '.css',
+        dest: '.tmp/styles'
       }
     },
 
@@ -437,6 +450,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'newer:jshint',
+    'coffeelint',
     'test',
     'build'
   ]);
