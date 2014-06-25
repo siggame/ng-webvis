@@ -53,6 +53,15 @@
         <![endif]-->
 
     <!-- Add your site or application content here -->
+    <div ng-controller="AlertCtrl as alertCtrl">
+      <alert ng-repeat="alert in alertCtrl.alert.getAlerts()"
+             ng-show="alert.isVisible()"
+             type="{{alert.type}}"
+             close="alert.hide()">
+        {{alert.message}}
+      </alert>
+    </div>
+
     <div class="container" ng-view=""></div>
 
     <!--[if lt IE 9]>
@@ -71,6 +80,7 @@
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/jquery-ui/ui/jquery-ui.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -80,6 +90,9 @@
     <script src="scripts/services/version.js"></script>
     <script src="scripts/controllers/navbar.js"></script>
     <script src="scripts/directives/slider.js"></script>
+    <script src="scripts/services/alert.js"></script>
+    <script src="scripts/controllers/alert.js"></script>
+    <script src="scripts/services/config.js"></script>
     <!-- endbuild -->
   </body>
 </html>
