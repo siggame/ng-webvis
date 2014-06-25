@@ -48,10 +48,23 @@ app.factory 'alert', ($timeout, $log, config) ->
         a = new Alert(message, type)
         a.hideAfter(config.alert.timeoutAfter)
         exports.alerts.push a
+        return a
 
-    # Shows in alert of type 'info'
+    # Shows an alert of type 'success'
+    exports.success = (message) ->
+        exports.alert(message, 'success')
+
+    # Shows an alert of type 'info'
     exports.info = (message) ->
         exports.alert(message, 'info')
+
+    # Shows an alert of type 'warning'
+    exports.warning = (message) ->
+        exports.alert(message, 'warning')
+
+    # Shows an alert of type 'error'
+    exports.error = (message) ->
+        exports.alert(message, 'danger')
 
     # return the created object
     return exports
