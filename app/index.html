@@ -53,10 +53,19 @@
         <![endif]-->
 
     <!-- Add your site or application content here -->
-    <div ng-controller="AlertCtrl">
-      <alert ng-repeat="alert in alertService.getAlerts()" ng-show="alert.isVisible()" type="{{alert.type}}" close="alert.hide()">{{alert.message}}</alert>
-      <button class='btn btn-default' ng-click="alertService.info('hullo')">Add Alert</button>
+    <div ng-controller="AlertCtrl as alertCtrl">
+      <alert ng-repeat="alert in alertCtrl.alert.getAlerts()"
+             ng-show="alert.isVisible()"
+             type="{{alert.type}}"
+             close="alert.hide()">
+        {{alert.message}}
+      </alert>
+      <button class='btn btn-default'
+              ng-click="alertCtrl.alert.info('hullo')">
+        Add Alert
+      </button>
     </div>
+
     <div class="container" ng-view=""></div>
 
     <!--[if lt IE 9]>
