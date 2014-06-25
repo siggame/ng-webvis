@@ -10,5 +10,9 @@ describe 'Service: config', ->
     beforeEach inject (_config_) ->
         config = _config_
 
-    it 'should do something', ->
-        expect(!!config).toBe true
+    it 'should have a version', ->
+        expect(!!config.version).toBe true
+
+    it 'should have an alert section', ->
+        expect(!!config.alert).toBe true
+        expect(!!config.alert.timeoutAfter).toBe true
