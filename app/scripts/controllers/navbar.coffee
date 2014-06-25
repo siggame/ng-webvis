@@ -2,5 +2,6 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.controller 'NavbarCtrl', ($scope, version) ->
-    $scope.version = version
+webvisApp.controller 'NavbarCtrl', (config) ->
+    @version = config.version
+    return this

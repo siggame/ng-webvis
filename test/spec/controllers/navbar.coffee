@@ -6,14 +6,12 @@ describe 'Controller: NavbarCtrl', ->
     beforeEach module 'webvisApp'
 
     NavbarCtrl = {}
-    scope = {}
 
     # Initialize the controller and a mock scope
-    beforeEach inject ($controller, $rootScope) ->
-        scope = $rootScope.$new()
+    beforeEach inject ($controller, config) ->
         NavbarCtrl = $controller 'NavbarCtrl', {
-            $scope: scope
+            config: config
         }
 
     it 'should attach "version" to the scope', ->
-        expect(scope.versoin).toExist
+        expect(NavbarCtrl.version).toBe "0.0.0"

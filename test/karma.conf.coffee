@@ -22,9 +22,7 @@ module.exports = (config) ->
             'app/bower_components/underscore/underscore.js',
             'app/bower_components/jquery/dist/jquery.js',
             'app/bower_components/jquery-ui/ui/jquery-ui.js',
-            'app/scripts/*.js',
-            'app/scripts/**/*.js',
-            'test/spec/**/*.js',
+            'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
             '.tmp/scripts/*.js',
             '.tmp/scripts/**/*.js',
             '.tmp/spec/**/*.js'
@@ -55,6 +53,7 @@ module.exports = (config) ->
 
         # Which plugins to enable
         plugins: [
+            'karma-coverage'
             'karma-phantomjs-launcher'
             'karma-jasmine'
         ]
@@ -67,7 +66,21 @@ module.exports = (config) ->
         # if true, it capture browsers, run tests and exit
         singleRun: false
 
+        # Use color
         colors: true
+
+        # Karma reports
+        reporters: ['progress', 'coverage']
+
+        coverageReporter:
+            type : 'html'
+            dir : 'coverage/'
+
+        # source files, that you wanna generate coverage for
+        # do not include tests or libraries
+        preprocessors:
+            # '**/.tmp/scripts/*.js': ['coverage']
+            '**/.tmp/scripts/**/*.js': ['coverage']
 
         # Uncomment the following lines if you are using grunt's
         # server to run the tests:

@@ -21,7 +21,7 @@
   </head>
 
   <body ng-app="webvisApp">
-    <div ng-controller="NavbarCtrl">
+    <div ng-controller="NavbarCtrl as navbar">
       <nav class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
           <!-- Brand and toggle get grouped for better mobile display -->
@@ -41,7 +41,7 @@
               <li><a href="#">Open</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a>Version {{ version }}</a></li>
+              <li><a>Version {{ navbar.version }}</a></li>
             </ul>
           </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
@@ -53,6 +53,15 @@
         <![endif]-->
 
     <!-- Add your site or application content here -->
+    <div ng-controller="AlertCtrl as alertCtrl">
+      <alert ng-repeat="alert in alertCtrl.alert.getAlerts()"
+             ng-show="alert.isVisible()"
+             type="{{alert.type}}"
+             close="alert.hide()">
+        {{alert.message}}
+      </alert>
+    </div>
+
     <div class="container" ng-view=""></div>
 
     <!--[if lt IE 9]>
@@ -71,16 +80,19 @@
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/jquery-ui/ui/jquery-ui.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/controllers/main.js"></script>
-    <script src="scripts/services/version.js"></script>
     <script src="scripts/controllers/navbar.js"></script>
     <script src="scripts/directives/slider.js"></script>
     <script src="scripts/directives/dropzone.js"></script>
+    <script src="scripts/services/alert.js"></script>
+    <script src="scripts/controllers/alert.js"></script>
+    <script src="scripts/services/config.js"></script>
     <!-- endbuild -->
   </body>
 </html>
