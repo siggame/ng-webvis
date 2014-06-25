@@ -6,14 +6,14 @@ describe 'Controller: AlertCtrl', ->
     beforeEach module 'webvisApp'
 
     AlertCtrl = {}
-    scope = {}
+    alertService = {}
 
     # Initialize the controller and a mock scope
-    beforeEach inject ($controller, $rootScope) ->
-        scope = $rootScope.$new()
+    beforeEach inject ($controller, $rootScope, alert) ->
+        alertService = alert
         AlertCtrl = $controller 'AlertCtrl', {
-            $scope: scope
+            $scope: $rootScope.$new()
         }
 
-    it 'should attach a list of awesomeThings to the scope', ->
-        expect(scope.awesomeThings.length).toBe 3
+    it 'should attach the alert service to itself', ->
+        expect(AlertCtrl.alert).toBe alertService
