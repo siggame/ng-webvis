@@ -23,9 +23,6 @@ module.exports = (config) ->
             'app/bower_components/jquery/dist/jquery.js',
             'app/bower_components/jquery-ui/ui/jquery-ui.js',
             'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-            'app/scripts/*.js',
-            'app/scripts/**/*.js',
-            'test/spec/**/*.js',
             '.tmp/scripts/*.js',
             '.tmp/scripts/**/*.js',
             '.tmp/spec/**/*.js'
