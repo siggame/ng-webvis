@@ -46,7 +46,7 @@ webvisApp.directive 'dropzone', ($log, alert) ->
             # Set up a callback that will be called when reader finishes
             reader.onload = (event) ->
                 file_contents = event.target.result
-                element.text file_contents
+                $log.debug file_contents
 
             # Start reading!
             reader.readAsText(file)
