@@ -10,8 +10,9 @@ webvisApp.directive 'slider', (alert)->
         $(inner_div).slider()
         $(inner_div).slider
             change: (event, ui) ->
-                console.log "Changed to #{ui.value}"
-                alert.info "Changed to #{ui.value}"
+                scope.$apply () ->
+                    console.log "Changed to #{ui.value}"
+                    alert.info "Changed to #{ui.value}"
 
             slide: (event, ui) ->
                 console.log "Sliding!"
