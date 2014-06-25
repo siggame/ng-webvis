@@ -4,7 +4,8 @@ webvisApp = angular.module('webvisApp', [
         'ngCookies',
         'ngResource',
         'ngSanitize',
-        'ngRoute'
+        'ngRoute',
+        'ui.bootstrap'
     ])
 
 webvisApp.config ($routeProvider) ->

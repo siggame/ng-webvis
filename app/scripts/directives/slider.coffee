@@ -2,7 +2,7 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.directive 'slider', ()->
+webvisApp.directive 'slider', (alert)->
     template: '<div></div>'
     restrict: 'E'
     link: (scope, element, attrs) ->
@@ -11,6 +11,7 @@ webvisApp.directive 'slider', ()->
         $(inner_div).slider
             change: (event, ui) ->
                 console.log "Changed to #{ui.value}"
+                alert.info "Changed to #{ui.value}"
 
             slide: (event, ui) ->
                 console.log "Sliding!"
