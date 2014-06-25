@@ -35,6 +35,13 @@ module.exports = function (grunt) {
         files: ['<%= yeoman.app %>/scripts/{,*/}*.{coffee,litcoffee,coffee.md}'],
         tasks: ['newer:coffee:dist']
       },
+      coffeelint: {
+        files: ['<%= yeoman.app %>/scripts/{,*/}*.{coffee,litcoffee,coffee.md}',
+                'test/{,*/}*.{coffee,litcoffee,coffee.md}',
+                'test/spec/{,*/}*.{coffee,litcoffee,coffee.md}'
+               ],
+        tasks: ['newer:coffeelint']
+      },
       coffeeTest: {
         files: ['test/spec/{,*/}*.{coffee,litcoffee,coffee.md}'],
         tasks: ['newer:coffee:test', 'karma']
