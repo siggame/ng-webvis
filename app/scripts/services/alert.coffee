@@ -9,21 +9,29 @@
 ###
 app = angular.module('webvisApp')
 
-class Alert
-    constructor: (message, type) ->
-        @message = message
-        @type = type
-        @visible = true
+app.factory 'alert', ($timeout, $log, config) ->
 
-    isVisible: () -> @visible
+    class Alert
+        constructor: (message, type) ->
+            @message = message
+            @type = type
+            do @show
 
-    hide: () -> @visible = false
+        toString: () ->
+            "(#{@type}) #{@message}"
 
-    show: () -> @visible = true
+        isVisible: () -> @visible
 
+        hide: () ->
+            $log.debug "Hiding #{@toString()}"
+            @visible = false
 
-app.factory 'alert', ($timeout) ->
-    console.log "Created alert factory"
+        show: () ->
+            $log.debug "Showing #{@toString()}"
+            @visible = true
+
+        hideAfter: (timeout) ->
+            $timeout (() => do @hide), timeout
 
     # The object we're creating with the factory
     exports = {}
@@ -37,9 +45,8 @@ app.factory 'alert', ($timeout) ->
 
     # Shows an alert of type 'type'
     exports.alert = (message, type) ->
-        console.log "Add alert (#{type}) #{message}"
         a = new Alert(message, type)
-        $timeout (() -> do a.hide), 2000
+        a.hideAfter(config.alert.timeoutAfter)
         exports.alerts.push a
 
     # Shows in alert of type 'info'
