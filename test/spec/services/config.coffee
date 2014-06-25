@@ -2,13 +2,13 @@
 
 describe 'Service: config', ->
 
-  # load the service's module
-  beforeEach module 'webvisApp'
+    # load the service's module
+    beforeEach module 'webvisApp'
 
-  # instantiate service
-  config = {}
-  beforeEach inject (_config_) ->
-    config = _config_
+    # instantiate service
+    config = {}
+    beforeEach inject (_config_) ->
+        config = _config_
 
-  it 'should do something', ->
-    expect(!!config).toBe true
+    it 'should do something', ->
+        expect(!!config).toBe true
