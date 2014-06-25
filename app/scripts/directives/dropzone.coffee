@@ -5,9 +5,16 @@ webvisApp = angular.module('webvisApp')
 goodLogName = (filename) ->
     /\.gamelog$/.test(filename)
 
-webvisApp.directive 'dropzone', () ->
+webvisApp.directive 'dropzone', ($log, alert) ->
     restrict: 'A'
     link: (scope, element) ->
+
+        # A helper function for showing errors
+        showError = (message) ->
+            scope.$apply ->
+                alert.error message
+            $log.warn message
+
         element.bind 'dragover', (event) ->
             event.stopPropagation()
             event.preventDefault()
@@ -18,22 +25,19 @@ webvisApp.directive 'dropzone', () ->
 
             files = event.originalEvent.dataTransfer.files
             if files.length != 1
-                # TODO Handle error
-                err = "Multiple files dropped"
-                console.log err
+                showError "Multiple files dropped"
                 return
 
             file = files[0]
             filename = escape file.name
 
-            console.log "Dropped #{filename} with type '#{file.type}'"
+            $log.info "Dropped #{filename} with type '#{file.type}'"
 
             if not goodLogName filename
-                err = "Bad file extension"
-                console.log err
+                showError "Bad file extension"
                 return
 
-            console.log("Extension looks ok. Ready to read gamelog")
+            $log.info "Extension looks ok. Ready to read gamelog"
 
             # TODO Trigger progress bar
 
