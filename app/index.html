@@ -20,7 +20,7 @@
     <!-- endbuild -->
   </head>
 
-  <body ng-app="webvisApp">
+  <body ng-app="webvisApp" dropzone>
     <div ng-controller="NavbarCtrl as navbar">
       <nav class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
@@ -38,7 +38,7 @@
           <!-- Collect the nav links, forms, and other content for toggling -->
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-              <li><a href="#">Open</a></li>
+              <li file-dialog>Open</li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li><a>Version {{ navbar.version }}</a></li>
@@ -89,9 +89,12 @@
     <script src="scripts/controllers/main.js"></script>
     <script src="scripts/controllers/navbar.js"></script>
     <script src="scripts/directives/slider.js"></script>
+    <script src="scripts/directives/dropzone.js"></script>
     <script src="scripts/services/alert.js"></script>
     <script src="scripts/controllers/alert.js"></script>
     <script src="scripts/services/config.js"></script>
+    <script src="scripts/directives/fileDialog.js"></script>
+    <script src="scripts/services/gamelog.js"></script>
     <!-- endbuild -->
   </body>
 </html>
