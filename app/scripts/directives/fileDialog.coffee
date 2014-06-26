@@ -2,13 +2,13 @@
 
 ###*
  # @ngdoc directive
- # @name webvisApp.directive:upload
+ # @name webvisApp.directive:fileDialog
  # @description
- # # upload
+ # # fileDialog
 ###
 webvisApp = angular.module('webvisApp')
 
-webvisApp.directive 'upload', ($log) ->
+webvisApp.directive 'fileDialog', ($log) ->
     restrict: 'A'
 
     template: "
