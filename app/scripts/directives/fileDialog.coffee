@@ -8,14 +8,14 @@
 ###
 webvisApp = angular.module('webvisApp')
 
-webvisApp.directive 'fileDialog', ($log) ->
+webvisApp.directive 'fileDialog', ($log, GameLog) ->
     restrict: 'A'
 
     template: "
         <a href>
             Open
         </a>
-        <form ng-submit='submit()' onsubmit='return false'>
+        <form onsubmit='return false'>
             <input style='display:none;' type='file' />
         </form>"
 
@@ -28,9 +28,5 @@ webvisApp.directive 'fileDialog', ($log) ->
 
         inputTag.change (event) ->
             $log.debug "Input changed"
-            formTag.submit()
+            GameLog.processFile event.target.files
             inputTag.val null
-
-    controller: ($scope, $log) ->
-        $scope.submit = () ->
-            $log.debug "Submit!"
