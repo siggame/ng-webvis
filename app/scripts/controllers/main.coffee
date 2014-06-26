@@ -3,8 +3,4 @@
 webvisApp = angular.module('webvisApp')
 
 webvisApp.controller 'MainCtrl', ($scope) ->
-    $scope.awesomeThings = [
-        'HTML5 Boilerplate'
-        'AngularJS'
-        'Karma'
-    ]
+    $scope.sliderValue = 0
