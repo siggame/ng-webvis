@@ -25,6 +25,18 @@ module.exports = function (grunt) {
       dist: 'dist'
     },
 
+    csslint: {
+      options: {
+        csslintrc: '.csslintrc',
+      },
+      strict: {
+        options: {
+          import: 2
+        },
+        src: ['.tmp/styles/*.css']
+      }
+    },
+
     // Watches files for changes and runs tasks based on the changed files
     watch: {
       bower: {
@@ -451,6 +463,7 @@ module.exports = function (grunt) {
   grunt.registerTask('default', [
     'newer:jshint',
     'coffeelint',
+    'csslint',
     'test',
     'build'
   ]);
