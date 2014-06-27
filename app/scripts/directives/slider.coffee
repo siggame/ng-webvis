@@ -2,27 +2,28 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.directive 'slider', ($log, alert)->
-    template: "
-        <div class='slider-container'>
-            <div class='slider'>
-            </div>
-            <div class='slider-value'>
-                {{ liveValue || 0 }}
-            </div>
-        </div>"
+webvisApp.directive 'slider', ($rootScope, $log, alert)->
+    template: '<div class="slider"></div>'
     restrict: 'E'
     scope:
-        value: '='
+        currentValue: '='
+        liveValue: '='
     link: (scope, element, attrs) ->
         inner_div = $(element).find(".slider")[0]
         $(inner_div).slider
             change: (event, ui) ->
                 $log.debug "Changed to #{ui.value}"
-                scope.$apply ->
-                    scope.value = ui.value
+                if not $rootScope.$$phase
+                    scope.$apply ->
+                        scope.currentValue = ui.value
 
             slide: (event, ui) ->
                 $log.debug "Sliding!"
-                scope.$apply ->
-                    scope.liveValue = ui.value
+                if not $rootScope.$$phase
+                    scope.$apply ->
+                        scope.liveValue = ui.value
+
+        scope.$watch 'currentValue', (newValue, oldValue) ->
+            $log.debug "currentValue changed to #{newValue}"
+            if newValue != oldValue
+                $(inner_div).slider "value", newValue
