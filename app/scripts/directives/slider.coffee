@@ -9,8 +9,11 @@ webvisApp.directive 'slider', ($rootScope, $log, alert)->
         currentValue: '='
         liveValue: '='
     link: (scope, element, attrs) ->
-        inner_div = $(element).find(".slider")[0]
-        $(inner_div).slider
+        slider = $(element).find(".slider")[0]
+
+        $(slider).slider
+            value: scope.currentValue
+
             change: (event, ui) ->
                 $log.debug "Changed to #{ui.value}"
                 if not $rootScope.$$phase
