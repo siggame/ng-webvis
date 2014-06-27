@@ -11,7 +11,7 @@ webvisApp = angular.module('webvisApp')
 
 webvisApp.controller 'PlaybackCtrl', ($scope, $log) ->
     @playing = false
-    @currentTurn = 20
+    @currentTurn = 0
 
     @isPlaying = -> @playing
 
