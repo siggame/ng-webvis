@@ -29,4 +29,4 @@ webvisApp.directive 'slider', ($rootScope, $log, alert)->
         scope.$watch 'currentValue', (newValue, oldValue) ->
             $log.debug "currentValue changed to #{newValue}"
             if newValue != oldValue
-                $(inner_div).slider "value", newValue
+                $(slider).slider "value", newValue
