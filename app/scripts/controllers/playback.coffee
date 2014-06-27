@@ -11,22 +11,19 @@ webvisApp = angular.module('webvisApp')
 
 webvisApp.controller 'PlaybackCtrl', ($scope, $log) ->
     @playing = false
+    @currentTurn = 20
 
     @isPlaying = -> @playing
 
     @stepBack = ->
-        $scope.currentTurn -= 1
-        $log.debug "Stepping back to #{$scope.currentTurn}"
+        @currentTurn -= 1
+        $log.debug "Stepping back to turn #{@currentTurn}"
 
     @stepForward = ->
-        $scope.currentTurn += 1
-        $log.debug "Stepping forward to #{$scope.currentTurn}"
+        @currentTurn += 1
+        $log.debug "Stepping forward to turn #{@currentTurn}"
 
     @playPause = ->
-        if @playing
-            $log.debug "Pausing"
-        else
-            $log.debug "Playing"
         @playing = not @playing
 
     return this
