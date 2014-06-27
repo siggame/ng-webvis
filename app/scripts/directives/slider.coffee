@@ -4,12 +4,12 @@ webvisApp = angular.module('webvisApp')
 
 webvisApp.directive 'slider', ($log, alert)->
     template: "
-        <div>
-            <div class='slider' style='width:90%'>
+        <div class='slider-container'>
+            <div class='slider'>
             </div>
-            <p class='value pull-right' style='width:10%'>
-                {{ liveValue }}
-            </p>
+            <div class='slider-value'>
+                {{ liveValue || 0 }}
+            </div>
         </div>"
     restrict: 'E'
     scope:
