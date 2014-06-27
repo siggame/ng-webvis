@@ -2,13 +2,13 @@
 
 describe 'Service: GameLog', ->
 
-  # load the service's module
-  beforeEach module 'webvisApp'
+    # load the service's module
+    beforeEach module 'webvisApp'
 
-  # instantiate service
-  GameLog = {}
-  beforeEach inject (_GameLog_) ->
-    GameLog = _GameLog_
+    # instantiate service
+    GameLog = {}
+    beforeEach inject (_GameLog_) ->
+        GameLog = _GameLog_
 
-  it 'should do something', ->
-    expect(!!GameLog).toBe true
+    it 'should do something', ->
+        expect(!!GameLog).toBe true
