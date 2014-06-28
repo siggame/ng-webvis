@@ -121,7 +121,7 @@ module.exports = function (grunt) {
       }
     },
 
-	// Make sure coffee styles are OK
+        // Make sure coffee styles are OK
     coffeelint: {
       options: {
         configFile: '.coffeelintrc'
@@ -135,7 +135,7 @@ module.exports = function (grunt) {
       }
     },
 
-	// Make sure css is free of lint
+        // Make sure css is free of lint
     csslint: {
       options: {
         csslintrc: '.csslintrc',
@@ -275,13 +275,6 @@ module.exports = function (grunt) {
       css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
       options: {
         assetsDirs: ['<%= yeoman.dist %>','<%= yeoman.dist %>/images'],
-        patterns: {
-          css: [
-            [/(\/bower_components\/bootstrap\/dist\/fonts)/g, 'fixing bootstrap fonts', function(match) {
-              return match.replace('/bower_components/bootstrap/dist/fonts', '../fonts');
-            }]
-          ]
-        }
       }
     },
 
@@ -371,6 +364,16 @@ module.exports = function (grunt) {
         }, {
           expand: true,
           cwd: 'bower_components/bootstrap/dist',
+          src: 'fonts/*',
+          dest: '<%= yeoman.dist %>/styles'
+        }, {
+          expand: true,
+          cwd: 'bower_components/jquery-ui/themes/smoothness',
+          src: 'images/*',
+          dest: '<%= yeoman.dist %>/styles'
+        }, {
+          expand: true,
+          cwd: 'bower_components/font-awesome',
           src: 'fonts/*',
           dest: '<%= yeoman.dist %>'
         }]
