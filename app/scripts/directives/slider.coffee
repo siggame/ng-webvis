@@ -3,13 +3,13 @@
 webvisApp = angular.module('webvisApp')
 
 webvisApp.directive 'slider', ($rootScope, $log, alert)->
-    template: '<div class="slider"></div>'
+    template: '<div></div>'
     restrict: 'E'
     scope:
         currentValue: '='
         liveValue: '='
     link: (scope, element, attrs) ->
-        slider = $(element).find(".slider")[0]
+        slider = $(element).find("div")[0]
 
         $(slider).slider
             value: scope.currentValue
