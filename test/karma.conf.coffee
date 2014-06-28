@@ -23,7 +23,9 @@ module.exports = (config) ->
             'bower_components/angular-touch/angular-touch.js'
             'bower_components/underscore/underscore.js'
             'bower_components/jquery/dist/jquery.js'
-            'bower_components/jquery-ui/ui/jquery-ui.js'
+            'bower_components/jquery-ui/ui/widget.js'
+            'bower_components/jquery-ui/ui/mouse.js'
+            'bower_components/jquery-ui/ui/slider.js'
             'bower_components/angular-bootstrap/ui-bootstrap-tpls.js'
             'app/scripts/**/*.coffee'
             'test/mock/**/*.coffee'
@@ -82,7 +84,7 @@ module.exports = (config) ->
         # source files, that you wanna generate coverage for
         # do not include tests or libraries
         preprocessors:
-            '**/*.coffee': ['coffee']
+            'test/**/*.coffee': ['coffee']
             'app/scripts/**/*.coffee': ['coverage']
 
         # Uncomment the following lines if you are using grunt's
