@@ -18,10 +18,9 @@ webvisApp.service 'GameLog', ($rootScope, $log, alert) ->
     goodLogName = (filename) ->
         /\.gamelog$/.test(filename)
 
-    @processFile = (files) ->
+    checkFiles = (files) ->
         if files.length != 1
-            showError "Multiple files dropped"
-            return
+            throw message: "Multiple files dropped"
 
         file = files[0]
         filename = escape file.name
@@ -29,11 +28,11 @@ webvisApp.service 'GameLog', ($rootScope, $log, alert) ->
         $log.info "Dropped #{filename} with type '#{file.type}'"
 
         if not goodLogName filename
-            showError "Bad file extension"
-            return
+            throw message: "Bad file extension"
 
-        $log.info "Extension looks ok. Ready to read gamelog"
+        return file
 
+    processFile = (file) ->
         # TODO Trigger progress bar
 
         reader = new FileReader()
@@ -45,5 +44,13 @@ webvisApp.service 'GameLog', ($rootScope, $log, alert) ->
 
         # Start reading!
         reader.readAsText(file)
+
+    @loadFile = (files) ->
+        try
+            file = checkFiles files
+            $log.info "Extension looks ok. Ready to read gamelog"
+            processFile file
+        catch error
+            showError error.message
 
     return this

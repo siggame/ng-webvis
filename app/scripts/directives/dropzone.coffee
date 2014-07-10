@@ -14,4 +14,4 @@ webvisApp.directive 'dropzone', ($log, alert, GameLog) ->
             event.stopPropagation()
             event.preventDefault()
 
-            GameLog.processFile event.originalEvent.dataTransfer.files
+            GameLog.loadFile event.originalEvent.dataTransfer.files
