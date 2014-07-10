@@ -6,6 +6,7 @@ webvisApp.directive 'slider', ($rootScope, $log, alert)->
     template: '<div></div>'
     restrict: 'E'
     scope:
+        maxValue: '='
         currentValue: '='
         liveValue: '='
     link: (scope, element, attrs) ->
@@ -13,6 +14,8 @@ webvisApp.directive 'slider', ($rootScope, $log, alert)->
 
         $(slider).slider
             value: scope.currentValue
+
+            max: scope.maxValue
 
             change: (event, ui) ->
                 $log.debug "Changed to #{ui.value}"
