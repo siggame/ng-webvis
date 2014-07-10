@@ -7,7 +7,8 @@
  # # GameLog
  # Service in the webvisApp.
 ###
-GameLogService = ($rootScope, $log, alert) ->
+webvisApp = angular.module('webvisApp')
+webvisApp.service 'GameLog', ($rootScope, $log, alert) ->
     # A helper function for showing errors
     showError = (message) ->
         $rootScope.$apply ->
@@ -46,7 +47,3 @@ GameLogService = ($rootScope, $log, alert) ->
         reader.readAsText(file)
 
     return this
-
-
-webvisApp = angular.module('webvisApp')
-webvisApp.service 'GameLog', GameLogService

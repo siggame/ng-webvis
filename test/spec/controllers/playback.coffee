@@ -1,16 +1,16 @@
 'use strict'
 
-describe 'Controller: MainCtrl', ->
+describe 'Controller: PlaybackCtrl', ->
 
     # load the controller's module
     beforeEach module 'webvisApp'
 
-    MainCtrl = {}
+    PlaybackCtrl = {}
     scope = {}
 
     # Initialize the controller and a mock scope
     beforeEach inject ($controller, $rootScope) ->
         scope = $rootScope.$new()
-        MainCtrl = $controller 'MainCtrl', {
+        PlaybackCtrl = $controller 'PlaybackCtrl', {
             $scope: scope
         }

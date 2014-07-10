@@ -2,15 +2,15 @@
 
 describe 'Directive: upload', ->
 
-  # load the directive's module
-  beforeEach module 'webvisApp'
+    # load the directive's module
+    beforeEach module 'webvisApp'
 
-  scope = {}
+    scope = {}
 
-  beforeEach inject ($controller, $rootScope) ->
-    scope = $rootScope.$new()
+    beforeEach inject ($controller, $rootScope) ->
+        scope = $rootScope.$new()
 
-  it 'should make hidden element visible', inject ($compile) ->
-    element = angular.element '<upload></upload>'
-    element = $compile(element) scope
-    expect(element.text()).toBe 'this is the upload directive'
+    it 'should not contain text', inject ($compile) ->
+        element = angular.element '<upload></upload>'
+        element = $compile(element) scope
+        expect(element.text()).toBe ''
