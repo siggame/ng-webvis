@@ -11,6 +11,7 @@ webvisApp = angular.module('webvisApp')
 
 webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
     @currentTurn = Game.currentTurn
+    @maxTurn = Game.maxTurn
 
     @isPlaying = -> Game.playing
 
