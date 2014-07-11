@@ -11,5 +11,4 @@ describe 'Service: Game', ->
         Game = _Game_
 
     it 'should have a minimum turn of zero turns', ->
-        console.log Game
         expect(Game.minTurn).toBe 0
