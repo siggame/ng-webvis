@@ -9,33 +9,29 @@
 ###
 webvisApp = angular.module('webvisApp')
 
-webvisApp.controller 'PlaybackCtrl', ($scope, $log) ->
-    @minTurn = 0
-    @maxTurn = 150
+webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
+    @currentTurn = Game.currentTurn
 
-    @playing = false
-    @currentTurn = 0
-
-    @isPlaying = -> @playing
+    @isPlaying = -> Game.playing
 
     @stepBack = ->
-        if @currentTurn > @minTurn
+        if @currentTurn > Game.minTurn
             @currentTurn -= 1
             $log.debug "Stepping back to turn #{@currentTurn}"
         else
-            @currentTurn = @minTurn
+            @currentTurn = Game.minTurn
             $log.debug "Remaining at turn #{@currentTurn}"
 
     @stepForward = ->
-        if @currentTurn < @maxTurn
+        if @currentTurn < Game.maxTurn
             @currentTurn += 1
             $log.debug "Stepping forward to turn #{@currentTurn}"
         else
-            @currentTurn = @maxTurn
+            @currentTurn = Game.maxTurn
             $log.debug "Remaining at turn #{@currentTurn}"
 
 
     @playPause = ->
-        @playing = not @playing
+        Game.playing = not Game.playing
 
     return this
