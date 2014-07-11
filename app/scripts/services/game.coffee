@@ -8,9 +8,6 @@ webvisApp.service 'Game',() ->
     @playing = false
     @currentTurn = 0
 
-    @getTurn = () -> @currentTurn
-    @setTurn = (val) -> @currentTurn = val
-
-    @isPlaying = () -> @playing
+    @setLog = (log) -> null
 
     return this
