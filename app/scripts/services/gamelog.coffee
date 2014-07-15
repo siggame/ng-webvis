@@ -8,7 +8,7 @@
  # Service in the webvisApp.
 ###
 webvisApp = angular.module('webvisApp')
-webvisApp.service 'GameLog', ($rootScope, $log, alert, Game) ->
+webvisApp.service 'GameLog', ($rootScope, $log, alert, Game, Parser) ->
     # A helper function for showing errors
     showError = (message) ->
         $rootScope.$apply ->
@@ -33,8 +33,9 @@ webvisApp.service 'GameLog', ($rootScope, $log, alert, Game) ->
         return file
 
     fileLoaded = (event) ->
+        $log.debug "File loaded"
         file_contents = event.target.result
-        $log.debug file_contents
+        $log.debug Parser.SexpParser.parse file_contents
 
     processFile = (file) ->
         # TODO Trigger progress bar
