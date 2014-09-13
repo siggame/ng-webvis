@@ -27,6 +27,6 @@ webvisApp.directive 'fileDialog', ($log, GameLog) ->
             inputTag.click()
 
         inputTag.change (event) ->
-            $log.debug "Input changed"
+            $log.debug "File dialog input changed"
             GameLog.loadFile event.target.files
             inputTag.val null
