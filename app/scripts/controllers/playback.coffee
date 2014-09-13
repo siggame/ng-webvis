@@ -14,6 +14,9 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
     @maxTurn = Game.maxTurn
 
     @isPlaying = -> Game.playing
+    @getCurrentTurn = -> Game.currentTurn
+    @getMaxTurn = -> Game.maxTurn
+
 
     @stepBack = ->
         if @currentTurn > Game.minTurn

@@ -33,3 +33,8 @@ webvisApp.directive 'slider', ($rootScope, $log, alert)->
             $log.debug "currentValue changed to #{newValue}"
             if newValue != oldValue
                 $(slider).slider "value", newValue
+
+        scope.$watch 'maxValue', (newValue, oldValue) ->
+            $log.debug "maxValue changed to #{newValue}"
+            if newValue != oldValue
+                $(slider).slider "option", "max", newValue
