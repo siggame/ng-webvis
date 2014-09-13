@@ -2,7 +2,7 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.directive 'dropzone', ($log, alert, GameLog) ->
+webvisApp.directive 'dropzone', ($log, alert, FileLoader) ->
     restrict: 'A'
     link: (scope, element) ->
 
@@ -14,4 +14,4 @@ webvisApp.directive 'dropzone', ($log, alert, GameLog) ->
             event.stopPropagation()
             event.preventDefault()
 
-            GameLog.loadFile event.originalEvent.dataTransfer.files
+            FileLoader.loadFile event.originalEvent.dataTransfer.files

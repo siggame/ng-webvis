@@ -2,13 +2,13 @@
 
 ###*
  # @ngdoc service
- # @name webvisApp.GameLog
+ # @name webvisApp.FileLoader
  # @description
- # # GameLog
+ # # FileLoader
  # Service in the webvisApp.
 ###
 webvisApp = angular.module('webvisApp')
-webvisApp.service 'GameLog', ($rootScope, $log, alert, Game, Parser) ->
+webvisApp.service 'FileLoader', ($rootScope, $log, alert, Game, Parser) ->
     # A helper function for showing errors
     showError = (message) ->
         $rootScope.$apply ->

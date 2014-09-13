@@ -8,7 +8,7 @@
 ###
 webvisApp = angular.module('webvisApp')
 
-webvisApp.directive 'fileDialog', ($log, GameLog) ->
+webvisApp.directive 'fileDialog', ($log, FileLoader) ->
     restrict: 'A'
 
     template: "
@@ -28,5 +28,5 @@ webvisApp.directive 'fileDialog', ($log, GameLog) ->
 
         inputTag.change (event) ->
             $log.debug "File dialog input changed"
-            GameLog.loadFile event.target.files
+            FileLoader.loadFile event.target.files
             inputTag.val null
