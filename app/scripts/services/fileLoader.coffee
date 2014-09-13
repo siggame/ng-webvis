@@ -8,7 +8,7 @@
  # Service in the webvisApp.
 ###
 webvisApp = angular.module('webvisApp')
-webvisApp.service 'FileLoader', ($rootScope, $log, alert, Game, Parser) ->
+webvisApp.service 'FileLoader', ($rootScope, $log, alert, Game) ->
     # A helper function for showing errors
     showError = (message) ->
         $rootScope.$apply ->
@@ -32,18 +32,15 @@ webvisApp.service 'FileLoader', ($rootScope, $log, alert, Game, Parser) ->
 
         return file
 
-    fileLoaded = (event) ->
-        $log.debug "File loaded"
-        file_contents = event.target.result
-        $log.debug Parser.SexpParser.parse file_contents
-
     processFile = (file) ->
         # TODO Trigger progress bar
 
         reader = new FileReader()
 
         # Set up a callback that will be called when reader finishes
-        reader.onload = fileLoaded
+        reader.onload = (event) ->
+            $log.debug "File read"
+            Game.fileLoaded event.target.result
 
         # Start reading!
         reader.readAsText(file)
