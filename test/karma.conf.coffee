@@ -1,7 +1,7 @@
 # Karma configuration
 # http://karma-runner.github.io/0.12/config/configuration-file.html
-# Generated on 2014-06-27 using
-# generator-karma 0.8.2
+# Generated on 2014-06-03 using
+# generator-karma 0.8.1
 
 module.exports = (config) ->
     config.set
@@ -27,9 +27,9 @@ module.exports = (config) ->
             'bower_components/jquery-ui/ui/mouse.js'
             'bower_components/jquery-ui/ui/slider.js'
             'bower_components/angular-bootstrap/ui-bootstrap-tpls.js'
-            'app/scripts/**/*.coffee'
-            'test/mock/**/*.coffee'
-            'test/spec/**/*.coffee'
+            '.tmp/scripts/*.js'
+            '.tmp/scripts/**/*.js'
+            '.tmp/spec/**/*.js'
         ]
 
         # list of files / patterns to exclude
@@ -57,10 +57,8 @@ module.exports = (config) ->
 
         # Which plugins to enable
         plugins: [
-            'karma-coverage'
             'karma-phantomjs-launcher'
             'karma-jasmine'
-            'karma-coffee-preprocessor'
         ]
 
         # enable / disable watching file and executing tests whenever
@@ -71,21 +69,7 @@ module.exports = (config) ->
         # if true, it capture browsers, run tests and exit
         singleRun: false
 
-        # Use color
         colors: true
-
-        # Karma reports
-        reporters: ['progress', 'coverage']
-
-        coverageReporter:
-            type : 'html'
-            dir : 'coverage/'
-
-        # source files, that you wanna generate coverage for
-        # do not include tests or libraries
-        preprocessors:
-            'test/**/*.coffee': ['coffee']
-            'app/scripts/**/*.coffee': ['coverage']
 
         # Uncomment the following lines if you are using grunt's
         # server to run the tests:
