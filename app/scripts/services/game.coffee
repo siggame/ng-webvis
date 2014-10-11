@@ -30,8 +30,15 @@ webvisApp.service 'Game', ($rootScope, $log, Parser) ->
             $log.error "Game doesn't have a plugin!"
             return
 
-        gameLog = Parser.SexpParser.parse logfile
+        parser = Parser[@plugin.getParserMethod()]
+        if not parser?
+            $log.error "Parser not provided"
+            return
+
+        gameLog = parser.parse logfile
+        @currentTurn = 0
         @maxTurn = gameLog.turns.length
+        @playing = false
 
         entities = _(@plugin.processLog gamelog)
 
