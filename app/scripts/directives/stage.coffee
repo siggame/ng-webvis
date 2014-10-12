@@ -12,7 +12,6 @@ webvisApp.directive 'stage', ($log, Renderer) ->
     template: ''
     restrict: 'E'
     link: (scope, element, attrs) ->
-        $log.info attrs
         width = attrs['width']
         height = attrs['height']
 
