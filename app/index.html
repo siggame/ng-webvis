@@ -25,25 +25,12 @@
         <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-    <!-- Add your site or application content here -->
-    <div ng-controller="AlertCtrl as alertCtrl">
-      <alert ng-repeat="alert in alertCtrl.alert.getAlerts()"
-             ng-show="alert.isVisible()"
-             type="{{alert.type}}"
-             close="alert.hide()">
-        {{alert.message}}
-      </alert>
-    </div>
+    <div ng-include="'partials/alerts.html'"></div>
 
     <div class="container">
       <div class="row">
         <div class="col-xs-3">
-          <ul class="nav navbar-nav">
-            <li file-dialog>Open</li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a>Version {{ navbar.version }}</a></li>
-          </ul>
+          <div ng-include="'partials/navbar.html'"></div>
         </div>
         <div class="col-xs-9">
           <div ng-view=""></div>

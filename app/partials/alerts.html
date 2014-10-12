@@ -1,0 +1,8 @@
+<div ng-controller="AlertCtrl as alertCtrl">
+  <alert ng-repeat="alert in alertCtrl.alert.getAlerts()"
+         ng-show="alert.isVisible()"
+         type="{{alert.type}}"
+         close="alert.hide()">
+    {{alert.message}}
+  </alert>
+</div>

@@ -7,45 +7,7 @@
       </div>
     </div>
 
-    <!-- Playback controls -->
-    <div class="row playback-container well well-sm" ng-controller="PlaybackCtrl as playback">
-      <div class="col-xs-12">
-        <div class="row">
-          <div class="col-xs-12">
-            <slider max-value="playback.getMaxTurn()" current-value="playback.currentTurn" live-value="liveValue"></slider>
-          </div>
+    <div ng-include="'partials/playback.html'"></div>
 
-          <br>
-
-          <div class="col-xs-12">
-            <div class="btn-toolbar playback-buttons">
-              <div class="btn-group playback-controls">
-
-                <!-- Step back button -->
-                <button class="btn btn-default" ng-click="playback.stepBack()">
-                  <i class="fa fa-backward"></i>
-                </button>
-
-                <!-- Play/pause buttons -->
-                <button class="btn btn-default" ng-click="playback.playPause()">
-                  <span ng-hide="playback.isPlaying()"><i class="fa fa-play"></i></span>
-                  <span ng-show="playback.isPlaying()"><i class="fa fa-pause"></i></span>
-                </button>
-
-                <!-- Step forward button -->
-                <button class="btn btn-default" ng-click="playback.stepForward()">
-                  <i class="fa fa-forward"></i>
-                </button>
-              </div>
-
-              <!-- Current turn display -->
-              <div class="btn btn-default slider-value pull-right">
-                {{ playback.currentTurn || 0 }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
