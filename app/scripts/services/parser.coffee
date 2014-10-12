@@ -33,6 +33,7 @@ webvisApp.factory 'Parser', ->
             log = @loadFile(file_contents)
 
             return {
+                fileContents: file_contents
                 gameID: @getGameID(log)
                 gameName: @getGameName(log)
                 turns: @getTurns(log)
