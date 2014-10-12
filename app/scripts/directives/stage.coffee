@@ -19,4 +19,4 @@ webvisApp.directive 'stage', ($log, Game) ->
         element.append renderer.view
 
         Game.setRenderer renderer
-        Renderer.start()
+        Game.start()
