@@ -8,6 +8,7 @@ webvisApp.service 'Game', ($rootScope, $log, Parser) ->
     @playing = false
     @currentTurn = 0
     @playbackSpeed = 1
+    @renderer = null
 
     @entities = null
 
@@ -18,12 +19,42 @@ webvisApp.service 'Game', ($rootScope, $log, Parser) ->
     @getPlaybackSpeed = () -> @playbackSpeed
 
     @getEntities = () -> @entities
+    
+    @isPlaying = () -> @playing
 
     @setPlugin = (plugin) ->
         @plugin = plugin
 
     @setTurn = (turnNum) ->
         @currentTurn = turnNum
+
+    @start = () ->
+        lastAnimate = new Date()
+        @lastAnimateTime = lastAnimate.getTime
+        requestAnimationFrame @animate
+        
+    @animate = () ->
+        if Game.isPlaying()
+            @updateTime
+        entities = do @getEntities
+        entities.each (entity) ->
+            entity.draw @getCurrentTurn(), @turnProgress
+
+        @turnProgress += @getPlaybackSpeed()
+        requestAnimationFrame @animate
+        
+    @setRenderer = (element) ->
+        @renderer = element
+        
+    @updateTime = () ->
+        currentDate = new Date()
+        currentTime = currentDate.getTime
+        curTurn = @getCurrentTurn + @turnProgress
+        dtSeconds = (currentTime - @lastAnimateTime)/1000
+        curTurn += @getPlaybackSpeed * dtSeconds  
+        Game.setTurn(window.parseInt(curTurn))
+        turnProgress = curTurn - window.parseInt(curTurn)
+        @lastAnimateTime = currentTime
 
     @fileLoaded = (logfile) ->
         if not @plugin?
