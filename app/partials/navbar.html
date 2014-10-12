@@ -1,11 +1,9 @@
-<div ng-controller="NavbarCtrl as navbar">
+<div ng-controller="NavbarCtrl as navbar" class="text-center">
   <h2> {{ navbar.gameName }} </h2>
-  <div class="container-fluid">
-    <ul class="nav navbar-nav">
-      <li file-dialog>Open</li>
-    </ul>
-    <ul class="nav navbar-nav navbar-right">
-      <li><a>Version {{ navbar.version }}</a></li>
-    </ul>
+  <h4 class="text-muted">{{ navbar.version }}</h4>
+  <div class="btn-group btn-group-justified">
+    <div class="btn-group btn-group-vertical">
+      <button file-dialog class="btn btn-primary">Open</button>
+    </div>
   </div>
 </div>
