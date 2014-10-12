@@ -2,7 +2,7 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.service 'Game', ($rootScope, $log, Parser) ->
+webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin) ->
     @minTurn = 0
     @maxTurn = 0
     @playing = false
@@ -11,16 +11,11 @@ webvisApp.service 'Game', ($rootScope, $log, Parser) ->
 
     @entities = null
 
-    @plugin = null
-
     @getCurrentTurn = () -> @currentTurn
 
     @getPlaybackSpeed = () -> @playbackSpeed
 
     @getEntities = () -> @entities
-
-    @setPlugin = (plugin) ->
-        @plugin = plugin
 
     @setTurn = (turnNum) ->
         @currentTurn = turnNum

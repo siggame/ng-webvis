@@ -7,6 +7,11 @@
  # # droids
  # Service in the webvisApp.
 ###
-angular.module('webvisApp')
-  .service 'Droids', ->
-    # AngularJS will instantiate a singleton by calling "new" on this function
+webvisApp = angular.module('webvisApp')
+webvisApp.service 'Plugin', (PluginBase)->
+
+    class Droids extends PluginBase.BasePlugin
+
+        getName: () -> "Droids"
+
+    return new Droids
