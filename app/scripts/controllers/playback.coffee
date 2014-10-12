@@ -17,7 +17,6 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
     @getCurrentTurn = -> Game.currentTurn
     @getMaxTurn = -> Game.maxTurn
 
-
     @stepBack = ->
         if @currentTurn > Game.minTurn
             @currentTurn -= 1
@@ -37,5 +36,6 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
 
     @playPause = ->
         Game.playing = not Game.playing
+        
 
     return this
