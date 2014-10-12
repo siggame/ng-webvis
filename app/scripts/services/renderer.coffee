@@ -11,12 +11,16 @@ webvisApp = angular.module('webvisApp')
 
 webvisApp.service 'Renderer', (Game)->
     @turnProgress = 0
+    @renderer = null
 
     @getCurrentTurn = () -> Game.getCurrentTurn()
 
     @getPlaybackSpeed = () -> Game.getPlaybackSpeed()
 
     @getEntities = () -> Game.getEntities()
+
+    @setRenderer = (element) ->
+        @renderer = element
 
     @start = () ->
         requestAnimationFrame @animate
