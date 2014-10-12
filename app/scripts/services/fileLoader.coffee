@@ -2,13 +2,13 @@
 
 ###*
  # @ngdoc service
- # @name webvisApp.GameLog
+ # @name webvisApp.FileLoader
  # @description
- # # GameLog
+ # # FileLoader
  # Service in the webvisApp.
 ###
 webvisApp = angular.module('webvisApp')
-webvisApp.service 'GameLog', ($rootScope, $log, alert) ->
+webvisApp.service 'FileLoader', ($rootScope, $log, alert, Game) ->
     # A helper function for showing errors
     showError = (message) ->
         $rootScope.$apply ->
@@ -39,8 +39,8 @@ webvisApp.service 'GameLog', ($rootScope, $log, alert) ->
 
         # Set up a callback that will be called when reader finishes
         reader.onload = (event) ->
-            file_contents = event.target.result
-            $log.debug file_contents
+            $log.debug "File read"
+            Game.fileLoaded event.target.result
 
         # Start reading!
         reader.readAsText(file)

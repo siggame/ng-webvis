@@ -20,6 +20,7 @@ webvisApp.config ($routeProvider) ->
     $routeProvider.when '/',
         templateUrl: 'views/main.html'
         controller: 'MainCtrl'
+        controllerAs: 'main'
 
     $routeProvider.otherwise
         redirectTo: '/'

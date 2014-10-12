@@ -3,7 +3,7 @@
 
     <div class="row">
       <div class="col-xs-12">
-        <h1>chesssss</h1>
+        <stage width="800" height="600"></stage>
       </div>
     </div>
 
@@ -12,7 +12,7 @@
       <div class="col-xs-12">
         <div class="row">
           <div class="col-xs-12">
-            <slider max-value="playback.maxTurn" current-value="playback.currentTurn" live-value="liveValue"></slider>
+            <slider max-value="playback.getMaxTurn()" current-value="playback.currentTurn" live-value="liveValue"></slider>
           </div>
 
           <br>
@@ -23,7 +23,6 @@
 
                 <!-- Step back button -->
                 <button class="btn btn-default" ng-click="playback.stepBack()">
-                  <!-- small button if the screen is large -->
                   <i class="fa fa-backward"></i>
                 </button>
 
@@ -48,6 +47,5 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
