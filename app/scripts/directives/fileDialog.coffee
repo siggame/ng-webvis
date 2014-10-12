@@ -11,20 +11,21 @@ webvisApp = angular.module('webvisApp')
 webvisApp.directive 'fileDialog', ($log, FileLoader) ->
     restrict: 'A'
 
-    template: "
-        <a href>
-            Open
-        </a>
+    transclude: true
+
+    template: "<div ng-transclude> </div>
         <form onsubmit='return false'>
             <input style='display:none;' type='file' />
         </form>"
 
     link: (scope, element) ->
-        anchorTag = $(element).find("a")
         formTag = $(element).find("form")
         inputTag = formTag.find("input[type='file']")
-        anchorTag.bind 'click', (event) ->
+        $(element).bind 'click', (event) ->
             inputTag.click()
+
+        inputTag.click (event) ->
+            event.stopPropagation()
 
         inputTag.change (event) ->
             $log.debug "File dialog input changed"
