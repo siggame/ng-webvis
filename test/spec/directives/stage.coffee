@@ -11,6 +11,6 @@ describe 'Directive: Stage', ->
         scope = $rootScope.$new()
 
     it 'should make hidden element visible', inject ($compile) ->
-        element = angular.element '<stage></stage>'
+        element = '<div id="parent"><stage></stage></div>'
         element = $compile(element) scope
         expect(element.text()).toBe ''
