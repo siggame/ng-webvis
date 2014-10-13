@@ -54,9 +54,9 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
     @fileLoaded = (logfile) =>
         gameLog = Plugin.parse logfile
         @currentTurn = 0
-        @maxTurn = gameLog.turns.length
         @playing = false
 
-        entities = _(@plugin.processLog gamelog)
+        @maxTurn = _(Plugin.getEntities gameLog)
+        @entities = _(Plugin.getEntities gameLog)
 
     return this

@@ -46,11 +46,15 @@ webvisApp.factory 'PluginBase', ->
         getName: () ->
             throw new PluginError("getName not implemented")
 
-        getParserMethod: () ->
-            throw new PluginError("getParsemethod not implemented")
+        getMaxTurn: () ->
+            throw new PluginError("getMaxTurns not implemented")
 
-        processLog: () ->
-            throw new PluginError("processLog not implemented")
+        getEntities: (gameLog) ->
+            throw new PluginError("getEntities not implemented")
+
+        parse: (logFile) ->
+            throw new PluginError("parse not implemented")
+
 
     return {
         BaseEntity: BaseEntity
