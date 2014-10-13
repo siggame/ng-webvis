@@ -9,6 +9,7 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
     @currentTurn = 0
     @playbackSpeed = 1
     @renderer = null
+    @stage = null
 
     @entities = _([])
 
@@ -29,6 +30,8 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
         requestAnimationFrame @animate
 
     @animate = () =>
+        requestAnimationFrame @animate
+
         if @isPlaying()
             @updateTime
         entities = @getEntities()
@@ -36,7 +39,8 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
             entity.draw @getCurrentTurn(), @turnProgress
 
         @turnProgress += @getPlaybackSpeed()
-        requestAnimationFrame @animate
+
+        if @stage then @renderer.render @stage
 
     @setRenderer = (element) ->
         @renderer = element
@@ -57,6 +61,10 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
         @playing = false
 
         @maxTurn = _(Plugin.getEntities gameLog)
+
+        @stage = new PIXI.Stage(0x66FF99)
         @entities = _(Plugin.getEntities gameLog)
+        @entities.each (entity) =>
+            @stage.addChild entity.getSprite()
 
     return this

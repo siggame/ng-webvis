@@ -18,6 +18,9 @@ webvisApp.factory 'PluginBase', ->
     class BaseEntity
         constructor: () ->
 
+        getSprite: () ->
+            throw new PluginError("getSprite not implemented")
+
         getAnimations: () ->
             throw new PluginError("getAnimations not implemented")
 
