@@ -10,7 +10,7 @@ webvisApp.service 'Game', ($rootScope, $log, Parser) ->
     @playbackSpeed = 1
     @renderer = null
 
-    @entities = null
+    @entities = _([])
 
     @plugin = null
 
@@ -19,7 +19,7 @@ webvisApp.service 'Game', ($rootScope, $log, Parser) ->
     @getPlaybackSpeed = () -> @playbackSpeed
 
     @getEntities = () -> @entities
-    
+
     @isPlaying = () -> @playing
 
     @setPlugin = (plugin) ->
@@ -32,26 +32,26 @@ webvisApp.service 'Game', ($rootScope, $log, Parser) ->
         lastAnimate = new Date()
         @lastAnimateTime = lastAnimate.getTime
         requestAnimationFrame @animate
-        
-    @animate = () ->
-        if Game.isPlaying()
+
+    @animate = () =>
+        if @isPlaying()
             @updateTime
-        entities = do @getEntities
+        entities = @getEntities()
         entities.each (entity) ->
             entity.draw @getCurrentTurn(), @turnProgress
 
         @turnProgress += @getPlaybackSpeed()
         requestAnimationFrame @animate
-        
+
     @setRenderer = (element) ->
         @renderer = element
-        
+
     @updateTime = () ->
         currentDate = new Date()
         currentTime = currentDate.getTime
         curTurn = @getCurrentTurn + @turnProgress
         dtSeconds = (currentTime - @lastAnimateTime)/1000
-        curTurn += @getPlaybackSpeed * dtSeconds  
+        curTurn += @getPlaybackSpeed * dtSeconds
         Game.setTurn(window.parseInt(curTurn))
         turnProgress = curTurn - window.parseInt(curTurn)
         @lastAnimateTime = currentTime
