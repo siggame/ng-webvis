@@ -31,13 +31,11 @@ webvisApp.factory 'PluginBase', ->
 
 
     class Animation
-        constructor: () ->
+        constructor: (@startTurn, @endTurn, @animate) ->
 
-        getStartTurn: () ->
-            throw new PluginError("getStartTurn not implemented")
+        getStartTurn: () -> @startTurn
 
-        getEndTurn: () ->
-            throw new PluginError("getEndTurn not implemented")
+        getEndTurn: () -> @endTurn
 
         animate: (turn, progress) ->
             throw new PluginError("animate not implemented")
