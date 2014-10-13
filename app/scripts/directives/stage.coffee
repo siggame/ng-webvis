@@ -28,7 +28,7 @@ webvisApp.directive 'stage', ($log, $window, Game) ->
 
             oH = window.outerHeight(true)
             h = window.height()
-            pH = $('.playback-container').outerHeight(true) + 5
+            pH = 88
             newHeight = 2 * h - oH - pH
 
             # Set the new width and height
