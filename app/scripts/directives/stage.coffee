@@ -22,9 +22,14 @@ webvisApp.directive 'stage', ($log, $window, Game) ->
         resizeRendererView = () ->
             # Calculate new width and height
             # TODO: Don't hard-code height of playback controls
+            window = angular.element($window)
+
             newWidth = element.parent().width()
-            playbackHeight = $('.playback-container').outerHeight(true)
-            newHeight = angular.element($window).height() - playbackHeight
+
+            oH = window.outerHeight(true)
+            h = window.height()
+            pH = $('.playback-container').outerHeight(true) + 5
+            newHeight = 2 * h - oH - pH
 
             # Set the new width and height
             renderer.view.style.width = "#{newWidth}px"
