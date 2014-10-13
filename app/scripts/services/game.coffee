@@ -2,17 +2,16 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.service 'Game', ($rootScope, $log, Parser) ->
+webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
     @minTurn = 0
     @maxTurn = 0
     @playing = false
     @currentTurn = 0
     @playbackSpeed = 1
     @renderer = null
+    @stage = null
 
     @entities = _([])
-
-    @plugin = null
 
     @getCurrentTurn = () -> @currentTurn
 
@@ -21,9 +20,6 @@ webvisApp.service 'Game', ($rootScope, $log, Parser) ->
     @getEntities = () -> @entities
 
     @isPlaying = () -> @playing
-
-    @setPlugin = (plugin) ->
-        @plugin = plugin
 
     @setTurn = (turnNum) ->
         @currentTurn = turnNum
@@ -34,19 +30,22 @@ webvisApp.service 'Game', ($rootScope, $log, Parser) ->
         requestAnimationFrame @animate
 
     @animate = () =>
+        requestAnimationFrame @animate
+
         if @isPlaying()
             @updateTime
         entities = @getEntities()
-        entities.each (entity) ->
+        entities.each (entity) =>
             entity.draw @getCurrentTurn(), @turnProgress
 
         @turnProgress += @getPlaybackSpeed()
-        requestAnimationFrame @animate
+
+        if @stage then @renderer.render @stage
 
     @setRenderer = (element) ->
         @renderer = element
 
-    @updateTime = () ->
+    @updateTime = () =>
         currentDate = new Date()
         currentTime = currentDate.getTime
         curTurn = @getCurrentTurn + @turnProgress
@@ -56,21 +55,16 @@ webvisApp.service 'Game', ($rootScope, $log, Parser) ->
         turnProgress = curTurn - window.parseInt(curTurn)
         @lastAnimateTime = currentTime
 
-    @fileLoaded = (logfile) ->
-        if not @plugin?
-            $log.error "Game doesn't have a plugin!"
-            return
-
-        parser = Parser[@plugin.getParserMethod()]
-        if not parser?
-            $log.error "Parser not provided"
-            return
-
-        gameLog = parser.parse logfile
+    @fileLoaded = (logfile) =>
+        gameLog = Plugin.parse logfile
         @currentTurn = 0
-        @maxTurn = gameLog.turns.length
         @playing = false
 
-        entities = _(@plugin.processLog gamelog)
+        @maxTurn = _(Plugin.getEntities gameLog)
+
+        @stage = new PIXI.Stage(0x66FF99)
+        @entities = _(Plugin.getEntities gameLog)
+        @entities.each (entity) =>
+            @stage.addChild entity.getSprite()
 
     return this

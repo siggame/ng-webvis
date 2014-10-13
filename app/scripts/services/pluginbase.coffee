@@ -18,6 +18,9 @@ webvisApp.factory 'PluginBase', ->
     class BaseEntity
         constructor: () ->
 
+        getSprite: () ->
+            throw new PluginError("getSprite not implemented")
+
         getAnimations: () ->
             throw new PluginError("getAnimations not implemented")
 
@@ -28,13 +31,11 @@ webvisApp.factory 'PluginBase', ->
 
 
     class Animation
-        constructor: () ->
+        constructor: (@startTurn, @endTurn, @animate) ->
 
-        getStartTurn: () ->
-            throw new PluginError("getStartTurn not implemented")
+        getStartTurn: () -> @startTurn
 
-        getEndTurn: () ->
-            throw new PluginError("getEndTurn not implemented")
+        getEndTurn: () -> @endTurn
 
         animate: (turn, progress) ->
             throw new PluginError("animate not implemented")
@@ -46,11 +47,15 @@ webvisApp.factory 'PluginBase', ->
         getName: () ->
             throw new PluginError("getName not implemented")
 
-        getParserMethod: () ->
-            throw new PluginError("getParsemethod not implemented")
+        getMaxTurn: () ->
+            throw new PluginError("getMaxTurns not implemented")
 
-        processLog: () ->
-            throw new PluginError("processLog not implemented")
+        getEntities: (gameLog) ->
+            throw new PluginError("getEntities not implemented")
+
+        parse: (logFile) ->
+            throw new PluginError("parse not implemented")
+
 
     return {
         BaseEntity: BaseEntity
