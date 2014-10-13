@@ -32,7 +32,7 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
         if @isPlaying()
             @updateTime
         entities = @getEntities()
-        entities.each (entity) ->
+        entities.each (entity) =>
             entity.draw @getCurrentTurn(), @turnProgress
 
         @turnProgress += @getPlaybackSpeed()
@@ -41,7 +41,7 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
     @setRenderer = (element) ->
         @renderer = element
 
-    @updateTime = () ->
+    @updateTime = () =>
         currentDate = new Date()
         currentTime = currentDate.getTime
         curTurn = @getCurrentTurn + @turnProgress
