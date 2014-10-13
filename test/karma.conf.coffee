@@ -27,6 +27,7 @@ module.exports = (config) ->
             'bower_components/jquery-ui/ui/mouse.js'
             'bower_components/jquery-ui/ui/slider.js'
             'bower_components/angular-bootstrap/ui-bootstrap-tpls.js'
+            'bower_components/pixi.js/bin/pixi.js'
             '.tmp/scripts/*.js'
             '.tmp/scripts/**/*.js'
             '.tmp/spec/**/*.js'

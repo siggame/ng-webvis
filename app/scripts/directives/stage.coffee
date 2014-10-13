@@ -8,7 +8,7 @@
 ###
 webvisApp = angular.module('webvisApp')
 
-webvisApp.directive 'stage', ($log, Renderer) ->
+webvisApp.directive 'stage', ($log, Game) ->
     template: ''
     restrict: 'E'
     link: (scope, element, attrs) ->
@@ -18,4 +18,5 @@ webvisApp.directive 'stage', ($log, Renderer) ->
         renderer = PIXI.autoDetectRenderer(width, height)
         element.append renderer.view
 
-        Renderer.setRenderer renderer
+        Game.setRenderer renderer
+        Game.start()

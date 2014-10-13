@@ -2,14 +2,17 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin) ->
+webvisApp.service 'Game', ($rootScope, $log, Parser) ->
     @minTurn = 0
     @maxTurn = 0
     @playing = false
     @currentTurn = 0
     @playbackSpeed = 1
+    @renderer = null
 
-    @entities = null
+    @entities = _([])
+
+    @plugin = null
 
     @getCurrentTurn = () -> @currentTurn
 
@@ -17,8 +20,41 @@ webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin) ->
 
     @getEntities = () -> @entities
 
+    @isPlaying = () -> @playing
+
+    @setPlugin = (plugin) ->
+        @plugin = plugin
+
     @setTurn = (turnNum) ->
         @currentTurn = turnNum
+
+    @start = () ->
+        lastAnimate = new Date()
+        @lastAnimateTime = lastAnimate.getTime
+        requestAnimationFrame @animate
+
+    @animate = () =>
+        if @isPlaying()
+            @updateTime
+        entities = @getEntities()
+        entities.each (entity) ->
+            entity.draw @getCurrentTurn(), @turnProgress
+
+        @turnProgress += @getPlaybackSpeed()
+        requestAnimationFrame @animate
+
+    @setRenderer = (element) ->
+        @renderer = element
+
+    @updateTime = () ->
+        currentDate = new Date()
+        currentTime = currentDate.getTime
+        curTurn = @getCurrentTurn + @turnProgress
+        dtSeconds = (currentTime - @lastAnimateTime)/1000
+        curTurn += @getPlaybackSpeed * dtSeconds
+        Game.setTurn(window.parseInt(curTurn))
+        turnProgress = curTurn - window.parseInt(curTurn)
+        @lastAnimateTime = currentTime
 
     @fileLoaded = (logfile) ->
         if not @plugin?
