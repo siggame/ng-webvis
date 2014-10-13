@@ -43,6 +43,9 @@ webvisApp.factory 'PluginBase', ->
     class BasePlugin
         constructor: () ->
 
+        getName: () ->
+            throw new PluginError("getName not implemented")
+
         getParserMethod: () ->
             throw new PluginError("getParsemethod not implemented")
 
