@@ -83,7 +83,7 @@ webvisApp.factory 'Parser', ->
             turns = gameLog[1..gameLog.length-2]
             prepareObj = (statusList, animationList) =>
                 status: @toObj(turns[i][1..(turns[i].length - 1)])
-                animations: turns[i+1][1..(turns[i].length - 1)]
+                animations: turns[i+1][1..(turns[i+1].length - 1)]
 
             for i in [0..(turns.length - 1)] by 2
                 prepareObj(turns[i], turns[i+1]) 
