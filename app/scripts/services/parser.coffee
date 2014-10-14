@@ -82,10 +82,11 @@ webvisApp.factory 'Parser', ->
         getTurns: (gameLog) ->
             turns = gameLog[1..gameLog.length-2]
             prepareObj = (statusList, animationList) =>
-                status: @toObj(turns[i][1..])
-                animations: turns[i+1][1..]
+                status: @toObj(turns[i][1..(turns[i].length - 1)])
+                animations: turns[i+1][1..(turns[i+1].length - 1)]
 
-            prepareObj(turns[i], turns[i+1]) for i in [0..(turns.length/2)] by 2
+            for i in [0..(turns.length - 1)] by 2
+                prepareObj(turns[i], turns[i+1]) 
 
         toObj: (sexp) ->
             game = _(sexp).find((x) -> x[0] == "game")
