@@ -10,6 +10,7 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
     @playbackSpeed = 1
     @renderer = null
     @stage = null
+    @turnProgress = 0
 
     @entities = _([])
 
@@ -18,27 +19,33 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
     @getPlaybackSpeed = () -> @playbackSpeed
 
     @getEntities = () -> @entities
+    
+    @getWidth = () -> @stage.width
+
+    @getHeight = () -> @stage.height
 
     @isPlaying = () -> @playing
 
     @setTurn = (turnNum) ->
         @currentTurn = turnNum
+        
+    @setMaxTurns = (maxTurn) ->
+        @maxTurn = maxTurn
 
     @start = () ->
         lastAnimate = new Date()
-        @lastAnimateTime = lastAnimate.getTime
+        @lastAnimateTime = lastAnimate.getTime()
         requestAnimationFrame @animate
 
     @animate = () =>
         requestAnimationFrame @animate
 
         if @isPlaying()
-            @updateTime
+            @updateTime()
+            
         entities = @getEntities()
         entities.each (entity) =>
             entity.draw @getCurrentTurn(), @turnProgress
-
-        @turnProgress += @getPlaybackSpeed()
 
         if @stage then @renderer.render @stage
 
@@ -47,12 +54,15 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
 
     @updateTime = () =>
         currentDate = new Date()
-        currentTime = currentDate.getTime
-        curTurn = @getCurrentTurn + @turnProgress
+        currentTime = currentDate.getTime()
+        curTurn = @getCurrentTurn() + @turnProgress
+        $log.info "#{@getCurrentTurn()} and #{@turnProgress}"
         dtSeconds = (currentTime - @lastAnimateTime)/1000
-        curTurn += @getPlaybackSpeed * dtSeconds
-        Game.setTurn(window.parseInt(curTurn))
-        turnProgress = curTurn - window.parseInt(curTurn)
+        
+        curTurn += @getPlaybackSpeed() * dtSeconds
+        @setTurn(window.parseInt(curTurn))
+        
+        @turnProgress = curTurn - @getCurrentTurn()
         @lastAnimateTime = currentTime
 
     @fileLoaded = (logfile) =>
@@ -60,10 +70,12 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
         @currentTurn = 0
         @playing = false
 
-        @maxTurn = _(Plugin.getEntities gameLog)
-
+        @setMaxTurns(gameLog.states.length) 
+        
         @stage = new PIXI.Stage(0x66FF99)
+        Plugin.setDimensions @stage.width, @stage.height
         @entities = _(Plugin.getEntities gameLog)
+        
         @entities.each (entity) =>
             @stage.addChild entity.getSprite()
 
