@@ -10,11 +10,11 @@
 webvisApp = angular.module('webvisApp')
 
 webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
-    @currentTurn = Game.currentTurn
+    @currentTurn = Game.getCurrentTurn()
     @maxTurn = Game.maxTurn
 
-    @isPlaying = -> Game.playing
-    @getCurrentTurn = -> Game.currentTurn
+    @isPlaying = -> Game.isPlaying()
+    @getCurrentTurn = -> Game.getCurrentTurn()
     @getMaxTurn = -> Game.maxTurn
 
     @stepBack = ->
@@ -35,7 +35,11 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
 
 
     @playPause = ->
+        $log.info "Play/Pause Pressed"
         Game.playing = not Game.playing
+        if(Game.isPlaying())
+            lastAnimate = new Date()
+            Game.lastAnimateTime = lastAnimate.getTime()
         
 
     return this

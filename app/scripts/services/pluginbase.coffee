@@ -9,7 +9,7 @@
 ###
 webvisApp = angular.module('webvisApp')
 
-webvisApp.factory 'PluginBase', ->
+webvisApp.factory 'PluginBase', ($log) ->
 
     class PluginError
         constructor: (@msg) ->
@@ -27,7 +27,10 @@ webvisApp.factory 'PluginBase', ->
         draw: (turnNum, turnProgress) ->
             animations = _(@getAnimations())
             animations.each (anim) ->
-                anim.animate turnNum, turnProgress
+                if anim.getStartTurn() < turnNum + turnProgress and 
+                    anim.getEndTurn() > turnNum + turnProgress
+                        $log.info "anim being called"
+                        anim.animate turnNum, turnProgress
 
 
     class Animation
@@ -40,6 +43,15 @@ webvisApp.factory 'PluginBase', ->
         animate: (turn, progress) ->
             throw new PluginError("animate not implemented")
 
+    class Sprite extends PIXI.Sprite
+        constructor: (texture) ->
+            super(texture)
+            @zOrder = 0
+            
+    class TilingSprite extends PIXI.TilingSprite
+        constructor: (texture) ->
+            super(texture)
+            @zOrder = 0
 
     class BasePlugin
         constructor: () ->
@@ -52,6 +64,9 @@ webvisApp.factory 'PluginBase', ->
 
         getEntities: (gameLog) ->
             throw new PluginError("getEntities not implemented")
+            
+        getZOrder: () ->
+            throw new PluginError("getZOrder not implemented")
 
         parse: (logFile) ->
             throw new PluginError("parse not implemented")
@@ -60,5 +75,7 @@ webvisApp.factory 'PluginBase', ->
     return {
         BaseEntity: BaseEntity
         Animation: Animation
+        Sprite: Sprite
+        TilingSprite: TilingSprite
         BasePlugin: BasePlugin
     }

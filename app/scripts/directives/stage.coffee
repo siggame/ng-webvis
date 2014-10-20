@@ -32,8 +32,9 @@ webvisApp.directive 'stage', ($log, $window, Game) ->
             newHeight = 2 * h - oH - pH
 
             # Set the new width and height
-            renderer.view.style.width = "#{newWidth}px"
-            renderer.view.style.height = "#{newHeight}px"
+            renderer.resize(newWidth, newHeight);
+            
+            Game.rendererResized()
 
         do resizeRendererView
 
