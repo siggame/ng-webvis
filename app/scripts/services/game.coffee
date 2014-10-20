@@ -68,11 +68,18 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
             worldMat.ty = 0;
             @stage.worldTransform = worldMat;
 
+    @getWidth = () -> @stage.width
+
+    @getHeight = () -> @stage.height
+
     @isPlaying = () -> @playing
 
     @setTurn = (turnNum) ->
         @currentTurn = turnNum
         
+    @setMaxTurns = (maxTurn) ->
+        @maxTurn = maxTurn
+
     @setMaxTurns = (maxTurn) ->
         @maxTurn = maxTurn
 
@@ -86,11 +93,11 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
 
         if @isPlaying()
             @updateTime()
-            
+
         entities = @getEntities()
         for id, entity of entities
             entity.draw @getCurrentTurn(), @turnProgress
-            
+
         if @stage then @renderer.render @stage
 
     @setRenderer = (element) ->

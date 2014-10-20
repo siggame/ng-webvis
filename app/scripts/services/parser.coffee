@@ -86,7 +86,7 @@ webvisApp.factory 'Parser', ->
                 animations: turns[i+1][1..(turns[i+1].length - 1)]
 
             for i in [0..(turns.length - 1)] by 2
-                prepareObj(turns[i], turns[i+1]) 
+                prepareObj(turns[i], turns[i+1])
 
         toObj: (sexp) ->
             game = _(sexp).find((x) -> x[0] == "game")
