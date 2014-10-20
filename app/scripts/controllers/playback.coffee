@@ -10,30 +10,26 @@
 webvisApp = angular.module('webvisApp')
 
 webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
-    @currentTurn = Game.getCurrentTurn()
-    @maxTurn = Game.maxTurn
+    @currentTurn = Game.currentTurn
+    @maxTurn = Game.getMaxTurn()
+    @minTurn = Game.getMinTurn()
 
     @isPlaying = -> Game.isPlaying()
     @getCurrentTurn = -> Game.getCurrentTurn()
-    @getMaxTurn = -> Game.maxTurn
+    @getMaxTurn = -> Game.getMaxTurn()
 
     @stepBack = ->
-        if @currentTurn > Game.minTurn
-            @currentTurn -= 1
-            $log.debug "Stepping back to turn #{@currentTurn}"
+        if Game.getCurrentTurn() > Game.getMinTurn()
+            Game.setCurrentTurn(Game.getCurrentTurn() - 1)
         else
-            @currentTurn = Game.minTurn
-            $log.debug "Remaining at turn #{@currentTurn}"
+            Game.setCurrentTurn(Game.getMinTurn())
 
     @stepForward = ->
-        if @currentTurn < Game.maxTurn
-            @currentTurn += 1
-            $log.debug "Stepping forward to turn #{@currentTurn}"
+        if Game.getCurrentTurn() < Game.getMaxTurn()
+            Game.setCurrentTurn(Game.getCurrentTurn() + 1)
         else
-            @currentTurn = Game.maxTurn
-            $log.debug "Remaining at turn #{@currentTurn}"
-
-
+            Game.setCurrentTurn(Game.getMaxTurn())
+        
     @playPause = ->
         $log.info "Play/Pause Pressed"
         Game.playing = not Game.playing

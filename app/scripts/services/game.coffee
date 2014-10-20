@@ -48,6 +48,14 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
     @turnProgress = 0
 
     @getCurrentTurn = () -> @currentTurn
+    
+    @setCurrentTurn = (t) -> 
+        @turnProgress = 0
+        @currentTurn = t
+
+    @getMaxTurn = () -> @maxTurn
+    
+    @getMinTurn = () -> @minTurn
 
     @getPlaybackSpeed = () -> @playbackSpeed
 
@@ -56,6 +64,17 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
     @getWidth = () -> @renderer.width
 
     @getHeight = () -> @renderer.height
+
+    @setTurn = (turnNum) ->
+        @currentTurn = turnNum
+        
+    @setMaxTurns = (maxTurn) ->
+        @maxTurn = maxTurn
+
+    @setMinTurns = (minTurn) ->
+        @minTurn = minTurn
+        
+    @isPlaying = () -> @playing
 
     @rendererResized = () =>
         if @renderer != null
@@ -67,21 +86,6 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
             worldMat.tx = 0;
             worldMat.ty = 0;
             @stage.worldTransform = worldMat;
-
-    @getWidth = () -> @stage.width
-
-    @getHeight = () -> @stage.height
-
-    @isPlaying = () -> @playing
-
-    @setTurn = (turnNum) ->
-        @currentTurn = turnNum
-        
-    @setMaxTurns = (maxTurn) ->
-        @maxTurn = maxTurn
-
-    @setMaxTurns = (maxTurn) ->
-        @maxTurn = maxTurn
 
     @start = () ->
         lastAnimate = new Date()
