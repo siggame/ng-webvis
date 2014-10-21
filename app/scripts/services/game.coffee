@@ -2,49 +2,14 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
-    class GameStage extends PIXI.Stage
-        constructor: (backgroundColor) ->
-            super(backgroundColor)
-        
-        addChild: (child) =>
-            if child.parent
-                child.parent.removeChild child
-                
-            child.parent = this
-            
-            if this.stage
-                child.setStageReference this.Stage
-        
-            if(@children.length == 0)
-                @children.push child
-            else
-                index = 0
-                while index < @children.length and 
-                    child.zOrder < @children[index].zOrder
-                        index++
-                @children.splice(index, 0, child)
-                    
-        addChildAt: (child) ->
-            throw {Error: "Not aloud to add a child without z ordering"}
-
-        swapChildren: (child, child2) ->
-            throw {Error: "Children must be sorted by z order"}
-            
-        _renderWebGL: (renderSession) ->
-            super(renderSession)
-            
-        _renderCanvas: (renderSession) ->
-            super(renderSession)
-            
-
+webvisApp.service 'Game', ($rootScope, $log, Plugin, Renderer) ->      
     @minTurn = 0
     @maxTurn = 0
     @playing = false
     @currentTurn = 0
     @playbackSpeed = 1
     @renderer = null
-    @stage = null
+    @gameLoaded = false
     @turnProgress = 0
 
     @getCurrentTurn = () -> @currentTurn
@@ -60,10 +25,6 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
     @getPlaybackSpeed = () -> @playbackSpeed
 
     @getEntities = () -> Plugin.entities
-    
-    @getWidth = () -> @renderer.width
-
-    @getHeight = () -> @renderer.height
 
     @setTurn = (turnNum) ->
         @currentTurn = turnNum
@@ -73,19 +34,11 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
 
     @setMinTurns = (minTurn) ->
         @minTurn = minTurn
+
+    @createRenderer = (canvas) ->
+        @renderer = new Renderer.CanvasRenderer(canvas, 20, 20)
         
     @isPlaying = () -> @playing
-
-    @rendererResized = () =>
-        if @renderer != null
-            worldMat = new PIXI.Matrix
-            worldMat.a = @renderer.width/Plugin.getWorldWidth()
-            worldMat.b = 0;
-            worldMat.c = 0;
-            worldMat.d = @renderer.height/Plugin.getWorldHeight()
-            worldMat.tx = 0;
-            worldMat.ty = 0;
-            @stage.worldTransform = worldMat;
 
     @start = () ->
         lastAnimate = new Date()
@@ -95,18 +48,15 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
     @animate = () =>
         requestAnimationFrame @animate
 
-        if @isPlaying()
+        if @isPlaying() and @gameLoaded
             @updateTime()
 
         entities = @getEntities()
         for id, entity of entities
             entity.draw @getCurrentTurn(), @turnProgress
 
-        if @stage then @renderer.render @stage
-
-    @setRenderer = (element) ->
-        @renderer = element
-
+        if @gameLoaded and @renderer != null
+            @renderer.draw()
 
     @updateTime = () =>
         currentDate = new Date()
@@ -125,16 +75,8 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin) ->
         
         @currentTurn = 0
         @playing = false
-
-        @setMaxTurns(gameLog.states.length) 
         
-        @stage = new GameStage(0x66FF99)
-        
-        @rendererResized()
-        
-        @entities = _(Plugin.getEntities gameLog)
-        
-        @entities.each (entity) =>
-            @stage.addChild entity.getSprite()
+        @setMaxTurns(gameLog.states.length)
+        @gameLoaded = true
 
     return this

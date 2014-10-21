@@ -43,16 +43,6 @@ webvisApp.factory 'PluginBase', ($log) ->
         animate: (turn, progress) ->
             throw new PluginError("animate not implemented")
 
-    class Sprite extends PIXI.Sprite
-        constructor: (texture) ->
-            super(texture)
-            @zOrder = 0
-            
-    class TilingSprite extends PIXI.TilingSprite
-        constructor: (texture) ->
-            super(texture)
-            @zOrder = 0
-
     class BasePlugin
         constructor: () ->
 
@@ -75,7 +65,5 @@ webvisApp.factory 'PluginBase', ($log) ->
     return {
         BaseEntity: BaseEntity
         Animation: Animation
-        Sprite: Sprite
-        TilingSprite: TilingSprite
         BasePlugin: BasePlugin
     }
