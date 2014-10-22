@@ -13,11 +13,31 @@ Renderer = {}
 Renderer.AssetManager = class AssetManager
     constructor: () ->
         @textures = {}
+        @sheetData = {}
         
     loadTexture: (fileName) ->
-        # if the texture doesn't exist in @textures then load it
-        # and then return the texture
-        # else just return the texture
+        img = document.createElement 'img'
+        img.src = fileName
+        @textures[fileName] = img
+        baseUrl = window.location.href.replace("/#/", "/")
+        u = baseUrl + fileName.replace(".png", ".json")
+        $.ajax({
+            dataType: "json"
+            url: u,
+            data: null,
+            success: (data) =>
+                @sheetData[fileName] = data
+            })
+            
+    loadTextures: (fileNames) ->
+        for filename in fileNames
+            @loadTexture filename
+            
+    getTexture: (fileName) ->
+        return @textures[fileName]
+    
+    getSheetData: (fileName) ->
+        return @sheetData[fileName]
 
 Renderer.Point = class Point
     constructor: (x, y, z) ->
@@ -93,6 +113,7 @@ Renderer.Color = class Color
 Renderer.Sprite = class Sprite
     constructor: () ->
         @texture = null
+        @frame = 0
         @position = new Point
         @anchor = new Point
         @width = 0.0
@@ -132,7 +153,10 @@ Renderer.BaseRenderer = class BaseRenderer
     resizeWorld: (worldWidth, worldHeight) ->
         throw {errorStr: "Function not implemented"}
  
-    setColor: (color) ->
+    begin: (color) ->
+        throw {errorStr: "Function not implemented"}
+    
+    drawLine: (line, color) ->
         throw {errorStr: "Function not implemented"}
     
     drawSprite: (sprite) ->
@@ -155,12 +179,90 @@ Renderer.CanvasRenderer = class CanvasRenderer extends
             @Projection.set(1, 1, 1/@worldHeight)
             @Projection.set(0, 0, 1/@worldWidth)
             @Projection.set(1, 1, 1/@worldHeight)
+            @AssetManager = new Renderer.AssetManager
             
         resizeWorld: (@worldWidth, @worldHeight) ->
-           
-        setColor: (color) ->   
+            
+        begin: (color) ->
+            @canvas.width = @canvas.width
             
         drawSprite: (sprite) ->
+            t = null
+            if sprite.texture != null
+                t = @AssetManager.getTexture sprite.texture
+                
+            if t?
+                sheetData = @AssetManager.getSheetData sprite.texture
+                if !sheetData?
+                    u = sprite.texCoords.x * t.width
+                    v = sprite.texCoords.y * t.height
+                    uWidth = sprite.texWidth * t.width
+                    vHeight = sprite.texHeight * t.height
+                else
+                    spriteResX = t.width / sheetData.width
+                    spriteResY = t.height / sheetData.height
+                    row = parseInt(sprite.frame / sheetData.width)
+                    column = sprite.frame % sheetData.width
+                    u = (column * spriteResX) + 
+                        (sprite.texCoords.x * spriteResX)
+                    v = (row * spriteResY) + 
+                        (sprite.texCoords.y * spriteResY)
+                    uWidth = (spriteResX * sprite.texWidth) - 1
+                    vHeight = (spriteResY * sprite.texHeight) - 1
+                
+                x = @Projection.get(0, 0) * sprite.position.x +
+                    @Projection.get(1, 0) * sprite.position.y +
+                    @Projection.get(2, 0) * sprite.position.z
+                
+                y = @Projection.get(0, 1) * sprite.position.x +
+                    @Projection.get(1, 1) * sprite.position.y +
+                    @Projection.get(2, 1) * sprite.position.z
+                
+                w = @Projection.get(0, 0) * sprite.width +
+                    @Projection.get(1, 0) * sprite.height +
+                    @Projection.get(2, 0) * 0
+                    
+                h = @Projection.get(0, 1) * sprite.width +
+                    @Projection.get(1, 1) * sprite.height +
+                    @Projection.get(2, 1) * 0
+                    
+                x = Math.round(x * @canvas.width)
+                y = Math.round(y * @canvas.height)
+                w = Math.round(w * @canvas.width)
+                h = Math.round(h * @canvas.height)
+                    
+                @context.drawImage t, u, v, uWidth, vHeight,
+                    x, y, w, h
+
+        drawLine: (line) ->
+            @context.beginPath()
+            @context.strokeStyle = "#000000"
+            @context.lineWidth = "1"
+            
+            x1 = @Projection.get(0, 0) * line.p1.x +
+                @Projection.get(1, 0) * line.p1.y +
+                @Projection.get(2, 0) * line.p1.z 
+                
+            y1 = @Projection.get(0, 1) * line.p1.x +
+                @Projection.get(1, 1) * line.p1.y +
+                @Projection.get(2, 1) * line.p1.z
+                
+            x2 = @Projection.get(0, 0) * line.p2.x +
+                @Projection.get(1, 0) * line.p2.y +
+                @Projection.get(2, 0) * line.p2.z 
+                
+            y2 = @Projection.get(0, 1) * line.p2.x +
+                @Projection.get(1, 1) * line.p2.y +
+                @Projection.get(2, 1) * line.p2.z
+            
+            x1 = parseInt(x1 * @canvas.width) + 0.5
+            y1 = parseInt(y1 * @canvas.height) + 0.5
+            x2 = parseInt(x2 * @canvas.width) + 0.5
+            y2 = parseInt(y2 * @canvas.height) + 0.5
+            
+            @context.moveTo x1, y1 
+            @context.lineTo x2, y2
+            @context.stroke()
 
         drawPath: (path) ->
         
@@ -178,7 +280,7 @@ Renderer.CanvasRenderer = class CanvasRenderer extends
                 @Projection.get(1, 1) * rect.position.y +
                 @Projection.get(2, 1) * rect.position.z
             
-            w = @Projection.get(0,0) * rect.width +
+            w = @Projection.get(0, 0) * rect.width +
                 @Projection.get(1, 0) * rect.height +
                 @Projection.get(2, 0) * 0
                 
@@ -201,6 +303,7 @@ Renderer.CanvasRenderer = class CanvasRenderer extends
 Renderer.WebGLRenderer = class WebGLRenderer extends 
     Renderer.BaseRenderer
         constructor: (@canvas, @worldWidth, @worldHeight, experimental) ->
+            @AssetManager = new Renderer.AssetManager
             @Projection = new Matrix4x4
             @Projection.set(0,0, 2/@width)
             @Projection.set(1,1, 2/@height)
