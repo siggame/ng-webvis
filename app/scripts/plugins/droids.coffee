@@ -14,4 +14,9 @@ webvisApp.service 'Plugin', (PluginBase)->
 
         getName: () -> "Droids"
 
+        getEntities: () ->
+
+        parse: (logFile) ->
+            throw new P
+
     return new Droids

@@ -14,12 +14,8 @@ webvisApp.factory 'PluginBase', ($log) ->
     class PluginError
         constructor: (@msg) ->
 
-
     class BaseEntity
         constructor: () ->
-
-        getSprite: () ->
-            throw new PluginError("getSprite not implemented")
 
         getAnimations: () ->
             throw new PluginError("getAnimations not implemented")
@@ -27,7 +23,7 @@ webvisApp.factory 'PluginBase', ($log) ->
         draw: (turnNum, turnProgress) ->
             animations = _(@getAnimations())
             animations.each (anim) ->
-                if anim.getStartTurn() < turnNum + turnProgress and 
+                if anim.getStartTurn() < turnNum + turnProgress and
                     anim.getEndTurn() > turnNum + turnProgress
                         $log.info "anim being called"
                         anim.animate turnNum, turnProgress
@@ -52,11 +48,8 @@ webvisApp.factory 'PluginBase', ($log) ->
         getMaxTurn: () ->
             throw new PluginError("getMaxTurns not implemented")
 
-        getEntities: (gameLog) ->
+        getEntities: () ->
             throw new PluginError("getEntities not implemented")
-            
-        getZOrder: () ->
-            throw new PluginError("getZOrder not implemented")
 
         parse: (logFile) ->
             throw new PluginError("parse not implemented")
