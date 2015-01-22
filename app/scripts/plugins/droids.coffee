@@ -8,7 +8,7 @@
  # Service in the webvisApp.
 ###
 webvisApp = angular.module('webvisApp')
-webvisApp.service 'Plugin', (PluginBase)->
+webvisApp.service 'Plugin', (PluginBase, Renderer)->
 
     class Droids extends PluginBase.BasePlugin
 

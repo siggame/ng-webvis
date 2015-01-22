@@ -2,7 +2,7 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.service 'Game', ($rootScope, $log, Plugin, Renderer) ->      
+webvisApp.service 'Game', ($rootScope, $log, Plugin, Renderer) ->
     @minTurn = 0
     @maxTurn = 0
     @playing = false
@@ -13,13 +13,13 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin, Renderer) ->
     @turnProgress = 0
 
     @getCurrentTurn = () -> @currentTurn
-    
-    @setCurrentTurn = (t) -> 
+
+    @setCurrentTurn = (t) ->
         @turnProgress = 0
         @currentTurn = t
 
     @getMaxTurn = () -> @maxTurn
-    
+
     @getMinTurn = () -> @minTurn
 
     @getPlaybackSpeed = () -> @playbackSpeed
@@ -28,7 +28,7 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin, Renderer) ->
 
     @setTurn = (turnNum) ->
         @currentTurn = turnNum
-        
+
     @setMaxTurns = (maxTurn) ->
         @maxTurn = maxTurn
 
@@ -37,7 +37,15 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin, Renderer) ->
 
     @createRenderer = (canvas) ->
         @renderer = new Renderer.CanvasRenderer(canvas, 20, 20)
-        
+        col = new Renderer.Color(0, 0, 0, 255)
+        console.log "yo"
+        @renderer.setClearColor(col)
+        @renderer.begin()
+
+    @canvasResized = (newWidth, newHeight) ->
+        if @renderer?
+            @renderer.begin()
+
     @isPlaying = () -> @playing
 
     @start = () ->
@@ -63,19 +71,19 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin, Renderer) ->
         currentTime = currentDate.getTime()
         curTurn = @getCurrentTurn() + @turnProgress
         dtSeconds = (currentTime - @lastAnimateTime)/1000
-        
+
         curTurn += @getPlaybackSpeed() * dtSeconds
         @setTurn(window.parseInt(curTurn))
-        
+
         @turnProgress = curTurn - @getCurrentTurn()
         @lastAnimateTime = currentTime
 
     @fileLoaded = (logfile) =>
         gameLog = Plugin.parse logfile
-        
+
         @currentTurn = 0
         @playing = false
-        
+
         @setMaxTurns(gameLog.states.length)
         @gameLoaded = true
 
