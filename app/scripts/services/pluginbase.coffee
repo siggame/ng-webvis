@@ -51,9 +51,11 @@ webvisApp.factory 'PluginBase', ($log) ->
         getEntities: () ->
             throw new PluginError("getEntities not implemented")
 
-        parse: (logFile) ->
+        loadGame: (gamedata) ->
             throw new PluginError("parse not implemented")
 
+        getSexpScheme: () ->
+            throw new PluginError("getSexpScheme not implemented")
 
     return {
         BaseEntity: BaseEntity

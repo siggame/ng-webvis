@@ -2,7 +2,7 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.service 'Game', ($rootScope, $log, Plugin, Renderer) ->
+webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin, Renderer) ->
     @minTurn = 0
     @maxTurn = 0
     @playing = false
@@ -64,7 +64,8 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin, Renderer) ->
             entity.draw @getCurrentTurn(), @turnProgress
 
         if @gameLoaded and @renderer != null
-            @renderer.draw()
+            # TODO: iterate over all entities, and call animate
+            @renderer.begin()
 
     @updateTime = () =>
         currentDate = new Date()
@@ -78,13 +79,14 @@ webvisApp.service 'Game', ($rootScope, $log, Plugin, Renderer) ->
         @turnProgress = curTurn - @getCurrentTurn()
         @lastAnimateTime = currentTime
 
-    @fileLoaded = (logfile) =>
-        gameLog = Plugin.parse logfile
+    @fileLoaded = (gameData) =>
+        data = Parser.SexpParser.parse(gameData, Plugin.getSexpScheme())
+        Plugin.loadGame(data)
 
         @currentTurn = 0
         @playing = false
 
-        @setMaxTurns(gameLog.states.length)
+        @setMaxTurns(Plugin.getMaxTurn())
         @gameLoaded = true
 
     return this
