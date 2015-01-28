@@ -20,13 +20,13 @@ webvisApp.factory 'PluginBase', ($log) ->
         getAnimations: () ->
             throw new PluginError("getAnimations not implemented")
 
-        draw: (turnNum, turnProgress) ->
+        draw: (renderer, turnNum, turnProgress) ->
             animations = _(@getAnimations())
             animations.each (anim) ->
                 if anim.getStartTurn() < turnNum + turnProgress and
                     anim.getEndTurn() > turnNum + turnProgress
                         $log.info "anim being called"
-                        anim.animate turnNum, turnProgress
+                        anim.animate renderer, turnNum, turnProgress
 
 
     class Animation
@@ -36,7 +36,7 @@ webvisApp.factory 'PluginBase', ($log) ->
 
         getEndTurn: () -> @endTurn
 
-        animate: (turn, progress) ->
+        animate: (renderer, turn, progress) ->
             throw new PluginError("animate not implemented")
 
     class BasePlugin
@@ -48,8 +48,20 @@ webvisApp.factory 'PluginBase', ($log) ->
         getMaxTurn: () ->
             throw new PluginError("getMaxTurns not implemented")
 
+        getMapWidth: () ->
+            throw new PluginError("getMapWidth not implemented")
+
+        getMapHeight: () ->
+            throw new PluginError("getMapHeight not implemented")
+
+        preDraw: (renderer) ->
+            throw new PluginError("preDraw not implemented")
+
         getEntities: () ->
             throw new PluginError("getEntities not implemented")
+
+        postDraw: (renderer) ->
+            throw new PluginError("postDraw not implemented")
 
         loadGame: (gamedata) ->
             throw new PluginError("parse not implemented")

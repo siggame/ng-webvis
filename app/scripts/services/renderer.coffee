@@ -136,9 +136,11 @@ webvisApp.service 'Renderer', ->
      # A line. (duh)
     ###
     @Line = class Line
-        constructor: (p1, p2) ->
-            if p1? then @p1 = p1 else @p1 = new Point
-            if p2? then @p2 = p2 else @p2 = new Point
+        constructor: (@x1, @y1, @x2, @y2) ->
+            @color = new Color
+            @z1 = 0.0
+            @z2 = 0.0
+
 
     ###
      # Renderer::Color
@@ -153,6 +155,12 @@ webvisApp.service 'Renderer', ->
             if g? then @g = g else @g = 1.0
             if b? then @b = b else @b = 1.0
             if a? then @a = a else @a = 1.0
+
+        setColor: (r, g, b, a) ->
+            @r = r
+            @g = g
+            @b = b
+            @a = a
 
         # returns a string with the CSS color value.
         # Ex. Color(1.0, 1.0, 0.0, 1.0) will return "#FFFF00"
@@ -335,10 +343,10 @@ webvisApp.service 'Renderer', ->
         drawSprite: (sprite) ->
             t = null
             if sprite.texture != null
-                t = Renderer.AssetManager.getTexture sprite.texture
+                t = AssetManager.getTexture sprite.texture
 
             if t?
-                sheetData = Renderer.AssetManager.getSheetData sprite.texture
+                sheetData = AssetManager.getSheetData sprite.texture
                 if !sheetData?
                     u = sprite.texCoords.x * t.width
                     v = sprite.texCoords.y * t.height
@@ -384,24 +392,24 @@ webvisApp.service 'Renderer', ->
         # See doc for BaseRenderer::drawLine(line)
         drawLine: (line) ->
             @context.beginPath()
-            @context.strokeStyle = "#000000"
+            @context.strokeStyle = line.color.toCSS()
             @context.lineWidth = "1"
 
-            x1 = @Projection.get(0, 0) * line.p1.x +
-                    @Projection.get(1, 0) * line.p1.y +
-                    @Projection.get(2, 0) * line.p1.z
+            x1 = @Projection.get(0, 0) * line.x1 +
+                @Projection.get(1, 0) * line.y1 +
+                @Projection.get(2, 0) * line.z1
 
-            y1 = @Projection.get(0, 1) * line.p1.x +
-                    @Projection.get(1, 1) * line.p1.y +
-                    @Projection.get(2, 1) * line.p1.z
+            y1 = @Projection.get(0, 1) * line.x1 +
+                @Projection.get(1, 1) * line.y1 +
+                @Projection.get(2, 1) * line.z1
 
-            x2 = @Projection.get(0, 0) * line.p2.x +
-                    @Projection.get(1, 0) * line.p2.y +
-                    @Projection.get(2, 0) * line.p2.z
+            x2 = @Projection.get(0, 0) * line.x2 +
+                @Projection.get(1, 0) * line.y2 +
+                @Projection.get(2, 0) * line.z2
 
-            y2 = @Projection.get(0, 1) * line.p2.x +
-                    @Projection.get(1, 1) * line.p2.y +
-                    @Projection.get(2, 1) * line.p2.z
+            y2 = @Projection.get(0, 1) * line.x2 +
+                @Projection.get(1, 1) * line.y2 +
+                @Projection.get(2, 1) * line.z2
 
             x1 = parseInt(x1 * @canvas.width) + 0.5
             y1 = parseInt(y1 * @canvas.height) + 0.5
@@ -427,20 +435,20 @@ webvisApp.service 'Renderer', ->
             @context.lineWidth = "1"
 
             x = @Projection.get(0, 0) * rect.position.x +
-                    @Projection.get(1, 0) * rect.position.y +
-                    @Projection.get(2, 0) * rect.position.z
+                @Projection.get(1, 0) * rect.position.y +
+                @Projection.get(2, 0) * rect.position.z
 
             y = @Projection.get(0, 1) * rect.position.x +
-                    @Projection.get(1, 1) * rect.position.y +
-                    @Projection.get(2, 1) * rect.position.z
+                @Projection.get(1, 1) * rect.position.y +
+                @Projection.get(2, 1) * rect.position.z
 
             w = @Projection.get(0, 0) * rect.width +
-                    @Projection.get(1, 0) * rect.height +
-                    @Projection.get(2, 0) * 0
+                @Projection.get(1, 0) * rect.height +
+                @Projection.get(2, 0) * 0
 
             h = @Projection.get(0, 1) * rect.width +
-                    @Projection.get(1, 1) * rect.height +
-                    @Projection.get(2, 1) * 0
+                @Projection.get(1, 1) * rect.height +
+                @Projection.get(2, 1) * 0
 
             x *= @canvas.width
             y *= @canvas.height
