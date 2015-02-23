@@ -51,5 +51,6 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
             lastAnimate = new Date()
             Game.lastAnimateTime = lastAnimate.getTime()
 
+    @fullscreen = ->
 
     return this

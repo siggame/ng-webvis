@@ -42,7 +42,7 @@ webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin, Renderer) ->
     @createRenderer = (canvas) ->
         @renderer = new Renderer.CanvasRenderer(canvas, 20, 20)
         col = new Renderer.Color(1, 1, 1, 1)
-        console.log "yo"
+        @renderer.assetManager.loadTextures()
         @renderer.setClearColor(col)
         @renderer.begin()
 

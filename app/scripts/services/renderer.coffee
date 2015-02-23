@@ -16,42 +16,49 @@ webvisApp.service 'Renderer', ->
      # referenced during draw calls.
      # INVARIANT: Imported textures never change their name during runtime.
     ###
-    @AssetManager = {}
-    @AssetManager.textures = {}
-    @AssetManager.sheetData = {}
+    @AssetManager = class AssetManager
+        constructor: ->
+            @textures = {}
+            @sheetData = {}
 
-    # Renderer::AssetManager::loadTexture(fileName)
-    # param filename (String) - name of the asset to search for on the server
-    @AssetManager.loadTexture = (fileName) ->
-        img = document.createElement 'img'
-        img.src = fileName
-        @textures[fileName] = img
-        baseUrl = window.location.href.replace("/#/", "/")
-        u = baseUrl + fileName.replace(".png", ".json")
-        $.ajax({
-            dataType: "json"
-            url: u,
-            data: null,
-            success: (data) =>
-                @sheetData[fileName] = data
-        })
+        # Renderer::AssetManager::loadTexture(fileName)
+        # param filename (String) - name of the asset to search for on the server
+        loadTextures: ->
+            baseUrl = window.location.href.replace("/#/", "/")
+            u = baseUrl + "scripts/plugins/resources.json"
+            $.ajax
+                dataType: "json",
+                url: u,
+                data: null,
+                complete: (jqxhr, textStatus) =>
+                    console.log textStatus
+                success: (data) =>
+                    console.log "recieved"
+                    for resource in data.resources
+                        img = document.createElement 'img'
+                        img.src = "images/" + resource.image
+                        @textures[resource.id] = img
 
-    # Renderer::AssetManager::loadTextures(fileNames)
-    # param filename (Array[String]) - array of asset names to search for on
-    #   the server
-    @AssetManager.loadTextures = (fileNames) ->
-            for filename in fileNames
-                @loadTexture filename
+                        if resource.spriteSheet != null
+                            u = baseUrl + resource.spriteSheet
+                            $.ajax
+                                dataType: "json",
+                                url: u,
+                                data: null,
+                                success: (data) =>
+                                    @sheetData[resource.id] = data
+                 error: (jqxhr, textStatus, errorThrown)->
+                    console.log textStatus + " " + errorThrown
 
-    # Renderer::AssetManager::getTexture(fileName)
-    # param fileName (String) - name of the asset to retrieve from cache
-    @AssetManager.getTexture = (fileName) ->
+        # Renderer::AssetManager::getTexture(fileName)
+        # param fileName (String) - name of the asset to retrieve from cache
+        getTexture: (fileName) ->
             return @textures[fileName]
 
-    # Renderer::AssetManager::getSheetData(fileName)
-    # param fileName (String) - name of the meta data object for a
-    #   corresponding sprite shee of the same name in the cache
-    @AssetManager.getSheetData = (fileName) ->
+        # Renderer::AssetManager::getSheetData(fileName)
+        # param fileName (String) - name of the meta data object for a
+        # corresponding sprite shee of the same name in the cache
+        getSheetData: (fileName) ->
             return @sheetData[fileName]
 
     ###
@@ -195,6 +202,9 @@ webvisApp.service 'Renderer', ->
             @texCoords = new Point(0, 0, 0)
             @texWidth = 1.0
             @texHeight = 1.0
+            @tiling = false
+            @tileWidth = 0.0
+            @tileHeight = 0.0
             @color = new Color(0, 0, 0, 0)
 
     ###
@@ -301,18 +311,20 @@ webvisApp.service 'Renderer', ->
     ###
     @CanvasRenderer = class CanvasRenderer extends @BaseRenderer
         constructor: (@canvas, @worldWidth, @worldHeight, @clearColor) ->
+            @assetManager = new AssetManager
             @context = @canvas.getContext("2d")
             if !@context?
                 throw {errorStr: "Could not get a 2d render context"}
             @Projection = new Matrix3x3
-            @Projection.set(0, 0, 1/@worldWidth)
-            @Projection.set(1, 1, 1/@worldHeight)
-            @Projection.set(0, 0, 1/@worldWidth)
-            @Projection.set(1, 1, 1/@worldHeight)
+            @resizeWorld(@worldWidth, @worldHeight)
 
         # CanvasRenderer::resizeWorld(worldWidth, worldHeight)
         # See doc for BaseRenderer::resizeWorld(worldWidth, worldHeight)
         resizeWorld: (@worldWidth, @worldHeight) ->
+            @Projection.set(0, 0, 1/@worldWidth)
+            @Projection.set(1, 1, 1/@worldHeight)
+            @Projection.set(0, 0, 1/@worldWidth)
+            @Projection.set(1, 1, 1/@worldHeight)
 
         # CanvasRenderer::begin(color)
         # See doc for BaseRenderer::begin(color)
@@ -343,10 +355,10 @@ webvisApp.service 'Renderer', ->
         drawSprite: (sprite) ->
             t = null
             if sprite.texture != null
-                t = AssetManager.getTexture sprite.texture
+                t = @assetManager.getTexture sprite.texture
 
             if t?
-                sheetData = AssetManager.getSheetData sprite.texture
+                sheetData = @assetManager.getSheetData sprite.texture
                 if !sheetData?
                     u = sprite.texCoords.x * t.width
                     v = sprite.texCoords.y * t.height
@@ -385,8 +397,31 @@ webvisApp.service 'Renderer', ->
                 w = Math.round(w * @canvas.width)
                 h = Math.round(h * @canvas.height)
 
-                @context.drawImage t, u, v, uWidth, vHeight,
-                    x, y, w, h
+                if !sprite.tiling
+                    @context.drawImage t, u, v, uWidth, vHeight,
+                        x, y, w, h
+                else
+                    tw = @Projection.get(0, 0) * sprite.tileWidth +
+                         @Projection.get(1, 0) * sprite.tileHeight
+
+                    th = @Projection.get(0, 1) * sprite.tileWidth +
+                         @Projection.get(1, 1) * sprite.tileHeight
+
+                    tw = Math.round(tw * @canvas.width)
+                    th = Math.round(th * @canvas.height)
+
+                    tempImg = document.createElement 'canvas'
+                    tempImg.width = tw
+                    tempImg.height = th
+                    tempCtx = tempImg.getContext '2d'
+
+                    tempCtx.drawImage t, u, v, uWidth, vHeight,
+                        0, 0, tempImg.width, tempImg.height
+
+                    pat = @context.createPattern tempImg, "repeat"
+                    @context.rect x, y, w, h
+                    @context.fillStyle = pat
+                    @context.fill()
 
         # CanvasRenderer::drawLine(line)
         # See doc for BaseRenderer::drawLine(line)

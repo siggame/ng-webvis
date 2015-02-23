@@ -29,7 +29,7 @@ webvisApp.directive 'stage', ($log, $window, Game) ->
 
             oH = window.outerHeight(true)
             h = window.height()
-            pH = 88
+            pH = 140
             newHeight = 2 * h - oH - pH
 
             canvas.width = newWidth
