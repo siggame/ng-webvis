@@ -13,7 +13,7 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
     @currentTurn = Game.getCurrentTurn()
     @maxTurn = Game.getMaxTurn()
     @minTurn = Game.getMinTurn()
-
+    @isFullscreen = false
 
     $scope.$on 'currentTurn:updated', (event, data) =>
         console.log "recieved " + data
@@ -52,5 +52,34 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
             Game.lastAnimateTime = lastAnimate.getTime()
 
     @fullscreen = ->
+        elem = document.getElementById "fullscreen-container";
+        if(document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.mozFullScreenElement ||
+            document.msFullscreenElement)
+                if document.exitFullscreen
+                    document.exitFullscreen()
+                else if document.webkitExitFullscreen
+                    document.webkitExitFullscreen()
+                else if document.mozCancelFullScreen
+                    document.mozCancelFullScreen()
+                else if document.msExitFullscreen
+                    document.msExitFullscreen()
+        else
+            console.log "null"
+            if elem.requestFullscreen
+                elem.requestFullscreen()
+            else if elem.msRequestFullscreen
+                elem.msRequestFullscreen()
+            else if elem.mozRequestFullscreen
+                elem.mozRequestFullscreen()
+            else if elem.webkitRequestFullscreen
+                elem.webkitRequestFullscreen()
+
+
+
+
+
+
 
     return this
