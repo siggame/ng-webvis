@@ -90,6 +90,7 @@ webvisApp.service 'Plugin', (PluginBase, Renderer)->
             @mapWidth = 0
             @mapHeight = 0
             @background = new Renderer.Sprite
+            @gameLoaded = false
 
         getName: () -> "Droids"
 
@@ -116,6 +117,8 @@ webvisApp.service 'Plugin', (PluginBase, Renderer)->
 
         postDraw: (renderer) ->
 
+        isLoaded: -> @gameLoaded
+
         loadGame: (gamedata) ->
             @maxTurn = gamedata.turns.length
 
@@ -134,7 +137,7 @@ webvisApp.service 'Plugin', (PluginBase, Renderer)->
 
             console.log @mapWidth + " " + @mapHeight
 
-
+            @gameLoaded = true
             ###
             #create all entities
             for turn in gamedata.turns

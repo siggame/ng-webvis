@@ -64,7 +64,10 @@ webvisApp.factory 'PluginBase', ($log) ->
             throw new PluginError("postDraw not implemented")
 
         loadGame: (gamedata) ->
-            throw new PluginError("parse not implemented")
+            throw new PluginError("loadGame not implemented")
+
+        isLoaded: ->
+            throw new PluginError("isLoaded not implemented")
 
         getSexpScheme: () ->
             throw new PluginError("getSexpScheme not implemented")

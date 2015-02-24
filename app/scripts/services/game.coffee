@@ -40,9 +40,14 @@ webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin, Renderer) ->
         @minTurn = minTurn
 
     @createRenderer = (canvas) ->
-        @renderer = new Renderer.CanvasRenderer(canvas, 20, 20)
+        console.log "creating a renderer"
+        if Plugin.isLoaded()
+            @renderer = new Renderer.CanvasRenderer(canvas, Plugin.getMapWidth(), Plugin.getMapHeight())
+        else
+            @renderer = new Renderer.CanvasRenderer(canvas, 20, 20)
         col = new Renderer.Color(1, 1, 1, 1)
-        @renderer.assetManager.loadTextures()
+        @renderer.assetManager.loadTextures ()=>
+            requestAnimationFrame @animate
         @renderer.setClearColor(col)
         @renderer.begin()
 
@@ -56,11 +61,12 @@ webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin, Renderer) ->
         lastAnimate = new Date()
         @lastAnimateTime = lastAnimate.getTime()
         requestAnimationFrame @animate
+        @playing = true
 
     @animate = () =>
-        requestAnimationFrame @animate
-
         if @isPlaying()
+            console.log "yo"
+            requestAnimationFrame @animate
             @updateTime()
 
         if @renderer != null
@@ -73,6 +79,7 @@ webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin, Renderer) ->
 
                 Plugin.preDraw(@renderer)
                 for id, entity of entities
+                    console.info "drawing " + id
                     entity.draw @renderer, @getCurrentTurn(), @turnProgress
                 Plugin.postDraw(@renderer)
 

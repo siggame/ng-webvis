@@ -25,12 +25,31 @@
         <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-    <div ng-include="'partials/alerts.html'"></div>
 
     <div class="container-fluid">
       <div class="row">
         <div class="hidden-xs hidden-sm col-md-3">
           <div ng-include="'partials/navbar.html'"></div>
+            <br>
+            <div class="well well-xs" role="tabpanel">
+                <ul id="tabs" class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#alert-content" id="alert-tab" role="tab" data-toggle="tab">Alerts</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#debug-content" id="debug-tab" role="tab" data-toggle="tab">Debug</a>
+                    </li>
+                </ul>
+                <div id="tabcontent" class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="alert-content">
+                        <br>
+                        <div ng-include="'partials/alerts.html'"></div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="debug-content">
+                        <p>To Be Implemented</p>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-xs-12 col-md-9">
           <div ng-view=""></div>

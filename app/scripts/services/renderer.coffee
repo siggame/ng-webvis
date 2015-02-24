@@ -23,7 +23,7 @@ webvisApp.service 'Renderer', ->
 
         # Renderer::AssetManager::loadTexture(fileName)
         # param filename (String) - name of the asset to search for on the server
-        loadTextures: ->
+        loadTextures: (onloadCallback) ->
             baseUrl = window.location.href.replace("/#/", "/")
             u = baseUrl + "scripts/plugins/resources.json"
             $.ajax
@@ -34,10 +34,16 @@ webvisApp.service 'Renderer', ->
                     console.log textStatus
                 success: (data) =>
                     console.log "recieved"
+                    numPictures = data.resources.length
                     for resource in data.resources
                         img = document.createElement 'img'
                         img.src = "images/" + resource.image
                         @textures[resource.id] = img
+
+                        img.onload = () =>
+                            numPictures--;
+                            if numPictures == 0
+                                onloadCallback()
 
                         if resource.spriteSheet != null
                             u = baseUrl + resource.spriteSheet
@@ -356,6 +362,8 @@ webvisApp.service 'Renderer', ->
             t = null
             if sprite.texture != null
                 t = @assetManager.getTexture sprite.texture
+            else
+                console.info "cannot draw a null or undefined texture"
 
             if t?
                 sheetData = @assetManager.getSheetData sprite.texture
@@ -422,6 +430,8 @@ webvisApp.service 'Renderer', ->
                     @context.rect x, y, w, h
                     @context.fillStyle = pat
                     @context.fill()
+            else
+                console.info "texture not found"
 
         # CanvasRenderer::drawLine(line)
         # See doc for BaseRenderer::drawLine(line)

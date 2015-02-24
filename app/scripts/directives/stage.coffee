@@ -35,12 +35,11 @@ webvisApp.directive 'stage', ($log, $window, Game) ->
             canvas.width = newWidth
             canvas.height = newHeight
 
+            console.info newWidth + "  " + newHeight
+
             Game.canvasResized(newWidth, newHeight)
 
-
         do resizeRendererView
-
-        Game.start()
 
         angular.element($window).on 'resize', () ->
             do resizeRendererView

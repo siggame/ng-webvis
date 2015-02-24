@@ -16,31 +16,32 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
     @isFullscreen = false
 
     $scope.$on 'currentTurn:updated', (event, data) =>
-        console.log "recieved " + data
         if !$scope.$$phase
             @currentTurn = data
             $scope.$apply()
 
     $scope.$on 'maxTurn:updated', (event, data) =>
-        console.log "recieved maxTurn = " + data
         if !$scope.$$phase
             @maxTurn = data
             $scope.$apply()
 
     $scope.$watch 'playback.currentTurn', (newValue) =>
         if angular.isDefined(newValue) and newValue != Game.getCurrentTurn()
-            console.log "changed " + newValue
             Game.setCurrentTurn newValue
+
+    @isPlaying = -> Game.isPlaying()
 
     @stepBack = ->
         if Game.getCurrentTurn() > Game.getMinTurn()
             Game.setCurrentTurn(Game.getCurrentTurn() - 1)
+            @currentTurn--
         else
             Game.setCurrentTurn(Game.getMinTurn())
 
     @stepForward = ->
         if Game.getCurrentTurn() < Game.getMaxTurn()
             Game.setCurrentTurn(Game.getCurrentTurn() + 1)
+            @currentTurn++
         else
             Game.setCurrentTurn(Game.getMaxTurn())
 
@@ -48,8 +49,7 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
         $log.info "Play/Pause Pressed"
         Game.playing = not Game.playing
         if(Game.isPlaying())
-            lastAnimate = new Date()
-            Game.lastAnimateTime = lastAnimate.getTime()
+            Game.start()
 
     @fullscreen = ->
         elem = document.getElementById "fullscreen-container";
@@ -66,7 +66,6 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
                 else if document.msExitFullscreen
                     document.msExitFullscreen()
         else
-            console.log "null"
             if elem.requestFullscreen
                 elem.requestFullscreen()
             else if elem.msRequestFullscreen
