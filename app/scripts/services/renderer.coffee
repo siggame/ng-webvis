@@ -25,7 +25,7 @@ webvisApp.service 'Renderer', ->
         # param filename (String) - name of the asset to search for on the server
         loadTextures: (onloadCallback) ->
             baseUrl = window.location.href.replace("/#/", "/")
-            u = baseUrl + "scripts/plugins/resources.json"
+            u = baseUrl + "plugins/resources.json"
             $.ajax
                 dataType: "json",
                 url: u,

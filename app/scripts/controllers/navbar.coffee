@@ -2,9 +2,14 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.controller 'NavbarCtrl', ($window, $scope, config, Plugin) ->
+webvisApp.controller 'NavbarCtrl', ($window, $scope, config, PluginManager) ->
     @version = config.version
-    @gameName = Plugin.getName()
+    @gameName = PluginManager.getName()
+    
+    $scope.$on 'currentPlugin:updated', (event, data) =>
+        if !$scope.$$phase
+            @gameName = PluginManager.getName()
+            $scope.$apply()
     
     resizeTabWindow = () ->
         window = $($window)

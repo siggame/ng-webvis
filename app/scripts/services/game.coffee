@@ -2,14 +2,13 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin, Renderer) ->
+webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @minTurn = 0
     @maxTurn = 0
     @playing = false
     @currentTurn = 0
     @playbackSpeed = 1
     @renderer = null
-    @gameLoaded = false
     @turnProgress = 0
 
     @getCurrentTurn = () -> @currentTurn
@@ -19,8 +18,6 @@ webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin, Renderer) ->
     @getMinTurn = () -> @minTurn
 
     @getPlaybackSpeed = () -> @playbackSpeed
-
-    @getEntities = () -> Plugin.entities
 
     @setCurrentTurn = (t) ->
         if t != @currentTurn
@@ -41,8 +38,8 @@ webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin, Renderer) ->
 
     @createRenderer = (canvas) ->
         console.log "creating a renderer"
-        if Plugin.isLoaded()
-            @renderer = new Renderer.CanvasRenderer(canvas, Plugin.getMapWidth(), Plugin.getMapHeight())
+        if PluginManager.isLoaded()
+            @renderer = new Renderer.CanvasRenderer(canvas, PluginManager.getMapWidth(), PluginManager.getMapHeight())
         else
             @renderer = new Renderer.CanvasRenderer(canvas, 20, 20)
         col = new Renderer.Color(1, 1, 1, 1)
@@ -72,16 +69,16 @@ webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin, Renderer) ->
         if @renderer != null
             @renderer.begin()
 
-            if @gameLoaded
-                entities = @getEntities()
+            if PluginManager.isLoaded()
+                entities = PluginManager.getEntities()
 
                 # console.log @getCurrentTurn() + " " + @turnProgress
 
-                Plugin.preDraw(@renderer)
+                PluginManager.preDraw(@renderer)
                 for id, entity of entities
                     console.info "drawing " + id
                     entity.draw @renderer, @getCurrentTurn(), @turnProgress
-                Plugin.postDraw(@renderer)
+                PluginManager.postDraw(@renderer)
 
     @updateTime = () =>
         currentDate = new Date()
@@ -95,17 +92,16 @@ webvisApp.service 'Game', ($rootScope, $log, Parser, Plugin, Renderer) ->
         @turnProgress = curTurn - @getCurrentTurn()
         @lastAnimateTime = currentTime
 
-    @fileLoaded = (gameData) =>
-        data = Parser.SexpParser.parse gameData, Plugin.getSexpScheme()
-        Plugin.loadGame data
+    @fileLoaded = (gameObject) =>
+        PluginManager.changePlugin gameObject.gameName
+        PluginManager.loadGame gameObject
 
-        @renderer.resizeWorld Plugin.getMapWidth(), Plugin.getMapHeight()
+        @renderer.resizeWorld PluginManager.getMapWidth(), PluginManager.getMapHeight()
 
         @currentTurn = 0
         @playing = false
 
-        @setMaxTurns(Plugin.getMaxTurn())
-        @gameLoaded = true
+        @setMaxTurns(PluginManager.getMaxTurn())
 
         requestAnimationFrame @animate
 

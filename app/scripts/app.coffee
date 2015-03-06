@@ -8,6 +8,7 @@
  #
  # Main module of the application.
 ###
+
 webvisApp = angular.module 'webvisApp', [
     'ngCookies'
     'ngResource'
@@ -16,7 +17,11 @@ webvisApp = angular.module 'webvisApp', [
     'ui.bootstrap'
 ]
 
-webvisApp.config ($routeProvider) ->
+webvisApp.config ($routeProvider, $provide, $compileProvider, $controllerProvider) ->
+    webvisApp.provide = $provide
+    webvisApp.compileProvider = $compileProvider
+    webvisApp.controllerProvider = $controllerProvider
+    
     $routeProvider.when '/',
         templateUrl: 'views/main.html'
         controller: 'MainCtrl'
