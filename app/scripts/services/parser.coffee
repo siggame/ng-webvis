@@ -13,7 +13,8 @@ webvisApp.factory 'Parser', ->
 
     class Parser
         constructor: () ->
-
+            @log = null
+            
         loadFile: () ->
             throw message: "Not implemented"
 
@@ -28,17 +29,13 @@ webvisApp.factory 'Parser', ->
 
         getGameWinner: () ->
             throw message: "Not implemented"
-
+   
+        clear: () ->
+            @log = null
+   
         parse: (file_contents) ->
-            log = @loadFile(file_contents)
-
-            return {
-                fileContents: file_contents
-                gameID: @getGameID(log)
-                gameName: @getGameName(log)
-                turns: @getTurns(log)
-                result: @getGameWinner(log)
-            }
+            if @log != null then @log = null
+            @log = @loadFile(file_contents)
 
 
     class SexpParser extends Parser
@@ -71,31 +68,72 @@ webvisApp.factory 'Parser', ->
 
             return JSON.parse(json.replace(/,\s*\]/g, ']'))
 
-        getGameID: (gameLog) -> _.last(gameLog)[1]
+        getGameID: () -> 
+            if @log != null 
+                _.last(@log)[1]
+            else 
+                return -1
 
-        getGameName: (gameLog) -> gameLog[0][1]
+        getGameName: () -> 
+            if @log != null 
+                @log[0][1]
+            else
+                return ""
 
-        getGameWinner: (gameLog) ->
-            winner = _.last(gameLog)
-            return team: winner[2], reason: winner[4]
+        getGameWinner: () ->
+            if @log != null
+                winner = _.last(@log)
+                return team: winner[2], reason: winner[4]
+            else
+                return null
 
-        getTurns: (gameLog) ->
-            turns = gameLog[1..gameLog.length-2]
-            prepareObj = (statusList, animationList) =>
-                status: @toObj(turns[i][1..(turns[i].length - 1)])
-                animations: turns[i+1][1..(turns[i+1].length - 1)]
+        getTurns: (scheme) ->
+            if @log != null
+                turns = []
+                for i in [1..(@log.length - 2)] by 2
+                    state = {}
+                    for j in [1..(@log[i].length - 1)]
+                        memberData = scheme[@log[i][j][0]]
+                        model = null
+                        if @log[i][j].length <= 1
+                            if !state[@log[i][j][0]]?
+                                state[@log[i][j][0]] = []
+                        else if @log[i][j][1] instanceof Array
+                            model = {}
+                            for k in [1..(@log[i][j].length - 1)]
+                                elem = {}
+                                for l in [0..(@log[i][j][k].length - 1)]
+                                    elem[memberData[l]] = @log[i][j][k][l]
+                                model[@log[i][j][k][0]] = elem
 
-            for i in [0..(turns.length - 1)] by 2
-                prepareObj(turns[i], turns[i+1])
+                            if !state[@log[i][j][0]]?
+                                state[@log[i][j][0]] = []
 
-        toObj: (sexp) ->
-            game = _(sexp).find((x) -> x[0] == "game")
-            statuses = _(sexp).filter((x) -> x[0] != "game")
-            status = _.object(_(statuses).map((x) -> [x[0], x[1..]]))
-            status['game'] = [game]
-            return status
+                            state[@log[i][j][0]] = model
+                        else
+                            for k in [1..(@log[i][j].length - 1)]
+                                state[memberData[k-1]] = @log[i][j][k]
 
+                    animations = {}
+                    for j in [1..(@log[i+1].length - 1)]
+                        if @log[i+1].length <= 1
+                            break
 
+                        memberData = scheme[@log[i+1][j][0]]
+                        anim = {}
+                        for k in [0..(@log[i+1][j].length - 1)]
+                            anim[memberData[k]] = @log[i+1][j][k]
+
+                        if !animations[@log[i+1][j][1]]?
+                            animations[@log[i+1][j][1]] = []
+                        animations[@log[i+1][j][1]].push anim
+
+                    state.animaitons = animations
+                    turns.push state
+
+                return turns
+            else
+                return null
 
     # Public API here
     return {

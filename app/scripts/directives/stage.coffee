@@ -13,11 +13,12 @@ webvisApp.directive 'stage', ($log, $window, Game) ->
     restrict: 'E'
     link: (scope, element, attrs) ->
 
-        width = attrs['width']
-        height = attrs['height']
+        canvas = document.createElement 'canvas'
+        canvas.width = attrs['width']
+        canvas.height = attrs['height']
+        element.append canvas
 
-        renderer = PIXI.autoDetectRenderer(width, height)
-        element.append renderer.view
+        Game.createRenderer canvas
 
         resizeRendererView = () ->
             # Calculate new width and height
@@ -28,17 +29,17 @@ webvisApp.directive 'stage', ($log, $window, Game) ->
 
             oH = window.outerHeight(true)
             h = window.height()
-            pH = 88
+            pH = 120
             newHeight = 2 * h - oH - pH
 
-            # Set the new width and height
-            renderer.view.style.width = "#{newWidth}px"
-            renderer.view.style.height = "#{newHeight}px"
+            canvas.width = newWidth
+            canvas.height = newHeight
+
+            console.info newWidth + "  " + newHeight
+
+            Game.canvasResized(newWidth, newHeight)
 
         do resizeRendererView
-
-        Game.setRenderer renderer
-        Game.start()
 
         angular.element($window).on 'resize', () ->
             do resizeRendererView

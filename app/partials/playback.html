@@ -1,14 +1,12 @@
 <!-- Playback controls -->
 <div class="playback-container" ng-controller="PlaybackCtrl as playback">
   <div class="playback-controls well well-sm">
-    <div class="row">
+    <div class="row" style="padding:0px;">
       <div class="col-xs-12">
-        <slider max-value="playback.getMaxTurn()" current-value="playback.currentTurn" live-value="liveValue"></slider>
+        <slider max-value="playback.maxTurn" current-value="playback.currentTurn" live-value="playback.currentTurn"></slider>
       </div>
 
-      <br>
-
-      <div class="col-xs-12">
+      <div class="col-xs-12" style="margin-top:10px;">
         <div class="btn-toolbar playback-buttons">
           <div class="btn-group playback-controls">
 
@@ -28,10 +26,15 @@
               <i class="fa fa-forward"></i>
             </button>
           </div>
+            <div class="btn btn-default slider-value">
+                {{ playback.currentTurn || 0 }}
+            </div>
 
           <!-- Current turn display -->
-          <div class="btn btn-default slider-value pull-right">
-            {{ playback.currentTurn || 0 }}
+          <div class="btn-group pull-right">
+              <button class="btn btn-default" ng-click="playback.fullscreen()">
+                  <i class="fa fa-desktop"></i>
+              </button>
           </div>
         </div>
       </div>

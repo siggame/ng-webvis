@@ -1,8 +1,32 @@
-<div ng-controller="NavbarCtrl as navbar" class="text-center">
-  <h2> {{ navbar.gameName }} <small class="text-muted">{{ navbar.version }}</small></h2>
-  <div class="btn-group btn-group-justified">
-    <div class="btn-group btn-group-vertical">
-      <button file-dialog class="btn btn-primary">Open</button>
+<div ng-controller="NavbarCtrl as navbar" class="text-center" style="height:100%;">
+  <div id="game-info" class="row-fluid">
+    <h2 style="padding-top:20px; padding-bottom:10px"> 
+      {{ navbar.gameName }} 
+      <small class="text-muted">{{ navbar.version }}</small>
+    </h2>
+    <div class="btn-group btn-group-justified">
+      <div class="btn-group btn-group-vertical">
+        <button file-dialog class="btn btn-primary">Open</button>
+      </div>
+    </div>
+  </div>
+  <div id="tab-panel" class="row-fluid well well-xs" role="tabpanel" style="margin-top:20px;margin-bottom:0px">
+    <ul class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="active">
+        <a href="#alert-content" id="alert-tab" role="tab" data-toggle="tab">Alerts</a>
+      </li>
+      <li role="presentation">
+        <a href="#debug-content" id="debug-tab" role="tab" data-toggle="tab">Debug</a>
+      </li>
+    </ul>
+    <div id="tabcontent" class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="alert-content">
+        <br>
+        <div ng-include="'partials/alerts.html'"></div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="debug-content">
+        <p>To Be Implemented</p>
+      </div>
     </div>
   </div>
 </div>
