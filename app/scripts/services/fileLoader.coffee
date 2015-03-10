@@ -20,7 +20,7 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
     verifyFileType = (filename) ->
         ext = ""
         for extension in acceptFileExtensions
-            if filename.indexOf("." + extension)
+            if filename.indexOf("." + extension) != -1
                 ext = extension
                 break
         return ext

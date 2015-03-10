@@ -9,7 +9,7 @@
 ###
 app = angular.module('webvisApp')
 
-app.factory 'alert', ($timeout, $log, config) ->
+app.factory 'alert', ($rootScope, $timeout, $log, config) ->
 
     class Alert
         constructor: (message, type) ->
@@ -24,6 +24,7 @@ app.factory 'alert', ($timeout, $log, config) ->
 
         hide: () ->
             $log.debug "Hiding #{@toString()}"
+            $rootScope.$apply()
             @visible = false
 
         show: () ->

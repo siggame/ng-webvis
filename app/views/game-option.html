@@ -1,0 +1,51 @@
+<div class="vis-tab-option-switch" ng-switch on="option.type">
+  <div ng-switch-when="checkbox">
+    <table>
+      <tr>
+        <td style="width:40%;">{{name}}</td>
+        <td style="width:60%;"><input type="checkbox"></td>
+      </tr>
+    </table>
+  </div>
+  <div ng-switch-when="slider">
+    <table>
+      <tr>
+        <td style="width:40%;">{{name}}</td>
+        <td style="width:50%;">
+          <slider max-value="option.maximum" current-value="option.current" live-value="option.current"></slider>    
+        </td>
+        <td style="width:10%;text-align:center">{{option.current}}</td>
+      </tr>
+    </table>
+  </div>
+  <div ng-switch-when="textbox">
+    <table>
+      <tr>
+        <td style="width:40%;">{{name}}</td>
+        <td style="width:60%;">
+          <input type="text" ng-model="option.text"></input>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div ng-switch-when="dropdown">
+    <table>
+      <tr>
+        <td style="width:40%;">{{name}}</td>
+        <td style="width:60%;">
+          <span class="dropdown">
+            <button class="btn" dropdown-toggle> 
+              {{option.currentValue}}
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li ng-repeat="choice in option.options">
+                <a href ng-click="option.currentValue = choice">{{choice}}</a>
+              </li>
+            </ul>
+          </span>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

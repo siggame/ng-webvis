@@ -10,23 +10,36 @@
       </div>
     </div>
   </div>
-  <div id="tab-panel" class="row-fluid well well-xs" role="tabpanel" style="margin-top:20px;margin-bottom:0px">
-    <ul class="nav nav-tabs" role="tablist">
-      <li role="presentation" class="active">
-        <a href="#alert-content" id="alert-tab" role="tab" data-toggle="tab">Alerts</a>
-      </li>
-      <li role="presentation">
-        <a href="#debug-content" id="debug-tab" role="tab" data-toggle="tab">Debug</a>
-      </li>
-    </ul>
-    <div id="tabcontent" class="tab-content">
-      <div role="tabpanel" class="tab-pane active" id="alert-content">
-        <br>
-        <div ng-include="'partials/alerts.html'"></div>
-      </div>
-      <div role="tabpanel" class="tab-pane" id="debug-content">
+  <div id="tab-panel" ng-controller="TabmenuCtrl as tabmenu" class="vis-tab-menu row-fluid well well-xs">
+    <tabset style="height:100%;">
+      <tab heading="Alerts">
+        <div class="vis-tab-content">
+          <div ng-include="'partials/alerts.html'"></div>
+        </div>
+      </tab>
+      <tab heading="Debug">
         <p>To Be Implemented</p>
-      </div>
-    </div>
+      </tab>
+      <tab>
+        <tab-heading>
+          <div class="btn-group dropdown">
+            Options
+            <a dropdown-toggle>
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li ng-repeat="choice in pages">
+                <a href ng-click="changePage(choice)">{{choice}}</a>
+              </li>
+            </ul>
+          </div>
+        </tab-heading>
+          <div class="vis-tab-content">
+            <div ng-repeat="(id, object) in currentPage">
+              <game-option name="id" option="object"></game-option>
+            </div>
+          </div>
+      </tab>
+    </tabset>
   </div>
 </div>

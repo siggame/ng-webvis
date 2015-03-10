@@ -1,4 +1,7 @@
 <div ng-controller="AlertCtrl as alertCtrl">
+  <div ng-if="!alertCtrl.hasAlert()" class="vis-no-alerts">
+    NO ALERTS
+  </div>
   <alert ng-repeat="alert in alertCtrl.alert.getAlerts()"
          ng-show="alert.isVisible()"
          type="{{alert.type}}"
