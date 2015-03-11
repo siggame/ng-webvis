@@ -18,7 +18,5 @@ app.controller 'AlertCtrl', (alert) ->
         for a in alerts     
             if a.isVisible()
                 return true
-            else
-                return false
     
     return this
