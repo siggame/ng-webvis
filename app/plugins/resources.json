@@ -1,0 +1,9 @@
+{
+    "resources": [
+        {
+            "id": "background",
+            "image": "desolate.png",
+            "spriteSheet": null
+        }
+    ]
+}
