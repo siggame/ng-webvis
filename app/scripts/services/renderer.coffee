@@ -24,8 +24,10 @@ webvisApp.service 'Renderer', ->
         # Renderer::AssetManager::loadTexture(fileName)
         # param filename (String) - name of the asset to search for on the server
         loadTextures: (onloadCallback) ->
-            baseUrl = window.location.href.replace("/#/", "/")
-            u = baseUrl + "plugins/resources.json"
+            u = window.location.protocol + "//" + 
+                window.location.hostname + ":" + 
+                window.location.port + "/plugins/resources.json"
+            console.log 
             $.ajax
                 dataType: "json",
                 url: u,
@@ -46,7 +48,9 @@ webvisApp.service 'Renderer', ->
                                 onloadCallback()
 
                         if resource.spriteSheet != null
-                            u = baseUrl + resource.spriteSheet
+                            u = window.location.protocol + "//" + 
+                                window.location.hostname + ":" + 
+                                window.location.port + "/" + resource.spriteSheet
                             $.ajax
                                 dataType: "json",
                                 url: u,

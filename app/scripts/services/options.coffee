@@ -30,7 +30,7 @@ angular.module('webvisApp').service 'Options', ($rootScope, alert) ->
         [   "textbox",
             "Arena Url",
             ""
-        ]
+        ],
         [ 
             "dropdown",
             "Mode",
