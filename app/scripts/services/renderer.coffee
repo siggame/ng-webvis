@@ -23,9 +23,11 @@ webvisApp.service 'Renderer', ->
 
         # Renderer::AssetManager::loadTexture(fileName)
         # param filename (String) - name of the asset to search for on the server
-        loadTextures: (onloadCallback) ->
-            baseUrl = window.location.href.replace("/#/", "/")
-            u = baseUrl + "plugins/resources.json"
+        loadTextures: (pluginName, onloadCallback) ->
+            @textures = {}
+            @sheetData = {}
+            u = "/plugins/" + pluginName + "/resources.json"
+            console.log u
             $.ajax
                 dataType: "json",
                 url: u,
@@ -316,9 +318,10 @@ webvisApp.service 'Renderer', ->
      # utilizes the HTML5 Canvas drawing API for rendering.
     ###
     @CanvasRenderer = class CanvasRenderer extends @BaseRenderer
-        constructor: (@canvas, @worldWidth, @worldHeight, @clearColor) ->
+        constructor: (@canvas, @worldWidth, @worldHeight) ->
             @assetManager = new AssetManager
             @context = @canvas.getContext("2d")
+            @clearColor = new Color(1,1,1)
             if !@context?
                 throw {errorStr: "Could not get a 2d render context"}
             @Projection = new Matrix3x3

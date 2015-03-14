@@ -68,10 +68,6 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
             gameObject["gameID"] = parser.getGameID()
             gameObject["gameWinner"] = parser.getGameWinner()
             
-            console.log parser.getGameName()
-            console.log parser.getGameID()
-            console.log parser.getGameWinner()
-            
             if $injector.has parser.getGameName()
                 console.log "plugin exists"
                 plugin = $injector.get parser.getGameName()
@@ -79,10 +75,7 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
                 parser.clear()
                 Game.fileLoaded gameObject
             else
-                console.log "plugin didn't exist"
-                baseUrl = window.location.href.replace("/#/", "/")
-                pluginUrl = baseUrl + "plugins/" + parser.getGameName() + ".js"
-                console.log parser.getGameName()
+                pluginUrl = "/plugins/" + parser.getGameName() + "/" + parser.getGameName() + ".js"
                 $.ajax
                     dataType: "script",
                     url: pluginUrl,
@@ -100,7 +93,7 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
                             ])
                     error: (jqxhr, textStatus, errorThrown)->
                         console.log textStatus + " " + errorThrown
-                        alert.error "Plugin " + parser.getGameName() + " could not be found"
+                        alert.error "Plugin " + parser.getGameName() + " could not be loaded. " + errorThrown 
                         parser.clear()
 
         # Start reading!

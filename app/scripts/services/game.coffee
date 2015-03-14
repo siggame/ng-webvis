@@ -21,14 +21,12 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
 
     @setCurrentTurn = (t) ->
         if t != @currentTurn
-            console.log "change " + t
             $rootScope.$broadcast('currentTurn:updated', t)
 
         @currentTurn = t
 
     @setMaxTurns = (maxTurn) ->
         if maxTurn != @maxTurn
-            console.log "change max turn " + maxTurn
             $rootScope.$broadcast('maxTurn:updated', maxTurn)
 
         @maxTurn = maxTurn
@@ -37,16 +35,10 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @minTurn = minTurn
 
     @createRenderer = (canvas) ->
-        console.log "creating a renderer"
         if PluginManager.isLoaded()
             @renderer = new Renderer.CanvasRenderer(canvas, PluginManager.getMapWidth(), PluginManager.getMapHeight())
         else
             @renderer = new Renderer.CanvasRenderer(canvas, 20, 20)
-        col = new Renderer.Color(1, 1, 1, 1)
-        @renderer.assetManager.loadTextures ()=>
-            requestAnimationFrame @animate
-        @renderer.setClearColor(col)
-        @renderer.begin()
 
     @canvasResized = (newWidth, newHeight) ->
         if @renderer?
@@ -62,7 +54,6 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
 
     @animate = () =>
         if @isPlaying()
-            console.log "yo"
             requestAnimationFrame @animate
             @updateTime()
 
@@ -93,16 +84,16 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @lastAnimateTime = currentTime
 
     @fileLoaded = (gameObject) =>
+        PluginManager.clear()
         PluginManager.changePlugin gameObject.gameName
         PluginManager.loadGame gameObject
 
         @renderer.resizeWorld PluginManager.getMapWidth(), PluginManager.getMapHeight()
-
         @currentTurn = 0
         @playing = false
-
         @setMaxTurns(PluginManager.getMaxTurn())
-
-        requestAnimationFrame @animate
+        
+        @renderer.assetManager.loadTextures gameObject.gameName, () =>
+            requestAnimationFrame @animate
 
     return this
