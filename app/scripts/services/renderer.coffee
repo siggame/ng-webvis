@@ -27,7 +27,6 @@ webvisApp.service 'Renderer', ->
             @textures = {}
             @sheetData = {}
             u = "/plugins/" + pluginName + "/resources.json"
-            console.log u
             $.ajax
                 dataType: "json",
                 url: u,
@@ -39,7 +38,7 @@ webvisApp.service 'Renderer', ->
                     numPictures = data.resources.length
                     for resource in data.resources
                         img = document.createElement 'img'
-                        img.src = "images/" + resource.image
+                        img.src = "/plugins/" + pluginName + "/images/" + resource.image
                         @textures[resource.id] = img
 
                         img.onload = () =>
@@ -47,8 +46,8 @@ webvisApp.service 'Renderer', ->
                             if numPictures == 0
                                 onloadCallback()
 
-                        if resource.spriteSheet != null
-                            u = baseUrl + resource.spriteSheet
+                        if resource.spriteSheet != (null)
+                            u = "/plugins/" + pluginName + "/images/" + resource.spriteSheet
                             $.ajax
                                 dataType: "json",
                                 url: u,
