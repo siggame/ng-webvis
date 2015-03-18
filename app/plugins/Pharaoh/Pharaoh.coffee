@@ -12,7 +12,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             ]
             Options.addPage "Pharaoh", @pharaohOptions
             @gameLoaded = false
-
+			
         getName: () -> "Pharaoh"
 
         preDraw: (renderer) ->
@@ -20,7 +20,9 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         postDraw: (renderer) ->
 
         loadGame: (gamedata) ->
-
+			
+			
+			
         getSexpScheme: () ->
             {
                 gameName : ["gameName"],
@@ -57,3 +59,4 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                        "scarabsForThieves", "maxStack", "roundsToWin",
                        "roundTurnLimit"]
             }
+	return new Pharaoh
