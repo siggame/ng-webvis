@@ -51,27 +51,27 @@ webvisApp.factory 'PluginBase', ($log) ->
         getMapWidth: () -> @mapWidth
 
         getMapHeight: () -> @mapHeight
-        
+
         getEntities: () -> @entities
-        
-        clear: () -> 
+
+        clear: () ->
             @entities = {}
             @maxTurn = 0
             @mapWidth = 0
             @mapheight = 0
-            
+
         getName: () ->
-            throw new PluginError("getName not implemented") 
-        
-        preDraw: (renderer) ->
+            throw new PluginError("getName not implemented")
+
+        preDraw: (delta, renderer) ->
             throw new PluginError("preDraw not implemented")
 
-        postDraw: (renderer) ->
+        postDraw: (delta, renderer) ->
             throw new PluginError("postDraw not implemented")
 
         loadGame: (gamedata) ->
             throw new PluginError("loadGame not implemented")
-    
+
         getSexpScheme: () ->
             throw new PluginError("getSexpScheme not implemented")
 

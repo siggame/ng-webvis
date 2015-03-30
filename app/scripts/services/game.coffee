@@ -53,9 +53,8 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @playing = true
 
     @animate = () =>
-        if @isPlaying()
-            requestAnimationFrame @animate
-            @updateTime()
+        requestAnimationFrame @animate
+        dt = @updateTime()
 
         if @renderer != null
             @renderer.begin()
@@ -63,13 +62,11 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
             if PluginManager.isLoaded()
                 entities = PluginManager.getEntities()
 
-                # console.log @getCurrentTurn() + " " + @turnProgress
-
-                PluginManager.preDraw(@renderer)
+                PluginManager.preDraw(dt, @renderer)
                 for id, entity of entities
                     console.info "drawing " + id
                     entity.draw @renderer, @getCurrentTurn(), @turnProgress
-                PluginManager.postDraw(@renderer)
+                PluginManager.postDraw(dt, @renderer)
 
     @updateTime = () =>
         currentDate = new Date()
@@ -77,11 +74,14 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         curTurn = @getCurrentTurn() + @turnProgress
         dtSeconds = (currentTime - @lastAnimateTime)/1000
 
-        curTurn += @getPlaybackSpeed() * dtSeconds
-        @setCurrentTurn(window.parseInt(curTurn))
+        if @isPlaying()
+            curTurn += @getPlaybackSpeed() * dtSeconds
+            @setCurrentTurn(window.parseInt(curTurn))
 
-        @turnProgress = curTurn - @getCurrentTurn()
-        @lastAnimateTime = currentTime
+            @turnProgress = curTurn - @getCurrentTurn()
+            @lastAnimateTime = currentTime
+            
+        return dtSeconds
 
     @fileLoaded = (gameObject) =>
         PluginManager.clear()
@@ -92,7 +92,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @currentTurn = 0
         @playing = false
         @setMaxTurns(PluginManager.getMaxTurn())
-        
+
         @renderer.assetManager.loadTextures gameObject.gameName, () =>
             requestAnimationFrame @animate
 
