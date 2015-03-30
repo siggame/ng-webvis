@@ -19,10 +19,12 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
         getName: () -> "Pharaoh"
 
-        preDraw: (renderer) ->
+        preDraw: (dt, renderer) ->
+            @background.position.x += 1 * dt;
+            @background.position.y += 1 * dt;
             renderer.drawSprite(@background)
 
-        postDraw: (renderer) ->
+        postDraw: (dt, renderer) ->
 
         loadGame: (gamedata) ->
             @maxTurn = gamedata.turns.length
