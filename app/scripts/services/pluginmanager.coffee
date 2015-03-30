@@ -69,7 +69,11 @@ webvisApp.service 'PluginManager', ($rootScope, $injector) ->
             @currentPlugin.loadGame(gamedata)
         else
             throw PluginError("No plugin selected")
-            
+    
+    @clear = () ->
+        if @currentPlugin != null
+            @currentPlugin.clear()
+    
     @isLoaded = () -> 
         if @currentPlugin != null
             return true;

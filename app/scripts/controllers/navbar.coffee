@@ -14,15 +14,11 @@ webvisApp.controller 'NavbarCtrl', ($window, $scope, config, PluginManager) ->
     resizeTabWindow = () ->
         window = $($window)
         $("#left-panel").height window.height()
-        console.log $("#left-panel").height() + " " + $("#game-info").outerHeight(true)
-        console.log $("#left-panel").height() - $("#game-info").outerHeight(true)
         $("#tab-panel").height($("#left-panel").height() - $("#game-info").outerHeight(true) - 70)
 
     do resizeTabWindow
-    do resizeTabWindow
     
     angular.element($window).on 'resize', () ->
-        console.log "called"
         do resizeTabWindow
     
     return this

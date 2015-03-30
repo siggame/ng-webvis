@@ -27,10 +27,6 @@ angular.module('webvisApp').service 'Options', ($rootScope, alert) ->
         
     # this option page is always present for non-plugin specific options
     @_webvisOptions = [
-        [   "textbox",
-            "Arena Url",
-            ""
-        ]
         [ 
             "dropdown",
             "Mode",
