@@ -1,28 +1,42 @@
 'use strict'
 
 angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Options) ->
+    class Theif extends PluginBase.BaseEntity
+        constructor: () ->
+
     class Pharaoh extends PluginBase.BasePlugin
         constructor: () ->
             @pharaohOptions = [
-                {
+                [
                     "checkbox",
                     "Animate Background",
                     false
-                }
+                ]
             ]
             Options.addPage "Pharaoh", @pharaohOptions
             @gameLoaded = false
-			
+            @background = new Renderer.Sprite();
+
         getName: () -> "Pharaoh"
 
         preDraw: (renderer) ->
+            renderer.drawSprite(@background)
 
         postDraw: (renderer) ->
 
         loadGame: (gamedata) ->
-			
-			
-			
+            @maxTurn = gamedata.turns.length
+            @mapWidth = gamedata.turns[0].mapWidth
+            @mapHeight = gamedata.turns[0].mapHeight
+
+            @background.texture = "background"
+            @background.width = @mapWidth
+            @background.height = @mapHeight
+            @background.tiling = true
+            @background.tileWidth = 24
+            @background.tileHeight = 16
+
+
         getSexpScheme: () ->
             {
                 gameName : ["gameName"],
@@ -46,7 +60,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                           "upassable"],
                 add : ["type", "sourceID"],
                 spawn : ["type", "actingID", "x", "y"],
-                move : ["type", "actingID", "fromX", "fromY", "toX", "toY"],
+                Move : ["type", "actingID", "fromX", "fromY", "toX", "toY"],
                 kill : ["type", "actingID", "targetID"],
                 pharaohTalk : ["type", "actingID", "message"],
                 theifTalk : ["type", "actingID", "message"],
@@ -59,4 +73,5 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                        "scarabsForThieves", "maxStack", "roundsToWin",
                        "roundTurnLimit"]
             }
-	return new Pharaoh
+
+    return new Pharaoh

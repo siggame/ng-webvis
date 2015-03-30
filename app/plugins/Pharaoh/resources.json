@@ -1,0 +1,9 @@
+{
+    "resources": [
+        {
+            "id": "background",
+            "image": "sands.png",
+            "spriteSheet": null
+        }
+    ]
+}
