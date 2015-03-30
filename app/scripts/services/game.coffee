@@ -10,6 +10,10 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @playbackSpeed = 1
     @renderer = null
     @turnProgress = 0
+    window.requestAnimFrame = (callback) =>
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+            (callback) =>
+                window.setTimeout(callback, 1000 / 60);
 
     @getCurrentTurn = () -> @currentTurn
 
@@ -77,10 +81,9 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         if @isPlaying()
             curTurn += @getPlaybackSpeed() * dtSeconds
             @setCurrentTurn(window.parseInt(curTurn))
-
             @turnProgress = curTurn - @getCurrentTurn()
-            @lastAnimateTime = currentTime
-            
+
+        @lastAnimateTime = currentTime
         return dtSeconds
 
     @fileLoaded = (gameObject) =>
@@ -94,6 +97,8 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @setMaxTurns(PluginManager.getMaxTurn())
 
         @renderer.assetManager.loadTextures gameObject.gameName, () =>
+            currentDate = new Date()
+            @lastAnimateTime = currentDate.getTime()
             requestAnimationFrame @animate
 
     return this
