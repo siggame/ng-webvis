@@ -20,8 +20,15 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         getName: () -> "Pharaoh"
 
         preDraw: (dt, renderer) ->
-            @background.position.x += 1 * dt;
-            @background.position.y += 1 * dt;
+            @background.tileOffsetX += dt * 0.05
+            if @background.tileOffsetX > 1
+                @background.tileOffsetX %= 1
+
+            @background.tileOffsetY += dt * 0.05
+            if @background.tileOffsetY > 1
+                @background.tileOffsetY %= 1
+
+            console.log dt
             renderer.drawSprite(@background)
 
         postDraw: (dt, renderer) ->
@@ -37,7 +44,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @background.tiling = true
             @background.tileWidth = 24
             @background.tileHeight = 16
-
+            @background.tileOffsetX = 0.5
+            @background.tileOffsetY = 0.5
 
         getSexpScheme: () ->
             {
