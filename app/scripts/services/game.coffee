@@ -11,9 +11,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @renderer = null
     @turnProgress = 0
     window.requestAnimFrame = (callback) =>
-        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
-            (callback) =>
-                window.setTimeout(callback, 1000 / 60);
+        return window.setTimeout(callback, 1000 / 60);
 
     @getCurrentTurn = () -> @currentTurn
 
