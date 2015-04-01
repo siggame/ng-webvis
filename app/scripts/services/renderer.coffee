@@ -23,11 +23,10 @@ webvisApp.service 'Renderer', ->
 
         # Renderer::AssetManager::loadTexture(fileName)
         # param filename (String) - name of the asset to search for on the server
-        loadTextures: (onloadCallback) ->
-            u = window.location.protocol + "//" + 
-                window.location.hostname + ":" + 
-                window.location.port + "/plugins/resources.json"
-            console.log 
+        loadTextures: (pluginName, onloadCallback) ->
+            @textures = {}
+            @sheetData = {}
+            u = "/plugins/" + pluginName + "/resources.json"
             $.ajax
                 dataType: "json",
                 url: u,
@@ -39,7 +38,7 @@ webvisApp.service 'Renderer', ->
                     numPictures = data.resources.length
                     for resource in data.resources
                         img = document.createElement 'img'
-                        img.src = "images/" + resource.image
+                        img.src = "/plugins/" + pluginName + "/images/" + resource.image
                         @textures[resource.id] = img
 
                         img.onload = () =>
@@ -47,10 +46,8 @@ webvisApp.service 'Renderer', ->
                             if numPictures == 0
                                 onloadCallback()
 
-                        if resource.spriteSheet != null
-                            u = window.location.protocol + "//" + 
-                                window.location.hostname + ":" + 
-                                window.location.port + "/" + resource.spriteSheet
+                        if resource.spriteSheet != (null)
+                            u = "/plugins/" + pluginName + "/images/" + resource.spriteSheet
                             $.ajax
                                 dataType: "json",
                                 url: u,
@@ -209,12 +206,17 @@ webvisApp.service 'Renderer', ->
             @anchor = new Point(0, 0, 0)
             @width = 0.0
             @height = 0.0
-            @texCoords = new Point(0, 0, 0)
+            @u1 = 0.0
+            @v1 = 0.0
+            @u2 = 1.0
+            @v2 = 1.0
             @texWidth = 1.0
             @texHeight = 1.0
             @tiling = false
             @tileWidth = 0.0
             @tileHeight = 0.0
+            @tileOffsetX = 0.0
+            @tileOffsetY = 0.0
             @color = new Color(0, 0, 0, 0)
 
     ###
@@ -320,13 +322,22 @@ webvisApp.service 'Renderer', ->
      # utilizes the HTML5 Canvas drawing API for rendering.
     ###
     @CanvasRenderer = class CanvasRenderer extends @BaseRenderer
-        constructor: (@canvas, @worldWidth, @worldHeight, @clearColor) ->
+        constructor: (@canvas, @worldWidth, @worldHeight) ->
             @assetManager = new AssetManager
             @context = @canvas.getContext("2d")
+            @clearColor = new Color(1,1,1)
             if !@context?
                 throw {errorStr: "Could not get a 2d render context"}
             @Projection = new Matrix3x3
             @resizeWorld(@worldWidth, @worldHeight)
+
+            @drawSpritePattern = document.createElement 'canvas'
+            @drawSpritePattern.width = 20
+            @drawSpritePattern.height = 20
+
+            @drawSpriteCanvas = document.createElement 'canvas'
+            @drawSpriteCanvas.width = 20
+            @drawSpriteCanvas.height = 20
 
         # CanvasRenderer::resizeWorld(worldWidth, worldHeight)
         # See doc for BaseRenderer::resizeWorld(worldWidth, worldHeight)
@@ -372,10 +383,10 @@ webvisApp.service 'Renderer', ->
             if t?
                 sheetData = @assetManager.getSheetData sprite.texture
                 if !sheetData?
-                    u = sprite.texCoords.x * t.width
-                    v = sprite.texCoords.y * t.height
-                    uWidth = sprite.texWidth * t.width
-                    vHeight = sprite.texHeight * t.height
+                    u = sprite.u1 * t.width
+                    v = sprite.v1 * t.height
+                    u2 = sprite.u2 * t.width
+                    v2 = sprite.v2 * t.height
                 else
                     spriteResX = t.width / sheetData.width
                     spriteResY = t.height / sheetData.height
@@ -387,6 +398,9 @@ webvisApp.service 'Renderer', ->
                             (sprite.texCoords.y * spriteResY)
                     uWidth = (spriteResX * sprite.texWidth) - 1
                     vHeight = (spriteResY * sprite.texHeight) - 1
+
+                if uWidth == 0 then uWidth = 1
+                if vHeight == 0 then vHeight = 1
 
                 x = @Projection.get(0, 0) * sprite.position.x +
                         @Projection.get(1, 0) * sprite.position.y +
@@ -410,9 +424,12 @@ webvisApp.service 'Renderer', ->
                 h = Math.round(h * @canvas.height)
 
                 if !sprite.tiling
-                    @context.drawImage t, u, v, uWidth, vHeight,
-                        x, y, w, h
+                    # draw the correct looking canvas onto the main canvas
+                    @context.translate x, y
+                    @context.drawImage t, u, v, u2 - u, v2 - v, 0, 0, w, h
                 else
+                    # determine the width and height of each tile with respect
+                    # to the current transform matrix
                     tw = @Projection.get(0, 0) * sprite.tileWidth +
                          @Projection.get(1, 0) * sprite.tileHeight
 
@@ -422,18 +439,31 @@ webvisApp.service 'Renderer', ->
                     tw = Math.round(tw * @canvas.width)
                     th = Math.round(th * @canvas.height)
 
-                    tempImg = document.createElement 'canvas'
-                    tempImg.width = tw
-                    tempImg.height = th
-                    tempCtx = tempImg.getContext '2d'
+                    # put texture on a canvas to use as a pattern
+                    @drawSpritePattern.width = tw
+                    @drawSpritePattern.height = th
+                    patternCtx = @drawSpritePattern.getContext '2d'
 
-                    tempCtx.drawImage t, u, v, uWidth, vHeight,
-                        0, 0, tempImg.width, tempImg.height
+                    patternCtx.drawImage t, u, v, u2 - u, v2 - v, 0, 0, tw, th
+                    pattern = @context.createPattern(@drawSpritePattern,
+                        "repeat")
 
-                    pat = @context.createPattern tempImg, "repeat"
-                    @context.rect x, y, w, h
-                    @context.fillStyle = pat
-                    @context.fill()
+                    # draw pattern on a canvas a given offset for tex coords
+                    @drawSpriteCanvas.width = w
+                    @drawSpriteCanvas.height = h
+                    spriteCtx = @drawSpriteCanvas.getContext '2d'
+
+                    offsetX = sprite.tileOffsetX * tw
+                    offsetY = sprite.tileOffsetY * th
+
+                    spriteCtx.translate(offsetX , offsetY)
+                    spriteCtx.rect(-offsetX, -offsetY, w, h)
+                    spriteCtx.fillStyle = pattern
+                    spriteCtx.fill()
+
+                    # draw the correct looking canvas on the main canvas
+                    @context.drawImage @drawSpriteCanvas, x, y, w, h
+
             else
                 console.info "texture not found"
 

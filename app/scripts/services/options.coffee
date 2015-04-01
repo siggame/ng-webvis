@@ -10,28 +10,28 @@
 angular.module('webvisApp').service 'Options', ($rootScope, alert) ->
     # Option classes
     @CheckBox = class CheckBox
-        constructor: (@type, @isChecked) ->     
-        
+        constructor: (@type, @isChecked) ->
+
     @Slider = class Slider
         constructor: (@type, @minimum, @maximum, @current) ->
-        
+
     @Textbox = class Textbox
         constructor: (@type, @text) ->
-            
+
     @Dropdown = class Dropdown
         constructor: (@type, @options, initialValue) ->
             @currentValue = initialValue
-            
-    # Members    
-    @_options = {}    
-        
+
+    # Members
+    @_options = {}
+
     # this option page is always present for non-plugin specific options
     @_webvisOptions = [
         [   "textbox",
             "Arena Url",
             ""
         ],
-        [ 
+        [
             "dropdown",
             "Mode",
             ["normal","arena"],
@@ -44,8 +44,8 @@ angular.module('webvisApp').service 'Options', ($rootScope, alert) ->
             "canvas"
         ]
     ]
-    
-    
+
+
     # private
     @_createOption = (init) ->
         option = null
@@ -65,7 +65,7 @@ angular.module('webvisApp').service 'Options', ($rootScope, alert) ->
         for option in options
             page[option[1]] = @_createOption(option)
         return page
-    
+
     # public
     @addPage = (name, options) ->
         if !@_options[name]?
@@ -76,21 +76,21 @@ angular.module('webvisApp').service 'Options', ($rootScope, alert) ->
             $rootScope.$broadcast('Options:pageAdded')
         else
             throw {message: "Page already exists"}
-            
+
     @add = (page, initData) ->
         if @_options[page]?
             @_options[page] = @_createOption(initData)
-        
+
     @get = (page, name) ->
         if @_options[page]? and @_options[page][name]?
             return @_options[page][name]
         else
             return null
-    
+
     @getOptions = () -> @_options
-    
+
     # constructor
     # during construction add the webvis option page
-    @_options["Webvis"] = @_parsePageConstructor(@_webvisOptions)    
-    
+    @_options["Webvis"] = @_parsePageConstructor(@_webvisOptions)
+
     return this

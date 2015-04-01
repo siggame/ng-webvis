@@ -10,6 +10,8 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @playbackSpeed = 1
     @renderer = null
     @turnProgress = 0
+    window.requestAnimFrame = (callback) =>
+        return window.setTimeout(callback, 1000 / 60);
 
     @getCurrentTurn = () -> @currentTurn
 
@@ -21,14 +23,12 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
 
     @setCurrentTurn = (t) ->
         if t != @currentTurn
-            console.log "change " + t
             $rootScope.$broadcast('currentTurn:updated', t)
 
         @currentTurn = t
 
     @setMaxTurns = (maxTurn) ->
         if maxTurn != @maxTurn
-            console.log "change max turn " + maxTurn
             $rootScope.$broadcast('maxTurn:updated', maxTurn)
 
         @maxTurn = maxTurn
@@ -37,16 +37,10 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @minTurn = minTurn
 
     @createRenderer = (canvas) ->
-        console.log "creating a renderer"
         if PluginManager.isLoaded()
             @renderer = new Renderer.CanvasRenderer(canvas, PluginManager.getMapWidth(), PluginManager.getMapHeight())
         else
             @renderer = new Renderer.CanvasRenderer(canvas, 20, 20)
-        col = new Renderer.Color(1, 1, 1, 1)
-        @renderer.assetManager.loadTextures ()=>
-            requestAnimationFrame @animate
-        @renderer.setClearColor(col)
-        @renderer.begin()
 
     @canvasResized = (newWidth, newHeight) ->
         if @renderer?
@@ -61,10 +55,8 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @playing = true
 
     @animate = () =>
-        if @isPlaying()
-            console.log "yo"
-            requestAnimationFrame @animate
-            @updateTime()
+        requestAnimationFrame @animate
+        dt = @updateTime()
 
         if @renderer != null
             @renderer.begin()
@@ -72,13 +64,11 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
             if PluginManager.isLoaded()
                 entities = PluginManager.getEntities()
 
-                # console.log @getCurrentTurn() + " " + @turnProgress
-
-                PluginManager.preDraw(@renderer)
+                PluginManager.preDraw(dt, @renderer)
                 for id, entity of entities
                     console.info "drawing " + id
                     entity.draw @renderer, @getCurrentTurn(), @turnProgress
-                PluginManager.postDraw(@renderer)
+                PluginManager.postDraw(dt, @renderer)
 
     @updateTime = () =>
         currentDate = new Date()
@@ -86,23 +76,27 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         curTurn = @getCurrentTurn() + @turnProgress
         dtSeconds = (currentTime - @lastAnimateTime)/1000
 
-        curTurn += @getPlaybackSpeed() * dtSeconds
-        @setCurrentTurn(window.parseInt(curTurn))
+        if @isPlaying()
+            curTurn += @getPlaybackSpeed() * dtSeconds
+            @setCurrentTurn(window.parseInt(curTurn))
+            @turnProgress = curTurn - @getCurrentTurn()
 
-        @turnProgress = curTurn - @getCurrentTurn()
         @lastAnimateTime = currentTime
+        return dtSeconds
 
     @fileLoaded = (gameObject) =>
+        PluginManager.clear()
         PluginManager.changePlugin gameObject.gameName
         PluginManager.loadGame gameObject
 
         @renderer.resizeWorld PluginManager.getMapWidth(), PluginManager.getMapHeight()
-
         @currentTurn = 0
         @playing = false
-
         @setMaxTurns(PluginManager.getMaxTurn())
 
-        requestAnimationFrame @animate
+        @renderer.assetManager.loadTextures gameObject.gameName, () =>
+            currentDate = new Date()
+            @lastAnimateTime = currentDate.getTime()
+            requestAnimationFrame @animate
 
     return this

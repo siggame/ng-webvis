@@ -41,26 +41,32 @@ webvisApp.factory 'PluginBase', ($log) ->
 
     class BasePlugin
         constructor: () ->
+            @entities = {}
+            @maxTurn = 0
+            @mapWidth = 0
+            @mapHeight = 0
+
+        getMaxTurn: () -> @maxTurn
+
+        getMapWidth: () -> @mapWidth
+
+        getMapHeight: () -> @mapHeight
+
+        getEntities: () -> @entities
+
+        clear: () ->
+            @entities = {}
+            @maxTurn = 0
+            @mapWidth = 0
+            @mapheight = 0
 
         getName: () ->
             throw new PluginError("getName not implemented")
 
-        getMaxTurn: () ->
-            throw new PluginError("getMaxTurns not implemented")
-
-        getMapWidth: () ->
-            throw new PluginError("getMapWidth not implemented")
-
-        getMapHeight: () ->
-            throw new PluginError("getMapHeight not implemented")
-
-        preDraw: (renderer) ->
+        preDraw: (delta, renderer) ->
             throw new PluginError("preDraw not implemented")
 
-        getEntities: () ->
-            throw new PluginError("getEntities not implemented")
-
-        postDraw: (renderer) ->
+        postDraw: (delta, renderer) ->
             throw new PluginError("postDraw not implemented")
 
         loadGame: (gamedata) ->

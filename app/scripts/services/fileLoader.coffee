@@ -66,10 +66,12 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
 
         parser.parse file.data
 
+
         gameObject = {}
         gameObject["gameName"] = parser.getGameName()
         gameObject["gameID"] = parser.getGameID()
         gameObject["gameWinner"] = parser.getGameWinner()
+
 
         if $injector.has parser.getGameName()
             plugin = $injector.get parser.getGameName()
@@ -77,8 +79,7 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
             parser.clear()
             Game.fileLoaded gameObject
         else
-            baseUrl = window.location.href.replace("/#/", "/")
-            pluginUrl = baseUrl + "plugins/" + parser.getGameName() + ".js"
+            pluginUrl = "/plugins/" + parser.getGameName() + "/" + parser.getGameName() + ".js"
             $.ajax
                 dataType: "script",
                 url: pluginUrl,
@@ -87,16 +88,15 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
                     $rootScope.$digest()
                     module = angular.module('webvisApp')
                     $injector.invoke([parser.getGameName(), (plugin) =>
+                        console.log "loaded plugin"
                         gameObject["turns"] = parser.getTurns(plugin.getSexpScheme())
                         parser.clear()
                         Game.fileLoaded gameObject
-                    ])
+                        ])
                 error: (jqxhr, textStatus, errorThrown)->
-                    alert.error "Plugin " + parser.getGameName() + " could not be found"
+                    alert.error "Plugin " + parser.getGameName() + " could not be loaded. " + errorThrown
+                    $rootScope.$digest()
                     parser.clear()
-
-        # Start reading!
-        reader.readAsText(file.data)
 
     @loadFile = (files) ->
         try
