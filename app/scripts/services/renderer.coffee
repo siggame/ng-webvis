@@ -335,10 +335,6 @@ webvisApp.service 'Renderer', ->
             @drawSpritePattern.width = 20
             @drawSpritePattern.height = 20
 
-            @drawSpriteCanvas = document.createElement 'canvas'
-            @drawSpriteCanvas.width = 20
-            @drawSpriteCanvas.height = 20
-
         # CanvasRenderer::resizeWorld(worldWidth, worldHeight)
         # See doc for BaseRenderer::resizeWorld(worldWidth, worldHeight)
         resizeWorld: (@worldWidth, @worldHeight) ->
@@ -449,20 +445,14 @@ webvisApp.service 'Renderer', ->
                         "repeat")
 
                     # draw pattern on a canvas a given offset for tex coords
-                    @drawSpriteCanvas.width = w
-                    @drawSpriteCanvas.height = h
-                    spriteCtx = @drawSpriteCanvas.getContext '2d'
-
                     offsetX = sprite.tileOffsetX * tw
                     offsetY = sprite.tileOffsetY * th
 
-                    spriteCtx.translate(offsetX , offsetY)
-                    spriteCtx.rect(-offsetX, -offsetY, w, h)
-                    spriteCtx.fillStyle = pattern
-                    spriteCtx.fill()
-
                     # draw the correct looking canvas on the main canvas
-                    @context.drawImage @drawSpriteCanvas, x, y, w, h
+                    @context.translate(offsetX + x, offsetY + x)
+                    @context.rect(x - offsetX, y - offsetY, w, h)
+                    @context.fillStyle = pattern
+                    @context.fill()
 
             else
                 console.info "texture not found"
