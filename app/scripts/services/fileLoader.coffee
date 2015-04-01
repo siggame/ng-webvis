@@ -110,11 +110,12 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
         try
             checkExtension = (url) ->
                 a = url.split('.')
-                if a.length == 1 or (a[0] == "" and a.length == 2)
+                if a.length == 1 or (a[1] == "")
                     return ""
-                return verifyFileType(a.pop())
+                return verifyFileType("." + a.pop())
 
             ext = checkExtension(u)
+
             if ext != ""
                 $.ajax
                     type: "GET",
@@ -124,9 +125,9 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
                     success: (d) =>
                         file = {
                             extension : ext
-                            data : data
+                            data : d
                         }
-                        @processFile(data)
+                        processFile(file)
                     error: (jqxhr, textStatus, errorThrown) ->
                         showError {message: "File could not be loaded from " + u}
             else
