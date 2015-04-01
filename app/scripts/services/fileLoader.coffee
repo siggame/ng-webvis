@@ -11,11 +11,11 @@ webvisApp = angular.module('webvisApp')
 webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parser, Options) ->
     # A helper function for showing errors
     acceptFileExtensions = ["gamelog", "glog", "json"]
-    
+
     showError = (message) ->
         alert.error message
-        if !$scope.$$phase
-            $scope.$apply()
+        if !$rootScope.$$phase
+            $rootScope.$apply()
         $log.warn message
 
     verifyFileType = (filename) ->
@@ -25,16 +25,14 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
                 ext = extension
                 break
         return ext
-        
+
 
     checkDroppedFiles = (files) ->
         if files.length != 1
             throw message: "Multiple files dropped"
 
-        fileData = files[0]
-        filename = escape fileData.name
-
-        $log.info "Dropped #{filename} with type '#{file.type}'"
+        file = files[0]
+        filename = escape file.name
 
         ext = verifyFileType filename
         if ext == ""
@@ -42,22 +40,22 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
 
         return {
             extension : ext
-            fileData : file
+            fileName : file
         }
 
-    readFromLocal = (file, callback) ->
+    readFromLocal = (fileData, callback) ->
         reader = new FileReader()
-        
         reader.onload = (event) =>
             file = {
-                extension : file.extension
+                extension : fileData.extension
                 data : event.target.result
-            }            
+            }
             callback(file)
-        
+        reader.readAsText(fileData.fileName)
+
     processFile = (file) ->
         # TODO Trigger progress bar
-        parser = null 
+        parser = null
         switch file.extension
             when "gamelog" or "glog"
                 parser = Parser.SexpParser
@@ -65,14 +63,14 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
                 parser = Parser.JsonParser
             else
                 throw message: "No parser available for file type of file"
-        
+
         parser.parse file.data
-        
+
         gameObject = {}
         gameObject["gameName"] = parser.getGameName()
         gameObject["gameID"] = parser.getGameID()
         gameObject["gameWinner"] = parser.getGameWinner()
-        
+
         if $injector.has parser.getGameName()
             plugin = $injector.get parser.getGameName()
             gameObject["turns"] = parser.getTurns(plugin.getSexpScheme())
@@ -92,7 +90,7 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
                         gameObject["turns"] = parser.getTurns(plugin.getSexpScheme())
                         parser.clear()
                         Game.fileLoaded gameObject
-                        ])
+                    ])
                 error: (jqxhr, textStatus, errorThrown)->
                     alert.error "Plugin " + parser.getGameName() + " could not be found"
                     parser.clear()
@@ -102,20 +100,20 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
 
     @loadFile = (files) ->
         try
-            fileData = checkFiles files
+            fileData = checkDroppedFiles files
             $log.info "Extension looks ok. Ready to read gamelog"
             readFromLocal(fileData, processFile)
         catch error
             showError error.message
-            
+
     @loadFromUrl = (u) ->
-        try 
+        try
             checkExtension = (url) ->
                 a = url.split('.')
                 if a.length == 1 or (a[0] == "" and a.length == 2)
                     return ""
                 return verifyFileType(a.pop())
-            
+
             ext = checkExtension(u)
             if ext != ""
                 $.ajax
@@ -131,9 +129,9 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
                         @processFile(data)
                     error: (jqxhr, textStatus, errorThrown) ->
                         showError {message: "File could not be loaded from " + u}
-            else     
-                throw message: "Bad File Extension"      
+            else
+                throw message: "Bad File Extension"
         catch error
-            showError error.message     
+            showError error.message
 
     return this
