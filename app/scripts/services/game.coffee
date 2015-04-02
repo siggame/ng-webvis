@@ -36,6 +36,9 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @setMinTurns = (minTurn) ->
         @minTurn = minTurn
 
+    @setPlaybackSpeed = (pb) ->
+        @playbackSpeed = pb
+
     @createRenderer = (canvas) ->
         if PluginManager.isLoaded()
             @renderer = new Renderer.CanvasRenderer(canvas, PluginManager.getMapWidth(), PluginManager.getMapHeight())
@@ -49,10 +52,14 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @isPlaying = () -> @playing
 
     @start = () ->
-        lastAnimate = new Date()
-        @lastAnimateTime = lastAnimate.getTime()
-        requestAnimationFrame @animate
-        @playing = true
+        if pluginManager.isLoaded()
+            lastAnimate = new Date()
+            @lastAnimateTime = lastAnimate.getTime()
+            requestAnimationFrame @animate
+            @playing = true
+
+    @stop = () ->
+        @playing = false
 
     @animate = () =>
         requestAnimationFrame @animate
@@ -80,6 +87,9 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
             curTurn += @getPlaybackSpeed() * dtSeconds
             @setCurrentTurn(window.parseInt(curTurn))
             @turnProgress = curTurn - @getCurrentTurn()
+            if curTurn >= PluginManager.getMaxTurns()
+                @turnProgress = 0
+                @stop()
 
         @lastAnimateTime = currentTime
         return dtSeconds

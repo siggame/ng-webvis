@@ -1,42 +1,58 @@
 <!-- Playback controls -->
 <div class="playback-container" ng-controller="PlaybackCtrl as playback">
   <div class="playback-controls well well-sm">
-    <div class="row" style="padding:0px;">
+    <div class="row" style="padding-left:10px;padding-right:10px">
       <div class="col-xs-12">
         <slider max-value="playback.maxTurn" current-value="playback.currentTurn" live-value="playback.currentTurn"></slider>
       </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12 playback-controls" style="margin-top:10px;">
+        <div class="btn-group pull-left">
+          <!-- Step back button -->
+          <button class="btn btn-default" ng-click="playback.stepBack()">
+            <i class="fa fa-backward"></i>
+          </button>
 
-      <div class="col-xs-12" style="margin-top:10px;">
-        <div class="btn-toolbar playback-buttons">
-          <div class="btn-group playback-controls">
+          <!-- Play/pause buttons -->
+          <button class="btn btn-default" ng-click="playback.playPause()">
+            <span ng-hide="playback.isPlaying()"><i class="fa fa-play"></i></span>
+            <span ng-show="playback.isPlaying()"><i class="fa fa-pause"></i></span>
+          </button>
 
-            <!-- Step back button -->
-            <button class="btn btn-default" ng-click="playback.stepBack()">
-              <i class="fa fa-backward"></i>
+          <!-- Step forward button -->
+          <button class="btn btn-default" ng-click="playback.stepForward()">
+            <i class="fa fa-forward"></i>
+          </button>
+        </div>
+
+        <!-- Fullscreen button -->
+        <div class="btn-group pull-right">
+            <button class="btn btn-default" ng-click="playback.fullscreen()">
+                <i class="fa fa-desktop"></i>
             </button>
+        </div>
 
-            <!-- Play/pause buttons -->
-            <button class="btn btn-default" ng-click="playback.playPause()">
-              <span ng-hide="playback.isPlaying()"><i class="fa fa-play"></i></span>
-              <span ng-show="playback.isPlaying()"><i class="fa fa-pause"></i></span>
-            </button>
-
-            <!-- Step forward button -->
-            <button class="btn btn-default" ng-click="playback.stepForward()">
-              <i class="fa fa-forward"></i>
-            </button>
-          </div>
-            <div class="btn btn-default slider-value">
-                {{ playback.currentTurn || 0 }}
-            </div>
-
-          <!-- Current turn display -->
-          <div class="btn-group pull-right">
-              <button class="btn btn-default" ng-click="playback.fullscreen()">
-                  <i class="fa fa-desktop"></i>
-              </button>
+        <!-- Current Turn -->
+        <div class="turn-display pull-right">
+          <p>Turn:</p>
+          <div class="btn btn-default slider-value disabled" style="margin-right:5px;">
+              {{ playback.currentTurn || 0 }}
           </div>
         </div>
+
+        <!-- Time Slider -->
+        <div class="time-slider pull-right">
+          <p>Time:</p>
+          <slider max-value="10" current-value="playback.timeDt" live-value="playback.timeDt"></slider>
+          <p>x{{playback.timeDt/4}}</p>
+          <script id="time-slide-handler">
+              var div = $(document.getElementById("time-slide-handler")).parent();
+              var pt = div.find("p").next().next();
+              pt.ready(function(){div.find("slider").css("width", div.width() - 100);});
+          </script>
+        </div>
+
       </div>
     </div>
   </div>
