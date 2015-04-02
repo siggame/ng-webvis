@@ -37,6 +37,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @minTurn = minTurn
 
     @setPlaybackSpeed = (pb) ->
+        console.log "setting playback speed " + pb
         @playbackSpeed = pb
 
     @createRenderer = (canvas) ->

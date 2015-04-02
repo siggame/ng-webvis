@@ -26,8 +26,25 @@
           </button>
         </div>
 
+
+
+        <!-- Fullscreen button -->
+        <div class="btn-group pull-right">
+            <button class="btn btn-default" ng-click="playback.fullscreen()">
+                <i class="fa fa-desktop"></i>
+            </button>
+        </div>
+
+        <!-- Current Turn -->
+        <div class="turn-display pull-right">
+          <p>Turn:</p>
+          <div class="btn btn-default slider-value" style="margin-right:5px;">
+              {{ playback.currentTurn || 0 }}
+          </div>
+        </div>
+
         <!-- Time Slider -->
-        <div class="time-slider">
+        <div class="time-slider pull-right">
           <p>Time:</p>
           <slider max-value="10" current-value="playback.timeDt" live-value="playback.timeDt"></slider>
           <p>x{{playback.timeDt/4}}</p>
@@ -38,17 +55,6 @@
           </script>
         </div>
 
-        <!-- Fullscreen button -->
-        <div class="btn-group pull-right">
-            <button class="btn btn-default" ng-click="playback.fullscreen()">
-                <i class="fa fa-desktop"></i>
-            </button>
-        </div>
-
-        <!-- Current Turn -->
-        <div class="btn btn-default slider-value pull-right" style="margin-right:5px;">
-            {{ playback.currentTurn || 0 }}
-        </div>
       </div>
     </div>
   </div>
