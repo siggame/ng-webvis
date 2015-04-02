@@ -15,6 +15,8 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
     @minTurn = Game.getMinTurn()
     @isFullscreen = false
 
+    @timeDt = Game.getPlaybackSpeed() * 4
+
     $scope.$on 'currentTurn:updated', (event, data) =>
         if !$scope.$$phase
             @currentTurn = data
@@ -28,6 +30,10 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
     $scope.$watch 'playback.currentTurn', (newValue) =>
         if angular.isDefined(newValue) and newValue != Game.getCurrentTurn()
             Game.setCurrentTurn newValue
+
+    $scope.$watch 'playback.timeDt', (newValue) =>
+        if angular.isDefined(newValue) and newValue/4 != Game.getPlaybackSpeed()
+            Game.setPlaybackSpeed newValue/4
 
     @isPlaying = -> Game.isPlaying()
 

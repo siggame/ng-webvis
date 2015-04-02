@@ -29,13 +29,12 @@
         <!-- Time Slider -->
         <div class="time-slider">
           <p>Time:</p>
-          <slider max-value="10" current-value="0"></slider>
-
+          <slider max-value="10" current-value="playback.timeDt" live-value="playback.timeDt"></slider>
+          <p>x{{playback.timeDt/4}}</p>
           <script id="time-slide-handler">
               var div = $(document.getElementById("time-slide-handler")).parent();
-              var parentWidth = div.width();
-              var textWidth = div.find("p").width();
-              div.find("slider").css("width", parentWidth - textWidth - 25);
+              var pt = div.find("p").next().next();
+              pt.ready(function(){div.find("slider").css("width", div.width() - 100);});
           </script>
         </div>
 

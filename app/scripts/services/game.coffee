@@ -36,6 +36,9 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @setMinTurns = (minTurn) ->
         @minTurn = minTurn
 
+    @setPlaybackSpeed = (pb) ->
+        @playbackSpeed = pb
+
     @createRenderer = (canvas) ->
         if PluginManager.isLoaded()
             @renderer = new Renderer.CanvasRenderer(canvas, PluginManager.getMapWidth(), PluginManager.getMapHeight())
