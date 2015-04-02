@@ -55,6 +55,8 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
         $log.info "Play/Pause Pressed"
         if(!Game.isPlaying())
             Game.start()
+        else
+            Game.stop()
 
     @fullscreen = ->
         elem = document.getElementById "fullscreen-container";
