@@ -113,6 +113,43 @@ webvisApp.service 'Renderer', ->
                 throw {errorStr: "Matrix out of bounds"}
             @elements[y*3 + x] = val
 
+        mul: (point, param2) ->
+            p = {x: 0, y: 0}
+            if !param2?
+                # called as mul : (Point point) ->
+                p.x = (@elements[0] * point.x) + (@elements[1] * points.y) + @elements[2]
+                p.y = (@elements[3] * point.x) + (@elements[4] * points.y) + @elements[5]
+            else
+                # called as mul : (x, y) ->
+                x = point
+                y = param2
+                p.x = (@elements[0] * x) + (@elements[1] * y) + @elements[2]
+                p.y = (@elements[3] * x) + (@elements[4] * y) + @elements[5]
+            return p
+
+        translate: (x, y) ->
+            @elements[2] += x
+            @elements[5] += y
+
+        rotate: (radians) ->
+            temp = []
+            temp[0] = Math::cos(radians)
+            temp[1] = -Math::sin(radians)
+            temp[2] = Math::sin(radians)
+            temp[3] = Math::cos(radians)
+
+            @elements[0] = (temp[0] * @elements[0]) + (temp[1] * @elements[3])
+            @elements[1] = (temp[0] * @elements[1]) + (temp[1] * @elements[4])
+            @elements[2] = (temp[2] * @elements[0]) + (temp[3] * @elements[3])
+            @elements[3] = (temp[2] * @elements[1]) + (temp[3] * @elements[4])
+
+        scale: (x, y) ->
+            @elements[0] = x * @elements[0]
+            @elements[1] = x * @elements[1]
+            @elements[2] = y * @elements[3]
+            @elements[3] = y * @elements[4]
+
+
     ###
      # Renderer::Matrix4x4
      # A Matrix with 4 rows and 4 columns. Used for transform matrices.
