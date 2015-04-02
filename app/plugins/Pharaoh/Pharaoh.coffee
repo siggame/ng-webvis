@@ -28,7 +28,6 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             if @background.tileOffsetY > 1
                 @background.tileOffsetY %= 1
 
-            console.log dt
             renderer.drawSprite(@background)
 
         postDraw: (dt, renderer) ->
