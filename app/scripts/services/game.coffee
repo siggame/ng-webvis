@@ -40,10 +40,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @playbackSpeed = pb
 
     @createRenderer = (canvas) ->
-        if PluginManager.isLoaded()
-            @renderer = new Renderer.CanvasRenderer(canvas, PluginManager.getMapWidth(), PluginManager.getMapHeight())
-        else
-            @renderer = new Renderer.CanvasRenderer(canvas, 20, 20)
+        @renderer = new Renderer.CanvasRenderer(canvas, 100, 100)
 
     @canvasResized = (newWidth, newHeight) ->
         if @renderer?
@@ -99,7 +96,6 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         PluginManager.changePlugin gameObject.gameName
         PluginManager.loadGame gameObject
 
-        @renderer.resizeWorld PluginManager.getMapWidth(), PluginManager.getMapHeight()
         @currentTurn = 0
         @playing = false
         @setMaxTurns(PluginManager.getMaxTurn())
