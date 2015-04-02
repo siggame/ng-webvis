@@ -188,6 +188,7 @@ webvisApp.service 'Renderer', ->
     ###
     @Line = class Line
         constructor: (@x1, @y1, @x2, @y2) ->
+            @transform = null
             @color = new Color
             @z1 = 0.0
             @z2 = 0.0
@@ -237,6 +238,7 @@ webvisApp.service 'Renderer', ->
     ###
     @Sprite = class Sprite
         constructor: () ->
+            @transform = null
             @texture = null
             @frame = 0
             @position = new Point(0, 0, 0)
@@ -262,6 +264,7 @@ webvisApp.service 'Renderer', ->
     ###
     @Rect = class Rect
         constructor: () ->
+            @transform = null
             @position = new Point(0, 0, 0)
             @width = 0.0
             @height = 0.0
@@ -276,6 +279,7 @@ webvisApp.service 'Renderer', ->
     ###
     @Path = class Path
         constructor: () ->
+            @transform = null
             @curPos = new Point(0, 0, 0)
             @points = []
             @strokeColor = new Color(0, 0, 0, 0)
@@ -312,6 +316,15 @@ webvisApp.service 'Renderer', ->
         # param worldWidth (real) - the width bound of the coordinate system
         # param worldHeight (real) - the height bound of the coordinate system
         resizeWorld: (worldWidth, worldHeight) ->
+            throw {errorStr: "Function not implemented"}
+
+        getProjection: () ->
+            throw {errorStr: "Function not implemented"}
+
+        getWorldSize: () ->
+            throw {errorStr: "Function not implemented"}
+
+        getScreenSize: () ->
             throw {errorStr: "Function not implemented"}
 
          # BaseRenderer:setClearColor(color)
@@ -382,6 +395,12 @@ webvisApp.service 'Renderer', ->
             @Projection.set(0, 0, 1/@worldWidth)
             @Projection.set(1, 1, 1/@worldHeight)
 
+        getProjection: () -> @Projection
+
+        getWorldSize: () -> [@worldWidth, @worldHeight]
+
+        getScreenSize: () -> [@canvas.width, @canvas.height]
+
         # CanvasRenderer::begin(color)
         # See doc for BaseRenderer::begin(color)
         begin: () ->
@@ -437,8 +456,12 @@ webvisApp.service 'Renderer', ->
                 if uWidth == 0 then uWidth = 1
                 if vHeight == 0 then vHeight = 1
 
-                [x, y] = @Projection.mul(sprite.position)
-                [w, h] = @Projection.mul(sprite.width, sprite.height)
+                if sprite.transform != null
+                    [x, y] = sprite.transform.mul(sprite.position)
+                    [w, h] = sprite.transform.mul(sprite.width, sprite.height)
+                else
+                    [x, y] = @Projection.mul(sprite.position)
+                    [w, h] = @Projection.mul(sprite.width, sprite.height)
 
                 x = Math.round(x * @canvas.width)
                 y = Math.round(y * @canvas.height)
@@ -452,7 +475,10 @@ webvisApp.service 'Renderer', ->
                 else
                     # determine the width and height of each tile with respect
                     # to the current transform matrix
-                    [tw, th] = @Projection.mul(sprite.tileWidth, sprite.tileHeight)
+                    if sprite.transform != null
+                        [tw, th] = sprite.transform.mul(sprite.tileWidth, sprite.tileHeight)
+                    else
+                        [tw, th] = @Projection.mul(sprite.tileWidth, sprite.tileHeight)
 
                     tw = Math.round(tw * @canvas.width)
                     th = Math.round(th * @canvas.height)
@@ -494,8 +520,12 @@ webvisApp.service 'Renderer', ->
             @context.strokeStyle = line.color.toCSS()
             @context.lineWidth = "1"
 
-            [x1, y1] = @Projection.mul(line.x1, line.y1)
-            [x2, y2] = @Projection.mul(line.x2, line.y2)
+            if line.transform != null
+                [x1, y1] = sprite.transform.mul(line.x1, line.y1)
+                [x2, y2] = sprite.transform.mul(line.x2, line.y2)
+            else
+                [x1, y1] = @Projection.mul(line.x1, line.y1)
+                [x2, y2] = @Projection.mul(line.x2, line.y2)
 
             x1 = parseInt(x1 * @canvas.width) + 0.5
             y1 = parseInt(y1 * @canvas.height) + 0.5
@@ -520,8 +550,12 @@ webvisApp.service 'Renderer', ->
             @context.strokeStyle = rect.strokeColor.toCSS()
             @context.lineWidth = "1"
 
-            [x, y] = @Projection.mul(rect.position)
-            [w, h] = @Projection.mul(rect.width, rect.height)
+            if rect.transform != null
+                [x, y] = @Projection.mul(rect.position)
+                [w, h] = @Projection.mul(rect.width, rect.height)
+            else
+                [x, y] = @Projection.mul(rect.position)
+                [w, h] = @Projection.mul(rect.width, rect.height)
 
             x = parseInt(x * @canvas.width)
             y = parseInt(y * @canvas.height)
