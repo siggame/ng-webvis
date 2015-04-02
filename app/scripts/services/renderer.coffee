@@ -92,7 +92,7 @@ webvisApp.service 'Renderer', ->
             for index in [0..8]
                 @elements[index] = 0.0
             for index in [0..2]
-                @elements[index*4+index] = 1.0
+                @elements[index*3+index] = 1.0
 
         #Matrix3x3::get(x , y)
         #param x (integer) - the column you wish to access at
@@ -114,18 +114,18 @@ webvisApp.service 'Renderer', ->
             @elements[y*3 + x] = val
 
         mul: (point, param2) ->
-            p = {x: 0, y: 0}
             if !param2?
                 # called as mul : (Point point) ->
-                p.x = (@elements[0] * point.x) + (@elements[1] * points.y) + @elements[2]
-                p.y = (@elements[3] * point.x) + (@elements[4] * points.y) + @elements[5]
+                x = (@elements[0] * point.x) + (@elements[1] * point.y) + @elements[2]
+                y = (@elements[3] * point.x) + (@elements[4] * point.y) + @elements[5]
             else
                 # called as mul : (x, y) ->
-                x = point
-                y = param2
-                p.x = (@elements[0] * x) + (@elements[1] * y) + @elements[2]
-                p.y = (@elements[3] * x) + (@elements[4] * y) + @elements[5]
-            return p
+                xt = point
+                yt = param2
+                x = (@elements[0] * xt) + (@elements[1] * yt) + @elements[2]
+                y = (@elements[3] * xt) + (@elements[4] * yt) + @elements[5]
+                console.log @elements[2] + " " + @elements[5]
+            return [x, y]
 
         translate: (x, y) ->
             @elements[2] += x
@@ -188,6 +188,7 @@ webvisApp.service 'Renderer', ->
     ###
     @Line = class Line
         constructor: (@x1, @y1, @x2, @y2) ->
+            @transform = null
             @color = new Color
             @z1 = 0.0
             @z2 = 0.0
@@ -237,6 +238,7 @@ webvisApp.service 'Renderer', ->
     ###
     @Sprite = class Sprite
         constructor: () ->
+            @transform = null
             @texture = null
             @frame = 0
             @position = new Point(0, 0, 0)
@@ -262,6 +264,7 @@ webvisApp.service 'Renderer', ->
     ###
     @Rect = class Rect
         constructor: () ->
+            @transform = null
             @position = new Point(0, 0, 0)
             @width = 0.0
             @height = 0.0
@@ -276,6 +279,7 @@ webvisApp.service 'Renderer', ->
     ###
     @Path = class Path
         constructor: () ->
+            @transform = null
             @curPos = new Point(0, 0, 0)
             @points = []
             @strokeColor = new Color(0, 0, 0, 0)
@@ -312,6 +316,15 @@ webvisApp.service 'Renderer', ->
         # param worldWidth (real) - the width bound of the coordinate system
         # param worldHeight (real) - the height bound of the coordinate system
         resizeWorld: (worldWidth, worldHeight) ->
+            throw {errorStr: "Function not implemented"}
+
+        getProjection: () ->
+            throw {errorStr: "Function not implemented"}
+
+        getWorldSize: () ->
+            throw {errorStr: "Function not implemented"}
+
+        getScreenSize: () ->
             throw {errorStr: "Function not implemented"}
 
          # BaseRenderer:setClearColor(color)
@@ -377,8 +390,12 @@ webvisApp.service 'Renderer', ->
         resizeWorld: (@worldWidth, @worldHeight) ->
             @Projection.set(0, 0, 1/@worldWidth)
             @Projection.set(1, 1, 1/@worldHeight)
-            @Projection.set(0, 0, 1/@worldWidth)
-            @Projection.set(1, 1, 1/@worldHeight)
+
+        getProjection: () -> @Projection
+
+        getWorldSize: () -> [@worldWidth, @worldHeight]
+
+        getScreenSize: () -> [@canvas.width, @canvas.height]
 
         # CanvasRenderer::begin(color)
         # See doc for BaseRenderer::begin(color)
@@ -435,21 +452,12 @@ webvisApp.service 'Renderer', ->
                 if uWidth == 0 then uWidth = 1
                 if vHeight == 0 then vHeight = 1
 
-                x = @Projection.get(0, 0) * sprite.position.x +
-                        @Projection.get(1, 0) * sprite.position.y +
-                        @Projection.get(2, 0) * sprite.position.z
-
-                y = @Projection.get(0, 1) * sprite.position.x +
-                        @Projection.get(1, 1) * sprite.position.y +
-                        @Projection.get(2, 1) * sprite.position.z
-
-                w = @Projection.get(0, 0) * sprite.width +
-                        @Projection.get(1, 0) * sprite.height +
-                        @Projection.get(2, 0) * 0
-
-                h = @Projection.get(0, 1) * sprite.width +
-                        @Projection.get(1, 1) * sprite.height +
-                        @Projection.get(2, 1) * 0
+                if sprite.transform != null
+                    [x, y] = sprite.transform.mul(sprite.position)
+                    [w, h] = sprite.transform.mul(sprite.width, sprite.height)
+                else
+                    [x, y] = @Projection.mul(sprite.position)
+                    [w, h] = @Projection.mul(sprite.width, sprite.height)
 
                 x = Math.round(x * @canvas.width)
                 y = Math.round(y * @canvas.height)
@@ -463,14 +471,15 @@ webvisApp.service 'Renderer', ->
                 else
                     # determine the width and height of each tile with respect
                     # to the current transform matrix
-                    tw = @Projection.get(0, 0) * sprite.tileWidth +
-                         @Projection.get(1, 0) * sprite.tileHeight
-
-                    th = @Projection.get(0, 1) * sprite.tileWidth +
-                         @Projection.get(1, 1) * sprite.tileHeight
+                    if sprite.transform != null
+                        [tw, th] = sprite.transform.mul(sprite.tileWidth, sprite.tileHeight)
+                    else
+                        [tw, th] = @Projection.mul(sprite.tileWidth, sprite.tileHeight)
 
                     tw = Math.round(tw * @canvas.width)
                     th = Math.round(th * @canvas.height)
+
+                    console.log tw + " " + th
 
                     # put texture on a canvas to use as a pattern
                     @drawSpritePattern.width = tw
@@ -501,21 +510,12 @@ webvisApp.service 'Renderer', ->
             @context.strokeStyle = line.color.toCSS()
             @context.lineWidth = "1"
 
-            x1 = @Projection.get(0, 0) * line.x1 +
-                @Projection.get(1, 0) * line.y1 +
-                @Projection.get(2, 0) * line.z1
-
-            y1 = @Projection.get(0, 1) * line.x1 +
-                @Projection.get(1, 1) * line.y1 +
-                @Projection.get(2, 1) * line.z1
-
-            x2 = @Projection.get(0, 0) * line.x2 +
-                @Projection.get(1, 0) * line.y2 +
-                @Projection.get(2, 0) * line.z2
-
-            y2 = @Projection.get(0, 1) * line.x2 +
-                @Projection.get(1, 1) * line.y2 +
-                @Projection.get(2, 1) * line.z2
+            if line.transform != null
+                [x1, y1] = sprite.transform.mul(line.x1, line.y1)
+                [x2, y2] = sprite.transform.mul(line.x2, line.y2)
+            else
+                [x1, y1] = @Projection.mul(line.x1, line.y1)
+                [x2, y2] = @Projection.mul(line.x2, line.y2)
 
             x1 = parseInt(x1 * @canvas.width) + 0.5
             y1 = parseInt(y1 * @canvas.height) + 0.5
@@ -540,26 +540,17 @@ webvisApp.service 'Renderer', ->
             @context.strokeStyle = rect.strokeColor.toCSS()
             @context.lineWidth = "1"
 
-            x = @Projection.get(0, 0) * rect.position.x +
-                @Projection.get(1, 0) * rect.position.y +
-                @Projection.get(2, 0) * rect.position.z
+            if rect.transform != null
+                [x, y] = @Projection.mul(rect.position)
+                [w, h] = @Projection.mul(rect.width, rect.height)
+            else
+                [x, y] = @Projection.mul(rect.position)
+                [w, h] = @Projection.mul(rect.width, rect.height)
 
-            y = @Projection.get(0, 1) * rect.position.x +
-                @Projection.get(1, 1) * rect.position.y +
-                @Projection.get(2, 1) * rect.position.z
-
-            w = @Projection.get(0, 0) * rect.width +
-                @Projection.get(1, 0) * rect.height +
-                @Projection.get(2, 0) * 0
-
-            h = @Projection.get(0, 1) * rect.width +
-                @Projection.get(1, 1) * rect.height +
-                @Projection.get(2, 1) * 0
-
-            x *= @canvas.width
-            y *= @canvas.height
-            w *= @canvas.width
-            h *= @canvas.height
+            x = parseInt(x * @canvas.width)
+            y = parseInt(y * @canvas.height)
+            w = parseInt(w * @canvas.width)
+            h = parseInt(h * @canvas.height)
 
             @context.rect x, y, w, h
             @context.stroke()
