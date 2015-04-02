@@ -52,7 +52,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @isPlaying = () -> @playing
 
     @start = () ->
-        if pluginManager.isLoaded()
+        if PluginManager.isLoaded()
             lastAnimate = new Date()
             @lastAnimateTime = lastAnimate.getTime()
             requestAnimationFrame @animate
@@ -87,7 +87,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
             curTurn += @getPlaybackSpeed() * dtSeconds
             @setCurrentTurn(window.parseInt(curTurn))
             @turnProgress = curTurn - @getCurrentTurn()
-            if curTurn >= PluginManager.getMaxTurns()
+            if curTurn >= PluginManager.getMaxTurn()
                 @turnProgress = 0
                 @stop()
 
