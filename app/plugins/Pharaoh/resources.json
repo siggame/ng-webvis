@@ -27,7 +27,7 @@
         },
         {        
             "id": "bomber",
-            "image": "slave.png",
+            "image": "bomber.png",
             "spriteSheet": null
         },
         {        
@@ -48,6 +48,11 @@
         {        
             "id": "halfscrb",
             "image": "halfscarab.png",
+            "spriteSheet": null
+        },
+        {        
+            "id": "mummy",
+            "image": "mummy.png",
             "spriteSheet": null
         }
     ]
