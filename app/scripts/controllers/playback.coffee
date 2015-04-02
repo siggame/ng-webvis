@@ -53,8 +53,7 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
 
     @playPause = ->
         $log.info "Play/Pause Pressed"
-        Game.playing = not Game.playing
-        if(Game.isPlaying())
+        if(!Game.isPlaying())
             Game.start()
 
     @fullscreen = ->

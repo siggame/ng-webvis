@@ -37,7 +37,6 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @minTurn = minTurn
 
     @setPlaybackSpeed = (pb) ->
-        console.log "setting playback speed " + pb
         @playbackSpeed = pb
 
     @createRenderer = (canvas) ->
@@ -53,10 +52,11 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @isPlaying = () -> @playing
 
     @start = () ->
-        lastAnimate = new Date()
-        @lastAnimateTime = lastAnimate.getTime()
-        requestAnimationFrame @animate
-        @playing = true
+        if pluginManager.isLoaded()
+            lastAnimate = new Date()
+            @lastAnimateTime = lastAnimate.getTime()
+            requestAnimationFrame @animate
+            @playing = true
 
     @animate = () =>
         requestAnimationFrame @animate
