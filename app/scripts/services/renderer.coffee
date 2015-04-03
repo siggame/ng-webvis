@@ -497,7 +497,7 @@ webvisApp.service 'Renderer', ->
                 if sprite.transform != null
                     [x, y] = sprite.transform.mul(sprite.position)
                     temptx = sprite.transform.elements[2]
-                    tempty = sprite.tarnsform.elements[5]
+                    tempty = sprite.transform.elements[5]
                     sprite.transform.elements[2] = 0
                     sprite.transform.elements[5] = 0
                     [w, h] = sprite.transform.mul(sprite.width, sprite.height)
