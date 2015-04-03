@@ -47,6 +47,9 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         if @renderer?
             requestAnimationFrame @animate
 
+        if PluginManager.isLoaded()
+            PluginManager.resize(@renderer)
+
     @isPlaying = () -> @playing
 
     @start = () ->
@@ -95,7 +98,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @fileLoaded = (gameObject) =>
         PluginManager.clear()
         PluginManager.changePlugin gameObject.gameName
-        PluginManager.loadGame gameObject
+        PluginManager.loadGame gameObject, @renderer
 
         @currentTurn = 0
         @playing = false

@@ -64,9 +64,15 @@ webvisApp.service 'PluginManager', ($rootScope, $injector) ->
         else
             throw PluginError("No plugin selected")
 
-    @loadGame = (gamedata) ->
+    @resize = (renderer) ->
         if @currentPlugin != null
-            @currentPlugin.loadGame(gamedata)
+            @currentPlugin.resize(renderer)
+        else
+            throw PluginError("No plugin selected")
+
+    @loadGame = (gamedata, renderer) ->
+        if @currentPlugin != null
+            @currentPlugin.loadGame(gamedata, renderer)
         else
             throw PluginError("No plugin selected")
 

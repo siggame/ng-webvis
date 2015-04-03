@@ -69,7 +69,10 @@ webvisApp.factory 'PluginBase', ($log) ->
         postDraw: (delta, renderer) ->
             throw new PluginError("postDraw not implemented")
 
-        loadGame: (gamedata) ->
+        resize: (renderer) ->
+            throw new PluginError("resize not implemented")
+
+        loadGame: (gamedata, renderer) ->
             throw new PluginError("loadGame not implemented")
 
         getSexpScheme: () ->

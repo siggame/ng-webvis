@@ -87,12 +87,16 @@ webvisApp.service 'Renderer', ->
      # 2D projections and transformations.
     ###
     @Matrix3x3 = class Matrix3x3
-        constructor: () ->
+        constructor: (param) ->
             @elements = []
-            for index in [0..8]
-                @elements[index] = 0.0
-            for index in [0..2]
-                @elements[index*3+index] = 1.0
+            if !param?
+                for index in [0..8]
+                    @elements[index] = 0.0
+                for index in [0..2]
+                    @elements[index*3+index] = 1.0
+            else
+                for i in [0..8]
+                    @elements[i] = param.elements[i]
 
         #Matrix3x3::get(x , y)
         #param x (integer) - the column you wish to access at
@@ -113,6 +117,10 @@ webvisApp.service 'Renderer', ->
                 throw {errorStr: "Matrix out of bounds"}
             @elements[y*3 + x] = val
 
+        copy: (mat) ->
+            for i in [0..8]
+                @elements[i] = mat.elements[i]
+
         mul: (point, param2) ->
             if !param2?
                 # called as mul : (Point point) ->
@@ -126,9 +134,49 @@ webvisApp.service 'Renderer', ->
                 y = (@elements[3] * xt) + (@elements[4] * yt) + @elements[5]
             return [x, y]
 
+        mulMat: (mat) ->
+            m = new Matrix3x3()
+            m.elements[0] = (@elements[0] * mat.elements[0]) +
+                            (@elements[1] * mat.elements[3]) +
+                            (@elements[2] * mat.elements[6])
+
+            m.elements[1] = (@elements[0] * mat.elements[1]) +
+                            (@elements[1] * mat.elements[4]) +
+                            (@elements[2] * mat.elements[7]) +
+
+            m.elements[2] = (@elements[0] * mat.elements[2]) +
+                            (@elements[1] * mat.elements[5]) +
+                            (@elements[2] * mat.elements[8])
+
+            m.elements[3] = (@elements[3] * mat.elements[0]) +
+                            (@elements[4] * mat.elements[3]) +
+                            (@elements[5] * mat.elements[6])
+
+            m.elements[4] = (@elements[3] * mat.elements[1]) +
+                            (@elements[4] * mat.elements[4]) +
+                            (@elements[5] * mat.elements[7])
+
+            m.elements[5] = (@elements[3] * mat.elements[2]) +
+                            (@elements[4] * mat.elements[5]) +
+                            (@elements[5] * mat.elements[8])
+
+            m.elements[6] = (@elements[6] * mat.elements[0]) +
+                            (@elements[7] * mat.elements[3]) +
+                            (@elements[8] * mat.elements[6])
+
+            m.elements[7] = (@elements[6] * mat.elements[1]) +
+                            (@elements[7] * mat.elements[4]) +
+                            (@elements[8] * mat.elements[7])
+
+            m.elements[8] = (@elements[6] * mat.elements[2]) +
+                            (@elements[7] * mat.elements[5]) +
+                            (@elements[8] * mat.elements[8])
+            return m
+
+
         translate: (x, y) ->
-            @elements[2] += x
-            @elements[5] += y
+            @elements[2] = (x * @elements[0]) + (y * @elements[1]) + @elements[2]
+            @elements[5] = (x * @elements[3]) + (y * @elements[4]) + @elements[5]
 
         rotate: (radians) ->
             temp = []
@@ -144,9 +192,9 @@ webvisApp.service 'Renderer', ->
 
         scale: (x, y) ->
             @elements[0] = x * @elements[0]
-            @elements[1] = x * @elements[1]
-            @elements[2] = y * @elements[3]
-            @elements[3] = y * @elements[4]
+            @elements[1] = y * @elements[1]
+            @elements[3] = x * @elements[3]
+            @elements[4] = y * @elements[4]
 
 
     ###
@@ -380,17 +428,6 @@ webvisApp.service 'Renderer', ->
             @Projection = new Matrix3x3
             @resizeWorld(@worldWidth, @worldHeight)
 
-<<<<<<< Updated upstream
-            @drawSpritePattern = document.createElement 'canvas'
-            @drawSpritePattern.width = 20
-            @drawSpritePattern.height = 20
-
-            @drawSpriteCanvas = document.createElement 'canvas'
-            @drawSpriteCanvas.width = 20
-            @drawSpriteCanvas.height = 20
-
-=======
->>>>>>> Stashed changes
         # CanvasRenderer::resizeWorld(worldWidth, worldHeight)
         # See doc for BaseRenderer::resizeWorld(worldWidth, worldHeight)
         resizeWorld: (@worldWidth, @worldHeight) ->
@@ -459,7 +496,13 @@ webvisApp.service 'Renderer', ->
 
                 if sprite.transform != null
                     [x, y] = sprite.transform.mul(sprite.position)
+                    temptx = sprite.transform.elements[2]
+                    tempty = sprite.tarnsform.elements[5]
+                    sprite.transform.elements[2] = 0
+                    sprite.transform.elements[5] = 0
                     [w, h] = sprite.transform.mul(sprite.width, sprite.height)
+                    sprite.transform.elements[2] = temptx
+                    sprite.transform.elements[5] = tempty
                 else
                     [x, y] = @Projection.mul(sprite.position)
                     [w, h] = @Projection.mul(sprite.width, sprite.height)
@@ -477,7 +520,13 @@ webvisApp.service 'Renderer', ->
                     # determine the width and height of each tile with respect
                     # to the current transform matrix
                     if sprite.transform != null
+                        temptx = sprite.transform.elements[2]
+                        tempty = sprite.tarnsform.elements[5]
+                        sprite.transform.elements[2] = 0
+                        sprite.transform.elements[5] = 0
                         [tw, th] = sprite.transform.mul(sprite.tileWidth, sprite.tileHeight)
+                        sprite.transform.elements[2] = temptx
+                        sprite.transform.elements[5] = tempty
                     else
                         [tw, th] = @Projection.mul(sprite.tileWidth, sprite.tileHeight)
 
@@ -497,35 +546,17 @@ webvisApp.service 'Renderer', ->
                         "repeat")
 
                     # draw pattern on a canvas a given offset for tex coords
-<<<<<<< Updated upstream
-                    @drawSpriteCanvas.width = w
-                    @drawSpriteCanvas.height = h
-                    spriteCtx = @drawSpriteCanvas.getContext '2d'
 
-                    offsetX = sprite.tileOffsetX * tw
-                    offsetY = sprite.tileOffsetY * th
-=======
                     offsetX = Math.round(sprite.tileOffsetX * tw)
                     offsetY = Math.round(sprite.tileOffsetY * th)
->>>>>>> Stashed changes
-
-                    spriteCtx.translate(offsetX , offsetY)
-                    spriteCtx.rect(-offsetX, -offsetY, w, h)
-                    spriteCtx.fillStyle = pattern
-                    spriteCtx.fill()
 
                     # draw the correct looking canvas on the main canvas
-<<<<<<< Updated upstream
-                    @context.drawImage @drawSpriteCanvas, x, y, w, h
-=======
                     @context.save()
                     @context.translate(offsetX + x, offsetY + x)
                     #console.log offsetX + " " + offsetY + " " + x + " " + y  + " " + w + " " + h
                     @context.fillStyle = pattern
                     @context.fillRect(x - offsetX, y - offsetY, w, h)
                     @context.restore()
->>>>>>> Stashed changes
-
             else
                 console.info "texture not found"
 
@@ -567,8 +598,14 @@ webvisApp.service 'Renderer', ->
             @context.lineWidth = "1"
 
             if rect.transform != null
-                [x, y] = @Projection.mul(rect.position)
-                [w, h] = @Projection.mul(rect.width, rect.height)
+                [x, y] = rect.transform.mul(rect.position)
+                temptx = rect.transform.elements[2]
+                tempty = rect.transform.elements[5]
+                rect.transform.elements[2] = 0
+                rect.transform.elements[5] = 0
+                [w, h] = rect.transform.mul(rect.width, rect.height)
+                rect.transform.elements[2] = temptx
+                rect.transform.elements[5] = tempty
             else
                 [x, y] = @Projection.mul(rect.position)
                 [w, h] = @Projection.mul(rect.width, rect.height)
@@ -578,6 +615,7 @@ webvisApp.service 'Renderer', ->
             w = parseInt(w * @canvas.width)
             h = parseInt(h * @canvas.height)
 
+            console.log x + " " + y + " " + w + " " + h
             @context.rect x, y, w, h
             @context.stroke()
             @context.fill()
