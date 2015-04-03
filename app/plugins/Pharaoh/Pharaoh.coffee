@@ -25,26 +25,30 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @background.tileOffsetX = 0.5
             @background.tileOffsetY = 0.5
 
-            @pyramid1 = new Renderer.Rect();
-            @pyramid1.position.x = 0
-            @pyramid1.position.y = 0
+            @pyramid1 = new Renderer.Sprite();
+            @pyramid1.texture = "floor"
             @pyramid1.width = 25
             @pyramid1.height = 25
-            @pyramid1.fillColor.setColor(1.0, 0.0, 0.0, 1.0)
+            @pyramid1.tiling = true
+            @pyramid1.tileWidth = 15
+            @pyramid1.tileHeight = 15
 
-            @pyramid2 = new Renderer.Rect();
+            @pyramid2 = new Renderer.Sprite();
+            @pyramid2.texture = "floor"
             @pyramid2.position.x = 25
             @pyramid2.position.y = 0
             @pyramid2.width = 25
             @pyramid2.height = 25
-            @pyramid2.fillColor.setColor(0.0, 1.0, 0.0, 1.0)
+            @pyramid2.tiling = true
+            @pyramid2.tileWidth = 15
+            @pyramid2.tileHeight = 15
 
         getName: () -> "Pharaoh"
 
         preDraw: (dt, renderer) ->
             renderer.drawSprite(@background)
-            renderer.drawRect(@pyramid1)
-            renderer.drawRect(@pyramid2)
+            renderer.drawSprite(@pyramid1)
+            renderer.drawSprite(@pyramid2)
 
         postDraw: (dt, renderer) ->
 

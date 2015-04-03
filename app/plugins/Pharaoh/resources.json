@@ -5,52 +5,57 @@
             "image": "sands.png",
             "spriteSheet": null
         },
-        {        
+        {
+            "id": "floor",
+            "image":"floor.png",
+            "spriteSheet": null
+        },
+        {
             "id": "slave",
             "image": "slave.png",
             "spriteSheet": null
         },
-        {        
+        {
             "id": "ninja",
             "image": "ninja.png",
             "spriteSheet": null
         },
-        {        
+        {
             "id": "digger",
             "image": "digger.png",
             "spriteSheet": null
         },
-        {        
+        {
             "id": "guide",
             "image": "guide.png",
             "spriteSheet": null
         },
-        {        
+        {
             "id": "bomber",
             "image": "bomber.png",
             "spriteSheet": null
         },
-        {        
+        {
             "id": "sarcred",
             "image": "sarcophagus1.png",
             "spriteSheet": null
         },
-        {        
+        {
             "id": "sarcblu",
             "image": "sarcophagus2.png",
             "spriteSheet": null
         },
-        {        
+        {
             "id": "fullscrb",
             "image": "fullscarab.png",
             "spriteSheet": null
         },
-        {        
+        {
             "id": "halfscrb",
             "image": "halfscarab.png",
             "spriteSheet": null
         },
-        {        
+        {
             "id": "mummy",
             "image": "mummy.png",
             "spriteSheet": null
