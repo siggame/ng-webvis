@@ -20,14 +20,6 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         getName: () -> "Pharaoh"
 
         preDraw: (dt, renderer) ->
-            @background.tileOffsetX += dt * 0.05
-            if @background.tileOffsetX > 1
-                @background.tileOffsetX %= 1
-
-            @background.tileOffsetY += dt * 0.05
-            if @background.tileOffsetY > 1
-                @background.tileOffsetY %= 1
-
             renderer.drawSprite(@background)
 
         postDraw: (dt, renderer) ->
@@ -38,11 +30,11 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @mapHeight = gamedata.turns[0].mapHeight
 
             @background.texture = "background"
-            @background.width = @mapWidth
-            @background.height = @mapHeight
+            @background.width = 100
+            @background.height = 100
             @background.tiling = true
-            @background.tileWidth = 24
-            @background.tileHeight = 16
+            @background.tileWidth = 60
+            @background.tileHeight = 70
             @background.tileOffsetX = 0.5
             @background.tileOffsetY = 0.5
 
