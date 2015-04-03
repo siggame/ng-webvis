@@ -1,3 +1,5 @@
+`// # sourceURL=Pharaoh.js
+`
 'use strict'
 
 angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Options) ->
@@ -15,7 +17,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             ]
             Options.addPage "Pharaoh", @pharaohOptions
             @gameLoaded = false
-            @background = new Renderer.Sprite();
+            @background = new Renderer.Sprite()
             @background.texture = "background"
             @background.width = 100
             @background.height = 100
@@ -25,7 +27,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @background.tileOffsetX = 0.5
             @background.tileOffsetY = 0.5
 
-            @pyramid1 = new Renderer.Sprite();
+            @pyramid1 = new Renderer.Sprite()
+            @pyramid1.transform = new Renderer.Matrix3x3()
             @pyramid1.texture = "floor"
             @pyramid1.width = 25
             @pyramid1.height = 25
@@ -33,7 +36,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @pyramid1.tileWidth = 15
             @pyramid1.tileHeight = 15
 
-            @pyramid2 = new Renderer.Sprite();
+            @pyramid2 = new Renderer.Sprite()
+            @pyramid2.transform = new Renderer.Matrix3x3()
             @pyramid2.texture = "floor"
             @pyramid2.position.x = 25
             @pyramid2.position.y = 0
@@ -43,12 +47,58 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @pyramid2.tileWidth = 15
             @pyramid2.tileHeight = 15
 
+            @pyramid1Lines = []
+            @pyramid2Lines = []
+            for i in [0..@pyramid1.width]
+                l = new Renderer.Line(i+@pyramid1.position.x,
+                                      @pyramid1.position.y,
+                                      i+@pyramid1.position.x,
+                                      @pyramid1.position.y + @pyramid1.height)
+                l.transform = @pyramid1.transform
+                l.color.setColor(0.0, 0.0, 0.0, 1.0)
+                @pyramid1Lines.push l
+
+            for i in [0..@pyramid1.height]
+                l = new Renderer.Line(@pyramid1.position.x,
+                                      i+@pyramid1.position.y,
+                                      @pyramid1.position.x + @pyramid1.width,
+                                      i+@pyramid1.position.y)
+                l.transform = @pyramid1.transform
+                l.color.setColor(0.0, 0.0, 0.0, 1.0)
+                @pyramid1Lines.push l
+
+            for i in [0..@pyramid2.width]
+                l = new Renderer.Line(i+@pyramid2.position.x,
+                                      @pyramid2.position.y,
+                                      i+@pyramid2.position.x,
+                                      @pyramid2.position.y + @pyramid2.height)
+                l.transform = @pyramid2.transform
+                l.color.setColor(0.0, 0.0, 0.0, 1.0)
+                @pyramid2Lines.push l
+
+            for i in [0..@pyramid2.height]
+                l = new Renderer.Line(@pyramid2.position.x,
+                                      i+@pyramid2.position.y,
+                                      @pyramid2.position.x + @pyramid2.width,
+                                      i)
+                l.transform = @pyramid2.transform
+                l.color.setColor(0.0, 0.0, 0.0, 1.0)
+                @pyramid2Lines.push l
+
+
+
         getName: () -> "Pharaoh"
 
         preDraw: (dt, renderer) ->
             renderer.drawSprite(@background)
             renderer.drawSprite(@pyramid1)
             renderer.drawSprite(@pyramid2)
+
+            for l in @pyramid1Lines
+                renderer.drawLine(l)
+
+            for l in @pyramid2Lines
+                renderer.drawLine(l)
 
         postDraw: (dt, renderer) ->
 
@@ -80,9 +130,9 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @mapWidth = gamedata.turns[0].mapWidth
             @mapHeight = gamedata.turns[0].mapHeight
 
-            @pyramid1.transform = new Renderer.Matrix3x3()
-            @pyramid2.transform = new Renderer.Matrix3x3()
             @resize(renderer)
+
+            console.log @pyramid1Lines
 
 
         getSexpScheme: () ->
