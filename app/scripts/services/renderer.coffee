@@ -521,7 +521,7 @@ webvisApp.service 'Renderer', ->
                     # to the current transform matrix
                     if sprite.transform != null
                         temptx = sprite.transform.elements[2]
-                        tempty = sprite.tarnsform.elements[5]
+                        tempty = sprite.transform.elements[5]
                         sprite.transform.elements[2] = 0
                         sprite.transform.elements[5] = 0
                         [tw, th] = sprite.transform.mul(sprite.tileWidth, sprite.tileHeight)
