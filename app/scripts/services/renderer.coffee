@@ -552,7 +552,7 @@ webvisApp.service 'Renderer', ->
                     # draw the correct looking canvas on the main canvas
                     @context.save()
                     @context.translate(offsetX + x, offsetY + y)
-                    console.log offsetX + " " + offsetY + " " + x + " " + y  + " " + w + " " + h
+                    #console.log offsetX + " " + offsetY + " " + x + " " + y  + " " + w + " " + h
                     @context.fillStyle = pattern
                     @context.fillRect(-offsetX, -offsetY, w, h)
                     @context.restore()
@@ -567,9 +567,11 @@ webvisApp.service 'Renderer', ->
             @context.lineWidth = "1"
 
             if line.transform != null
-                [x1, y1] = sprite.transform.mul(line.x1, line.y1)
-                [x2, y2] = sprite.transform.mul(line.x2, line.y2)
+                #console.log "here"
+                [x1, y1] = line.transform.mul(line.x1, line.y1)
+                [x2, y2] = line.transform.mul(line.x2, line.y2)
             else
+                #console.log "nullhere"
                 [x1, y1] = @Projection.mul(line.x1, line.y1)
                 [x2, y2] = @Projection.mul(line.x2, line.y2)
 
