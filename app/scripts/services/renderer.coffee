@@ -551,10 +551,10 @@ webvisApp.service 'Renderer', ->
 
                     # draw the correct looking canvas on the main canvas
                     @context.save()
-                    @context.translate(offsetX + x, offsetY + x)
-                    #console.log offsetX + " " + offsetY + " " + x + " " + y  + " " + w + " " + h
+                    @context.translate(offsetX + x, offsetY + y)
+                    console.log offsetX + " " + offsetY + " " + x + " " + y  + " " + w + " " + h
                     @context.fillStyle = pattern
-                    @context.fillRect(x - offsetX, y - offsetY, w, h)
+                    @context.fillRect(-offsetX, -offsetY, w, h)
                     @context.restore()
             else
                 console.info "texture not found"
