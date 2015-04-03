@@ -488,7 +488,7 @@ webvisApp.service 'Renderer', ->
                     # draw pattern on a canvas a given offset for tex coords
                     offsetX = Math.round(sprite.tileOffsetX * tw)
                     offsetY = Math.round(sprite.tileOffsetY * th)
-
+                    
                     # draw the correct looking canvas on the main canvas
                     @context.save()
                     @context.translate(offsetX + x, offsetY + x)
