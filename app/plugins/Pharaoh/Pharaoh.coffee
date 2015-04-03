@@ -16,19 +16,6 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             Options.addPage "Pharaoh", @pharaohOptions
             @gameLoaded = false
             @background = new Renderer.Sprite();
-
-        getName: () -> "Pharaoh"
-
-        preDraw: (dt, renderer) ->
-            renderer.drawSprite(@background)
-
-        postDraw: (dt, renderer) ->
-
-        loadGame: (gamedata) ->
-            @maxTurn = gamedata.turns.length
-            @mapWidth = gamedata.turns[0].mapWidth
-            @mapHeight = gamedata.turns[0].mapHeight
-
             @background.texture = "background"
             @background.width = 100
             @background.height = 100
@@ -37,6 +24,62 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @background.tileHeight = 70
             @background.tileOffsetX = 0.5
             @background.tileOffsetY = 0.5
+
+            @pyramid1 = new Renderer.Rect();
+            @pyramid1.position.x = 0
+            @pyramid1.position.y = 0
+            @pyramid1.width = 25
+            @pyramid1.height = 25
+            @pyramid1.fillColor.setColor(1.0, 0.0, 0.0, 1.0)
+
+            @pyramid2 = new Renderer.Rect();
+            @pyramid2.position.x = 25
+            @pyramid2.position.y = 0
+            @pyramid2.width = 25
+            @pyramid2.height = 25
+            @pyramid2.fillColor.setColor(0.0, 1.0, 0.0, 1.0)
+
+        getName: () -> "Pharaoh"
+
+        preDraw: (dt, renderer) ->
+            renderer.drawSprite(@background)
+            renderer.drawRect(@pyramid1)
+            renderer.drawRect(@pyramid2)
+
+        postDraw: (dt, renderer) ->
+
+        resize: (renderer) ->
+            proj = renderer.getProjection()
+            @pyramid1.transform.copy(proj)
+            @pyramid2.transform.copy(proj)
+
+            # (0, 0) at top left of pyramid 1
+            # appears at (5, 5) of global coords
+            @pyramid1.transform.translate(5, 5)
+
+            # (25, 25) now appears at (45,75) of global coords
+            @pyramid1.transform.scale(42/(@mapWidth/ 2), 70/@mapHeight)
+
+            # (0, 0) at top left or pyramid 2
+            # appears at (55, 5) of global coords
+            @pyramid2.transform.translate(53, 5)
+
+            # (25, 25) now appears at (95, 75)
+            @pyramid2.transform.scale(42/(@mapWidth/2), 70/@mapHeight)
+
+            # (26, 0) appears at top left of pyramid 2 so that thieves in
+            # pyramid 2 can use the coordinates provided by the game log
+            @pyramid2.transform.translate(-(@mapWidth/2), 0);
+
+        loadGame: (gamedata, renderer) ->
+            @maxTurn = gamedata.turns.length
+            @mapWidth = gamedata.turns[0].mapWidth
+            @mapHeight = gamedata.turns[0].mapHeight
+
+            @pyramid1.transform = new Renderer.Matrix3x3()
+            @pyramid2.transform = new Renderer.Matrix3x3()
+            @resize(renderer)
+
 
         getSexpScheme: () ->
             {
