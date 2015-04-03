@@ -124,7 +124,6 @@ webvisApp.service 'Renderer', ->
                 yt = param2
                 x = (@elements[0] * xt) + (@elements[1] * yt) + @elements[2]
                 y = (@elements[3] * xt) + (@elements[4] * yt) + @elements[5]
-                console.log @elements[2] + " " + @elements[5]
             return [x, y]
 
         translate: (x, y) ->
@@ -381,6 +380,7 @@ webvisApp.service 'Renderer', ->
             @Projection = new Matrix3x3
             @resizeWorld(@worldWidth, @worldHeight)
 
+<<<<<<< Updated upstream
             @drawSpritePattern = document.createElement 'canvas'
             @drawSpritePattern.width = 20
             @drawSpritePattern.height = 20
@@ -389,6 +389,8 @@ webvisApp.service 'Renderer', ->
             @drawSpriteCanvas.width = 20
             @drawSpriteCanvas.height = 20
 
+=======
+>>>>>>> Stashed changes
         # CanvasRenderer::resizeWorld(worldWidth, worldHeight)
         # See doc for BaseRenderer::resizeWorld(worldWidth, worldHeight)
         resizeWorld: (@worldWidth, @worldHeight) ->
@@ -418,7 +420,6 @@ webvisApp.service 'Renderer', ->
             @context.rect x, y, w, h
             @context.stroke()
             @context.fill()
-            console.log
 
         # CanvasRenderer::setClearColor(color)
         # See doc for BaseRenderer::setClearColor(color)
@@ -483,24 +484,30 @@ webvisApp.service 'Renderer', ->
                     tw = Math.round(tw * @canvas.width)
                     th = Math.round(th * @canvas.height)
 
-                    console.log tw + " " + th
-
                     # put texture on a canvas to use as a pattern
-                    @drawSpritePattern.width = tw
-                    @drawSpritePattern.height = th
-                    patternCtx = @drawSpritePattern.getContext '2d'
+                    if !sprite._patternCanvas?
+                        sprite._patternCanvas = document.createElement 'canvas'
+                        sprite._patternCanvas.width = tw
+                        sprite._patternCanvas.height = th
 
+                    patternCtx = sprite._patternCanvas.getContext '2d'
+                    #console.log u + " " + v + " " + u2 + " " + v2 + " " + tw + " " + th
                     patternCtx.drawImage t, u, v, u2 - u, v2 - v, 0, 0, tw, th
-                    pattern = @context.createPattern(@drawSpritePattern,
+                    pattern = @context.createPattern(sprite._patternCanvas,
                         "repeat")
 
                     # draw pattern on a canvas a given offset for tex coords
+<<<<<<< Updated upstream
                     @drawSpriteCanvas.width = w
                     @drawSpriteCanvas.height = h
                     spriteCtx = @drawSpriteCanvas.getContext '2d'
 
                     offsetX = sprite.tileOffsetX * tw
                     offsetY = sprite.tileOffsetY * th
+=======
+                    offsetX = Math.round(sprite.tileOffsetX * tw)
+                    offsetY = Math.round(sprite.tileOffsetY * th)
+>>>>>>> Stashed changes
 
                     spriteCtx.translate(offsetX , offsetY)
                     spriteCtx.rect(-offsetX, -offsetY, w, h)
@@ -508,7 +515,16 @@ webvisApp.service 'Renderer', ->
                     spriteCtx.fill()
 
                     # draw the correct looking canvas on the main canvas
+<<<<<<< Updated upstream
                     @context.drawImage @drawSpriteCanvas, x, y, w, h
+=======
+                    @context.save()
+                    @context.translate(offsetX + x, offsetY + x)
+                    #console.log offsetX + " " + offsetY + " " + x + " " + y  + " " + w + " " + h
+                    @context.fillStyle = pattern
+                    @context.fillRect(x - offsetX, y - offsetY, w, h)
+                    @context.restore()
+>>>>>>> Stashed changes
 
             else
                 console.info "texture not found"
