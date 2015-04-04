@@ -23,9 +23,8 @@ webvisApp.factory 'PluginBase', ($log) ->
         draw: (renderer, turnNum, turnProgress) ->
             animations = _(@getAnimations())
             animations.each (anim) ->
-                if anim.getStartTurn() < turnNum + turnProgress and
+                if anim.getStartTurn() <= turnNum + turnProgress and
                     anim.getEndTurn() > turnNum + turnProgress
-                        $log.info "anim being called"
                         anim.animate renderer, turnNum, turnProgress
 
 

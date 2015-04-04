@@ -14,7 +14,7 @@ webvisApp.factory 'Parser', ->
     class Parser
         constructor: () ->
             @log = null
-            
+
         loadFile: () ->
             throw message: "Not implemented"
 
@@ -29,10 +29,10 @@ webvisApp.factory 'Parser', ->
 
         getGameWinner: () ->
             throw message: "Not implemented"
-   
+
         clear: () ->
             @log = null
-   
+
         parse: (file_contents) ->
             if @log != null then @log = null
             @log = @loadFile(file_contents)
@@ -68,14 +68,14 @@ webvisApp.factory 'Parser', ->
 
             return JSON.parse(json.replace(/,\s*\]/g, ']'))
 
-        getGameID: () -> 
-            if @log != null 
+        getGameID: () ->
+            if @log != null
                 _.last(@log)[1]
-            else 
+            else
                 return -1
 
-        getGameName: () -> 
-            if @log != null 
+        getGameName: () ->
+            if @log != null
                 @log[0][1]
             else
                 return ""

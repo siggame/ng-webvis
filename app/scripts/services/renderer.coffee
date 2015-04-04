@@ -616,7 +616,7 @@ webvisApp.service 'Renderer', ->
             w = parseInt(w * @canvas.width)
             h = parseInt(h * @canvas.height)
 
-            console.log x + " " + y + " " + w + " " + h
+            #console.log x + " " + y + " " + w + " " + h
             @context.rect x, y, w, h
             @context.stroke()
             @context.fill()
