@@ -11,12 +11,11 @@ app = angular.module('webvisApp')
 
 app.controller 'AlertCtrl', (alert) ->
     @alert = alert
-    
+
     @hasAlert = () ->
-        console.log "checking alerts"
         alerts = alert.getAlerts()
-        for a in alerts     
+        for a in alerts
             if a.isVisible()
                 return true
-    
+
     return this

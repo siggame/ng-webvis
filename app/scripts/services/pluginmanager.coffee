@@ -24,25 +24,25 @@ webvisApp.service 'PluginManager', ($rootScope, $injector) ->
 
     @getName = () ->
         if @currentPlugin != null
-            @currentPlugin.getName()
+            return @currentPlugin.getName()
         else
             return "WebVis"
 
     @getMaxTurn = () ->
         if @currentPlugin != null
-            @currentPlugin.getMaxTurn()
+            return @currentPlugin.getMaxTurn()
         else
             throw PluginError("No plugin selected")
 
     @getMapWidth = () ->
         if @currentPlugin != null
-            @currentPlugin.getMapWidth()
+            return @currentPlugin.getMapWidth()
         else
             throw PluginError("No plugin selected")
 
     @getMapHeight = () ->
         if @currentPlugin != null
-            @currentPlugin.getMapHeight()
+            return @currentPlugin.getMapHeight()
         else
             throw PluginError("No plugin selected")
 
@@ -54,7 +54,8 @@ webvisApp.service 'PluginManager', ($rootScope, $injector) ->
 
     @getEntities = () ->
         if @currentPlugin != null
-            @currentPlugin.getEntities()
+            e = @currentPlugin.getEntities()
+            return e
         else
             throw PluginError("No plugin selected")
 
