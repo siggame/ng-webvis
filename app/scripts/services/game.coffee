@@ -70,7 +70,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
             currentTime = currentDate.getTime()
             @renderer.begin()
 
-            if PluginManager.isLoaded()
+            if PluginManager.isLoaded() and @renderer.assetManager.isLoaded()
                 entities = PluginManager.getEntities()
 
                 PluginManager.preDraw(dt, @renderer)
@@ -79,8 +79,8 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
                     entity.draw @renderer, @getCurrentTurn(), @turnProgress
                 PluginManager.postDraw(dt, @renderer)
             currentDate = new Date()
-            #console.log dt
-            #console.log currentDate.getTime() - currentTime
+            # console.log dt
+            # console.log currentDate.getTime() - currentTime
         requestAnimationFrame @animate
 
     @updateTime = () =>

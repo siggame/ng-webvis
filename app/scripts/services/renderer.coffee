@@ -18,12 +18,14 @@ webvisApp.service 'Renderer', ->
     ###
     @AssetManager = class AssetManager
         constructor: ->
+            @loaded = false
             @textures = {}
             @sheetData = {}
 
         # Renderer::AssetManager::loadTexture(fileName)
         # param filename (String) - name of the asset to search for on the server
         loadTextures: (pluginName, onloadCallback) ->
+            @loaded = false
             @textures = {}
             @sheetData = {}
             u = "/plugins/" + pluginName + "/resources.json"
@@ -44,6 +46,7 @@ webvisApp.service 'Renderer', ->
                         img.onload = () =>
                             numPictures--;
                             if numPictures == 0
+                                @loaded = true
                                 onloadCallback()
 
                         if resource.spriteSheet != (null)
@@ -56,6 +59,8 @@ webvisApp.service 'Renderer', ->
                                     @sheetData[resource.id] = data
                  error: (jqxhr, textStatus, errorThrown)->
                     console.log textStatus + " " + errorThrown
+
+        isLoaded: () -> @loaded
 
         # Renderer::AssetManager::getTexture(fileName)
         # param fileName (String) - name of the asset to retrieve from cache
@@ -557,7 +562,7 @@ webvisApp.service 'Renderer', ->
                     @context.fillRect(-offsetX, -offsetY, w, h)
                     @context.restore()
             else
-                console.info "texture not found"
+                console.info "texture not found: " + sprite.texture
 
         # CanvasRenderer::drawLine(line)
         # See doc for BaseRenderer::drawLine(line)
