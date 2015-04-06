@@ -17,11 +17,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         @idle: (id, entities) =>
             (renderer, turn, progress) =>
                 intervals = entities[id].intervals
-                for i in [0...intervals.length] by 2
-                    if turn >= intervals[i] and turn < intervals[i+1]
-                        renderer.drawRect entities[id].sprite
-                        break;
-                    if turn >= intervals[i] and !intervals[i+1]?
+                for i in [0 ... intervals.length] by 2
+                    if intervals[i] <= turn and turn <= intervals[i+1]
                         renderer.drawRect entities[id].sprite
 
     class Pharaoh extends PluginBase.BasePlugin
@@ -170,6 +167,18 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             i = -1
             for turn in gamedata.turns
                 i++
+                if i+1 < @maxTurn and
+                    turn.roundNumber != gamedata.turns[i+1].roundNumber
+                        for id,ent of @entities
+                            if ent instanceof Wall and
+                                ent.intervals.length %2 == 1
+                                    ent.intervals.push i
+
+                if i+1 == @maxTurn
+                    for id, ent of @entities
+                        if ent instanceof Wall and
+                            ent.intervals.length %2 == 1
+                                ent.intervals.push i
 
                 for id,tile of turn.Tile
                     if tile.type == 2
@@ -188,18 +197,14 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                             f = Wall.idle(id, @entities)
                             a = new PluginBase.Animation(0, @maxTurn, f)
                             @entities[id].animations.push a
+
+                        if @entities[id].intervals.length %2 == 0
                             @entities[id].intervals.push i
 
-                        if i+1 < @maxTurn and gamedata.turns[i+1].Tile?
-                            nextState = gamedata.turns[i+1].Tile[id]
-                            if nextState? and nextState.type == 0
-                                @entities[id].intervals.push i
-                    if tile.type == 0
-                        if @entities[id]
-                            if i+1 < @maxTurn
-                                nextState = gamedata.turns[i+1].tiles[id]
-                                if nextState? and nextState.type == 2
-                                    @entities[id].intervals.push i
+                    if tile.type == 0 and @entities[id]? and
+                        @entities[id].intervals.length %2 == 1
+                            @entities[id].intervals.push i
+
 
         getSexpScheme: () ->
             {
@@ -230,6 +235,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 theifTalk : ["type", "actingID", "message"],
                 activate : ["type", "actingID"],
                 bomb : ["type", "actingID", "x", "y"],
+                remove : ["type", "actingID"],
                 AnimOwner : ["type", "owner"],
                 game : ["mapWidth", "mapHeight", "turnNumber",
                        "roundTurnNumber", "maxThieves", "maxTraps", "playerID",
