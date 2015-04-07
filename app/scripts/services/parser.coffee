@@ -128,7 +128,7 @@ webvisApp.factory 'Parser', ->
                             animations[@log[i+1][j][1]] = []
                         animations[@log[i+1][j][1]].push anim
 
-                    state.animaitons = animations
+                    state.animations = animations
                     turns.push state
 
                 return turns
