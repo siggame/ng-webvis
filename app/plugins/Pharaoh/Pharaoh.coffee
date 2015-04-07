@@ -3,16 +3,43 @@
 'use strict'
 
 angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Options) ->
-    class Theif extends PluginBase.BaseEntity
+    class Entity extends PluginBase.BaseEntity
         constructor: () ->
-
-    class Wall extends PluginBase.BaseEntity
-        constructor: () ->
-            @sprite = new Renderer.Rect()
             @animations = []
-            @intervals = []
 
         getAnimations: () -> @animations
+
+    class Thief extends Entity
+        constructor: () ->
+            super()
+            @start = 0
+            @end = 0
+            @sprite = new Renderer.Rect()
+
+        @idle: (id, entities) =>
+            (renderer, turn, progress) =>
+                if entities[id].start < turn and turn < entities[id].end
+                    console.log "blah blah blah"
+                    renderer.drawRect entities[id].sprite
+
+        @move: (id, entities, moves) =>
+            (renderer, turn, progress) =>
+                sprite = entities[id].sprite
+                i = Math.floor(moves.length * progress)
+                subt = (moves.length * progress) - i
+
+                diffx = moves[i].toX - moves[i].fromX
+                diffy = moves[i].toY - moves[i].fromY
+
+                sprite.position.x = moves[i].fromX + (diffx * subt)
+                sprite.position.y = moves[i].fromY + (diffy * subt)
+                console.log moves[i].fromX + " " + moves[i].toX + " " +  moves[i].fromY + " " + moves[i].toY + " " + subt + " " + diffx + " " + diffy + " "
+
+    class Wall extends Entity
+        constructor: () ->
+            super()
+            @sprite = new Renderer.Rect()
+            @intervals = []
 
         @idle: (id, entities) =>
             (renderer, turn, progress) =>
@@ -205,6 +232,51 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         @entities[id].intervals.length %2 == 1
                             @entities[id].intervals.push i
 
+                for id,thief of turn.Thief
+                    if !@entities[id]?
+                        @entities[id] = new Thief()
+                        @entities[id].sprite.position.x = thief.x
+                        @entities[id].sprite.position.y = thief.y
+                        if thief.x < 25
+                            @entities[id].sprite.transform = @pyramid1.transform
+                        else
+                            @entities[id].sprite.transform = @pyramid2.transform
+                        @entities[id].sprite.fillColor.setColor(1.0, 1.0, 1.0, 1.0)
+                        switch thief.thiefType
+                            when 0
+                                @entities[id].sprite.fillColor.setColor(1.0, 0.0, 0.0, 1.0)
+                            when 1
+                                @entities[id].sprite.fillColor.setColor(1.0, 1.0, 0.0, 1.0)
+                            when 2
+                                @entities[id].sprite.fillColor.setColor(0.0, 1.0, 1.0, 1.0)
+                            when 3
+                                @entities[id].sprite.fillColor.setColor(1.0, 0.0, 1.0, 1.0)
+                            when 4
+                                @entities[id].sprite.fillColor.setColor(0.0, 0.0, 1.0, 1.0)
+                        @entities[id].sprite.width = 1
+                        @entities[id].sprite.height = 1
+                        @entities[id].start = i
+
+                        f = Thief.idle(id, @entities)
+                        a = new PluginBase.Animation(0, @maxTurn, f)
+                        @entities[id].animations.push a
+
+                    # does not exist, or dies next turn
+                    if i+1 < @maxTurn and !gamedata.turns[i+1].Thief[id]?
+                        @entities[id].end = i
+
+                for id,animList of turn.animations
+                    moves = []
+                    for anim in animList
+                        switch(anim.type)
+                            when "move"
+                                moves.push anim
+
+                    if moves.length != 0
+                        e = @entities[id]
+                        f = Thief.move(id, @entities, moves)
+                        a = new PluginBase.Animation(i, i+1, f)
+                        @entities[id].animations.push a
 
         getSexpScheme: () ->
             {
@@ -215,7 +287,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 Trap : ["id", "x", "y", "owner", "trapType", "visible",
                        "active", "bodyCount", "activationsRemaining",
                        "turnsTillActive"],
-                Thief : ["id", "x", "y", "owner", "theifType", "alive",
+                Thief : ["id", "x", "y", "owner", "thiefType", "alive",
                         "specialsLeft", "maxSpecials", "movementLeft",
                         "maxMovement", "frozenTurnsLeft"],
                 ThiefType : ["id", "name", "type", "cost", "maxMovement",
