@@ -20,7 +20,7 @@ webvisApp.factory 'PluginBase', ($log) ->
         getAnimations: () ->
             throw new PluginError("getAnimations not implemented")
 
-        draw: (renderer, turnNum, turnProgress) ->
+        draw: (renderer, turnNum, turnProgress) =>
             animations = _(@getAnimations())
             animations.each (anim) ->
                 if anim.getStartTurn() <= turnNum + turnProgress and
