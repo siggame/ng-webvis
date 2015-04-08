@@ -36,7 +36,7 @@ webvisApp.controller 'MainCtrl', ($rootScope, $scope, FileLoader, Options) ->
 
         $.ajax
             dataType: "text",
-            url: option.text + "/api/next-game/",
+            url: option.text + "/api/next_game/",
             data: null,
             complete : (jqxhr, textStatus) =>
                 console.log textStatus
@@ -44,6 +44,7 @@ webvisApp.controller 'MainCtrl', ($rootScope, $scope, FileLoader, Options) ->
                 FileLoader.loadFromUrl(data)
             error: (jqxhr, textStatus, errorThrown) ->
                 console.log textStatus + " " + errorThrown
+
     else if params.logUrl?
         FileLoader.loadFromUrl decodeURIComponent(params.logUrl)
 
