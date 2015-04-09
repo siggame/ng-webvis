@@ -40,18 +40,48 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
 
         return {
             extension : ext
-            fileName : file
+            file : file
         }
 
-    readFromLocal = (fileData, callback) ->
-        reader = new FileReader()
-        reader.onload = (event) =>
+    readCompressed = (fileData, callback) ->
+        prepareFile = (event) ->
             file = {
                 extension : fileData.extension
                 data : event.target.result
             }
             callback(file)
-        reader.readAsText(fileData.fileName)
+
+        decompress = (file) ->
+            buffer = new Uint8Array(file.target.result)
+            decompressed = compressjs.Bzip2.decompressFile(buffer)
+
+            textReader = new FileReader()
+            textReader.onload = prepareFile
+            textReader.readAsText(new Blob([decompressed]))
+
+        reader = new FileReader()
+        reader.onload = decompress
+
+        $log.debug "Reading compressed file"
+        reader.readAsArrayBuffer(fileData.file)
+
+    readDecompressed = (fileData, callback) ->
+        reader = new FileReader()
+        reader.onload = (event) ->
+            file = {
+                extension : fileData.extension
+                data : event.target.result
+            }
+            callback(file)
+
+        $log.debug "Reading decompressed file"
+        reader.readAsText(fileData.file)
+
+    preProcessFile = (file) ->
+        if file.extension == "glog"
+            readCompressed(file, processFile)
+        else
+            readDecompressed(file, processFile)
 
     processFile = (file) ->
         # TODO Trigger progress bar
@@ -104,7 +134,7 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
         try
             fileData = checkDroppedFiles files
             $log.info "Extension looks ok. Ready to read gamelog"
-            readFromLocal(fileData, processFile)
+            preProcessFile(fileData)
         catch error
             showError error.message
 
