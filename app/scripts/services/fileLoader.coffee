@@ -57,7 +57,9 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
         # TODO Trigger progress bar
         parser = null
         switch file.extension
-            when "gamelog" or "glog"
+            when "gamelog"
+                parser = Parser.SexpParser
+            when "glog"
                 parser = Parser.SexpParser
             when "json"
                 parser = Parser.JsonParser
