@@ -56,6 +56,11 @@
             "spriteSheet": null
         },
         {
+            "id": "explosion",
+            "image": "explosion.png",
+            "spriteSheet": null
+        },
+        {
             "id": "mummy",
             "image": "mummy.png",
             "spriteSheet": null
