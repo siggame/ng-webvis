@@ -10,6 +10,8 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @playbackSpeed = 1
     @renderer = null
     @turnProgress = 0
+    @lastRenderTime = new Date()
+    @frames = 0
 
     @getCurrentTurn = () -> @currentTurn
 
@@ -41,9 +43,6 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @renderer = new Renderer.CanvasRenderer(canvas, 100, 100)
 
     @canvasResized = (newWidth, newHeight) ->
-        if @renderer?
-            @animate()
-
         if PluginManager.isLoaded()
             PluginManager.resize(@renderer)
 
@@ -53,46 +52,34 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         if PluginManager.isLoaded()
             lastAnimate = new Date()
             @lastAnimateTime = lastAnimate.getTime()
-            @animate()
             @playing = true
 
     @stop = () ->
         @playing = false
 
     @animate = () =>
+        window.requestAnimationFrame(@animate)
+        
         dt = @updateTime()
+        now = new Date()
+        if now - @lastRenderTime > 1000
+            console.log "fps: " +  @frames
+            @frames = 0
+            @lastRenderTime = now
 
         if @renderer != null
-            console.log "start"
             @renderer.begin()
 
             if PluginManager.isLoaded() and @renderer.assetManager.isLoaded()
                 entities = PluginManager.getEntities()
-                queue = []
 
                 PluginManager.preDraw(dt, @renderer)
                 for id, entity of entities
-                    queue.push [entity.draw, entity]
-                @animRegulator(this, queue, dt)
+                    entity.draw @renderer, @getCurrentTurn(), @turnProgress
+                PluginManager.postDraw(dt, @renderer)
+        end = new Date()
 
-    @animRegulator = (t, queue, dt) ->
-        start = +new Date()
-        loop
-            end = +new Date()
-
-            a = queue.shift()
-            f = a[0]
-            ent = a[1]
-            f.call(ent, t.renderer, t.getCurrentTurn(), t.turnProgress)
-
-            if queue.length > 0  and end - start < 10 then continue
-            if queue.length > 0
-                setTimeout(t.animRegulator, 2, t, queue, dt);
-            else
-                PluginManager.postDraw(dt, t.renderer)
-                setTimeout(t.animate(), 10)
-                console.log "end"
-            break;
+        @frames++
 
     @updateTime = () =>
         currentDate = new Date()
@@ -123,6 +110,6 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @renderer.assetManager.loadTextures gameObject.gameName, () =>
             currentDate = new Date()
             @lastAnimateTime = currentDate.getTime()
-            @animate()
 
+    window.requestAnimationFrame @animate
     return this
