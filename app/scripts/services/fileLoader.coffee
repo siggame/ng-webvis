@@ -139,31 +139,47 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
             showError error.message
 
     @loadFromUrl = (u) ->
-        try
-            checkExtension = (url) ->
-                a = url.split('.')
-                if a.length == 1 or (a[1] == "")
-                    return ""
-                return verifyFileType("." + a.pop())
+        checkExtension = (url) ->
+            a = url.split('.')
+            if a.length == 1 or (a[1] == "")
+                return ""
+            return verifyFileType("." + a.pop())
 
+        error = (jqxhr, textStatus, errorThrown) ->
+            showError message: "File could not be loaded from #{u}"
+
+        success = (data) ->
+            file =
+                extension : ext
+                file : new Blob([data])
+            preProcessFile(file)
+
+        fetchText = () ->
+            $.ajax
+                type: "GET"
+                dataType: "text"
+                url: u
+                data: null
+                success: success
+                error: error
+
+        fetchBinary = () ->
+            req = new XMLHttpRequest()
+            req.open("GET", u, true)
+            req.responseType = "blob"
+            req.onload = (event) -> success(req.response)
+            req.onerror = error
+            req.send()
+
+        try
             ext = checkExtension(u)
 
-            if ext != ""
-                $.ajax
-                    type: "GET",
-                    dataType: "text",
-                    url: u,
-                    data: null,
-                    success: (d) =>
-                        file = {
-                            extension : ext
-                            data : d
-                        }
-                        processFile(file)
-                    error: (jqxhr, textStatus, errorThrown) ->
-                        showError {message: "File could not be loaded from " + u}
-            else
-                throw message: "Bad File Extension"
+            switch ext
+                when "glog" then fetchBinary()
+                when "gamelog" then fetchText()
+                when "json" then fetchText()
+                else
+                    throw message: "Bad File Extension"
         catch error
             showError error.message
 
