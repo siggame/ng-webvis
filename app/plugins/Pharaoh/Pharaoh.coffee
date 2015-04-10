@@ -14,12 +14,23 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             super()
             @start = 0
             @end = 0
+            @posIntervals = []
+            @positions = []
             @sprite = new Renderer.Rect()
 
         @idle: (id, entities) =>
             (renderer, turn, progress) =>
+                intervals = entities[id].posIntervals
+                positions = entities[id].positions
+
+                j = -1
+                for i in [0 ... intervals.length] by 2
+                    j++
+                    if intervals[i] <= turn and turn < intervals[i+1]
+                        entities[id].sprite.position.x = positions[j].x
+                        entities[id].sprite.position.y = positions[j].y
+
                 if entities[id].start < turn and turn < entities[id].end
-                    console.log "blah blah blah"
                     renderer.drawRect entities[id].sprite
 
         @move: (id, entities, moves) =>
@@ -33,7 +44,6 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
                 sprite.position.x = moves[i].fromX + (diffx * subt)
                 sprite.position.y = moves[i].fromY + (diffy * subt)
-                console.log moves[i].fromX + " " + moves[i].toX + " " +  moves[i].fromY + " " + moves[i].toY + " " + subt + " " + diffx + " " + diffy + " "
 
     class Wall extends Entity
         constructor: () ->
@@ -189,8 +199,6 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
             @resize(renderer)
 
-            console.log "blah"
-
             i = -1
             for turn in gamedata.turns
                 i++
@@ -256,6 +264,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         @entities[id].sprite.width = 1
                         @entities[id].sprite.height = 1
                         @entities[id].start = i
+                        @entities[id].positions.push new Renderer.Point(thief.x, thief.y)
+                        @entities[id].posIntervals.push i
 
                         f = Thief.idle(id, @entities)
                         a = new PluginBase.Animation(0, @maxTurn, f)
@@ -264,6 +274,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                     # does not exist, or dies next turn
                     if i+1 < @maxTurn and !gamedata.turns[i+1].Thief[id]?
                         @entities[id].end = i
+                        @entities[id].posIntervals.push i
 
                 for id,animList of turn.animations
                     moves = []
@@ -277,6 +288,11 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         f = Thief.move(id, @entities, moves)
                         a = new PluginBase.Animation(i, i+1, f)
                         @entities[id].animations.push a
+
+                        lastMove = moves[moves.length - 1]
+                        e.positions.push new Renderer.Point(lastMove.toX, lastMove.toY, 0)
+                        e.posIntervals.push i
+                        e.posIntervals.push i+1
 
         getSexpScheme: () ->
             {
