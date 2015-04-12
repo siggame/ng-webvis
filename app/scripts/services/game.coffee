@@ -59,7 +59,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
 
     @animate = () =>
         window.requestAnimationFrame(@animate)
-        
+
         dt = @updateTime()
         now = new Date()
         if now - @lastRenderTime > 1000
@@ -77,6 +77,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
                 for id, entity of entities
                     entity.draw @renderer, @getCurrentTurn(), @turnProgress
                 PluginManager.postDraw(dt, @renderer)
+            @renderer.end()
         end = new Date()
 
         @frames++
