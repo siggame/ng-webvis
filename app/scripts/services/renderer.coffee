@@ -425,8 +425,11 @@ webvisApp.service 'Renderer', ->
     ###
     @CanvasRenderer = class CanvasRenderer extends @BaseRenderer
         constructor: (@canvas, @worldWidth, @worldHeight) ->
+            @drawBuffer = document.createElement 'canvas'
+            @drawBuffer.width = @canvas.width
+            @drawBuffer.height = @canvas.height
             @assetManager = new AssetManager
-            @context = @canvas.getContext("2d")
+            @context = @drawBuffer.getContext("2d")
             @clearColor = new Color(1,1,1)
             if !@context?
                 throw {errorStr: "Could not get a 2d render context"}
@@ -436,6 +439,8 @@ webvisApp.service 'Renderer', ->
         # CanvasRenderer::resizeWorld(worldWidth, worldHeight)
         # See doc for BaseRenderer::resizeWorld(worldWidth, worldHeight)
         resizeWorld: (@worldWidth, @worldHeight) ->
+            @drawBuffer.width = @canvas.width
+            @drawBuffer.height = @canvas.height
             @Projection.set(0, 0, 1/@worldWidth)
             @Projection.set(1, 1, 1/@worldHeight)
 
@@ -449,6 +454,10 @@ webvisApp.service 'Renderer', ->
         # See doc for BaseRenderer::begin(color)
         begin: () ->
             @canvas.width = @canvas.width
+            if @canvas.width != @drawBuffer.width
+                @drawBuffer.width = @canvas.width
+            if @canvas.height != @drawBuffer.height
+                @drawBuffer.height = @canvas.height
             @context.beginPath()
             @context.fillStyle = @clearColor.toCSS()
             @context.strokeStyle = @clearColor.toCSS()
@@ -462,6 +471,10 @@ webvisApp.service 'Renderer', ->
             @context.rect x, y, w, h
             @context.stroke()
             @context.fill()
+
+        end: () ->
+            frontBuffer = @canvas.getContext "2d"
+            frontBuffer.drawImage @drawBuffer,0, 0, @canvas.width, @canvas.height
 
         # CanvasRenderer::setClearColor(color)
         # See doc for BaseRenderer::setClearColor(color)
