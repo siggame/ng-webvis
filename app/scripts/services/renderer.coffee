@@ -93,7 +93,7 @@ webvisApp.service 'Renderer', ->
     ###
     @Matrix3x3 = class Matrix3x3
         constructor: (param) ->
-            @elements = []
+            @elements = new Float32Array(9)
             if !param?
                 for index in [0..8]
                     @elements[index] = 0.0
@@ -393,6 +393,9 @@ webvisApp.service 'Renderer', ->
         begin: (color) ->
             throw {errorStr: "Function not implemented"}
 
+        end: () ->
+            throw {errorStr: "Function not implemented"}
+
         # BaseRenderer::drawLine(line, color)
         # Draws the line object to the screen.
         # param line (Renderer::Line) - The line to be drawn
@@ -643,7 +646,139 @@ webvisApp.service 'Renderer', ->
 
     @WebGLRenderer = class WebGLRenderer extends @BaseRenderer
         constructor: (@canvas, @worldWidth, @worldHeight, experimental) ->
-            throw {errorStr: "WebGLRenderer not yet implemented"}
+            rectVerts = [
+              0.0, 0.0, 0.0,
+              1.0, 0.0, 0.0,
+              0.0, 1.0, 0.0,
+              1.0, 1.0, 0.0
+            ]
+
+            rectIndices = [0, 1, 2, 2, 1, 3]
+
+            @baseRect = gl.createBuffer()
+            gl.bindBuffer(gl.ARRAY_BUFFER, @baseRect)
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rectVerts), gl.STATIC_DRAW)
+            @baseRect.itemSize = 3;
+            @baseRect.numItems = 4;
+
+            gl.enable(gl.DEPTH_TEST)
+
+            vertShaderSource = "
+                attribute vec3 aVertexPosition;
+
+                uniform mat4 uMVMatrix;
+                uniform mat4 uPMatrix;
+
+                void main(void) {
+                    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                }
+            "
+
+            fragShaderSource = "
+                precision mediump float;
+
+                void main(void) {
+                    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+                }
+            "
+            @vertShader = gl.createShader(gl.VERTEX_SHADER)
+            gl.shaderSource(@vertShader, vertShaderSource)
+            gl.compileShader(@vertShader)
+            if !gl.getShaderParameter(@vertShader, gl.COMPILE_STATUS)
+                throw msg: "vertex shader did not compile correctly"
+
+            @fragShader = gl.createShader(gl.FRAGMENT_SHADER)
+            gl.shaderSource(@fragShader, fragShaderSource)
+            gl.compileShader(@fragShader)
+            if !gl.getShaderParameter(@fragShader, gl.COMPILE_STATUS)
+                throw msg: "fragment shader did not compile correctly"
+
+            @shaderProg = gl.createProgram()
+            gl.attachShader(@shaderProg, @vertShader)
+            gl.attachShader(@shaderProg, @fragShader)
+            gl.linkProgram(@shaderProg)
+
+            if !gl.getProgramParameter(@shaderProg, gl.LINK_STATUS)
+                throw msg: "shader program could not be linked"
+
+            gl.useProgram(@shaderProg)
+            @shaderProg.vertexPositionAttribute = gl.getAttribLocation(@shaderProg, "aVertexPosition")
+            gl.enableVertexAttribArray(@shaderProg.vertexPositionAttribute)
+
+
+        # BaseRenderer::resizeWorld(worldWidth, worldHeight)
+        # Resizes the coordinate system scale within the view.
+        # Ex. if you call resizeWorld(20, 40) a point at the middle of the
+        #   screen is located at Point(10, 20).
+        # param worldWidth (real) - the width bound of the coordinate system
+        # param worldHeight (real) - the height bound of the coordinate system
+        resizeWorld: (worldWidth, worldHeight) ->
+            gl.viewport( 0, 0, @canvas.width, @canvas.height)
+
+        getProjection: () ->
+            throw {errorStr: "Function not implemented"}
+
+        getWorldSize: () ->
+            throw {errorStr: "Function not implemented"}
+
+        getScreenSize: () ->
+            throw {errorStr: "Function not implemented"}
+
+         # BaseRenderer:setClearColor(color)
+         # Sets the color that the background is cleared to on resizes.
+         # param color (Renderer::Color) - The color that the drawing area
+         # will be cleared to on begin and resize calls.
+        setClearColor: (color) ->
+            gl.clearColor(color.r, color.g, color.b, color.a)
+
+         # BaseRenderer::begin(color)
+         # Clears the drawing area to the color specified.
+         # param color (Renderer::Color) - The color that the drawing area
+         #   will be cleared to.
+        begin: (color) ->
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+        end: () ->
+
+        # BaseRenderer::drawLine(line, color)
+        # Draws the line object to the screen.
+        # param line (Renderer::Line) - The line to be drawn
+        # param color (Renderer::Color) - the color the drawn line will be.
+        drawLine: (line, color) ->
+            throw {errorStr: "Function not implemented"}
+
+        # BaseRenderer::drawSprite(sprite)
+        # Draws the sprite object to the screen.
+        # param line (Renderer::Sprite) - the sprite to be drawn
+        drawSprite: (sprite) ->
+            throw {errorStr: "Function not implemented"}
+
+        # BaseRenderer::drawSprite(sprite)
+        # Draws the path object to the screen.
+        # param line (Renderer::Path) - the path to be drawn
+        drawPath: (path) ->
+            throw {errorStr: "Function not implemented"}
+
+        # BaseRenderer::drawRect(sprite)
+        # Draws the Rectangle to the screen.
+        # param line (Renderer::Rect) - the rectangle to be drawn.
+        drawRect: (rect) ->
+            gl.bindBuffer(gl.ARRAY_BUFFER, @baseRect)
+            gl.vertexAttribPointer(@shaderProg.vertexPositionAttribute,
+                                   @baseRect.itemSize, gl.FLOAT,
+                                   false, 0, 0)
+
+            gl.uniformMatrix4fv()
+
+            x = parseInt(x * @canvas.width)
+            y = parseInt(y * @canvas.height)
+            w = parseInt(w * @canvas.width)
+            h = parseInt(h * @canvas.height)
+
+            #console.log x + " " + y + " " + w + " " + h
+            @context.rect x, y, w, h
+            @context.stroke()
+            @context.fill()
 
     @autoDetectRenderer = (canvas, worldWidth, worldHeight) ->
         context = canvas.getContext "webgl"
