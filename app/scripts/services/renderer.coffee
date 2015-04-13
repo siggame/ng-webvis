@@ -93,7 +93,7 @@ webvisApp.service 'Renderer', ->
     ###
     @Matrix3x3 = class Matrix3x3
         constructor: (param) ->
-            @elements = []
+            @elements = new Float32Array(9)
             if !param?
                 for index in [0..8]
                     @elements[index] = 0.0
