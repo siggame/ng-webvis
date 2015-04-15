@@ -16,7 +16,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @end = 0
             @posIntervals = []
             @positions = []
-            @sprite = new Renderer.Rect()
+            @sprite = new Renderer.Sprite()
 
         @idle: (id, entities) =>
             (renderer, turn, progress) =>
@@ -31,7 +31,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         entities[id].sprite.position.y = positions[j].y
 
                 if entities[id].start < turn and turn < entities[id].end
-                    renderer.drawRect entities[id].sprite
+                    renderer.drawSprite entities[id].sprite
 
         @move: (id, entities, moves) =>
             (renderer, turn, progress) =>
@@ -320,18 +320,18 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                             @entities[id].sprite.transform = @pyramid1.transform
                         else
                             @entities[id].sprite.transform = @pyramid2.transform
-                        @entities[id].sprite.fillColor.setColor(1.0, 1.0, 1.0, 1.0)
+
                         switch thief.thiefType
                             when 0
-                                @entities[id].sprite.fillColor.setColor(1.0, 0.0, 0.0, 1.0)
+                                @entities[id].sprite.texture = "bomber"
                             when 1
-                                @entities[id].sprite.fillColor.setColor(1.0, 1.0, 0.0, 1.0)
+                                @entities[id].sprite.texture = "digger"
                             when 2
-                                @entities[id].sprite.fillColor.setColor(0.0, 1.0, 1.0, 1.0)
+                                @entities[id].sprite.texture = "ninja"
                             when 3
-                                @entities[id].sprite.fillColor.setColor(1.0, 0.0, 1.0, 1.0)
+                                @entities[id].sprite.texture = "guide"
                             when 4
-                                @entities[id].sprite.fillColor.setColor(0.0, 0.0, 1.0, 1.0)
+                                @entities[id].sprite.texture = "slave"
                         @entities[id].sprite.width = 1
                         @entities[id].sprite.height = 1
                         @entities[id].start = i
