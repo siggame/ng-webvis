@@ -805,12 +805,12 @@ webvisApp.service 'Renderer', ->
                         @textures[resource.id] = tex
 
                         func = (t) => () =>
-                            console.log t
                             @gl.bindTexture(@gl.TEXTURE_2D, t)
-                            @gl.pixelStorei(@gl.UNPACK_FLIP_Y_WEBGL, true)
                             @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @gl.RGBA, @gl.UNSIGNED_BYTE, t.img)
                             @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
                             @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.NEAREST)
+                            @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_S, @gl.REPEAT)
+                            @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_T, @gl.REPEAT)
                             @gl.bindTexture(@gl.TEXTURE_2D, null)
 
                             numPictures--;
@@ -849,6 +849,7 @@ webvisApp.service 'Renderer', ->
          # param color (Renderer::Color) - The color that the drawing area
          #   will be cleared to.
         begin: (color) ->
+            @gl.viewport( 0, 0, @canvas.width, @canvas.height)
             @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
 
         end: () ->
@@ -873,13 +874,24 @@ webvisApp.service 'Renderer', ->
                 sheetData = @_getSheetData sprite.texture
                 @gl.bindBuffer(@gl.ARRAY_BUFFER, @texCoords)
                 if !sheetData?
-                    newData = new Float32Array([
-                        sprite.u1, sprite.v1
-                        sprite.u2, sprite.v1
-                        sprite.u1, sprite.v2
-                        sprite.u2, sprite.v2
-                    ])
-                    @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, newData)
+                    if !sprite.tiling
+                        @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
+                            sprite.u1, sprite.v1
+                            sprite.u2, sprite.v1
+                            sprite.u1, sprite.v2
+                            sprite.u2, sprite.v2
+                        ]))
+                    else
+                        u1 = 0 + sprite.tileOffsetX
+                        u2 = (sprite.width / sprite.tileWidth) + sprite.tileOffsetX
+                        v1 = 0 + sprite.tileOffsetY
+                        v2 = (sprite.height / sprite.tileHeight) + sprite.tileOffsetY
+                        @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
+                            u1, v1,
+                            u2, v1,
+                            u1, v2,
+                            u2, v2
+                        ]))
                 else
                     spriteResX = t.img.width / sheetData.width
                     spriteResY = t.img.height / sheetData.height
@@ -936,7 +948,7 @@ webvisApp.service 'Renderer', ->
         drawRect: (rect) ->
             @gl.useProgram(@colorProg)
             @gl.disableVertexAttribArray(1)
-            @resizeWorld(100, 100)
+
             mvmat = new Matrix3x3
 
             color = new Float32Array(4)
