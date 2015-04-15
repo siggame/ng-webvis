@@ -269,6 +269,16 @@ webvisApp.service 'Renderer', ->
             @points.push(new Line(@curPos, new Point(x, y)))
             moveTo(x, y)
 
+    @Text = class Text
+        constructor: () ->
+            @transform = null
+            @text = ""
+            @alignment = "left"
+            @position = new Point(0, 0, 0)
+            @width = 0.0
+            @size = 0
+            @color = new Color(0, 0, 0, 0)
+
     ###
      # Renderer::BaseRenderer
      # This is the interface that all renderers must adhere to.
@@ -346,6 +356,12 @@ webvisApp.service 'Renderer', ->
         # Draws the Rectangle to the screen.
         # param line (Renderer::Rect) - the rectangle to be drawn.
         drawRect: (rect) ->
+            throw {errorStr: "Function not implemented"}
+
+        # BaseRenderer::drawText(text)
+        # Draw the Text object to the screen.
+        # param text (Renderer::Text) - the text to be drawn.
+        drawText: (text) ->
             throw {errorStr: "Function not implemented"}
 
     ###
@@ -616,12 +632,45 @@ webvisApp.service 'Renderer', ->
             @context.stroke()
             @context.fill()
 
+        drawText: (text) ->
+            @context.textAlign = "left"
+            @context.font = "Bold " + text.size + "px Verdana"
+            @context.fillStyle = text.color.toCSS()
+
+            if text.alignment == "right"
+                @context.textAlign = "right"
+            else
+                @context.textAlign = "left"
+
+            @context.textBaseline = 'top'
+            if text.transform != null
+                [x, y] = text.transform.mul(rect.position)
+                temptx = text.transform.elements[6]
+                tempty = text.transform.elements[7]
+                text.transform.elements[6] = 0
+                text.transform.elements[7] = 0
+                [w, h] = text.transform.mul(text.width, text,size)
+            else
+                [x, y] = @Projection.mul(text.position)
+                [w, h] = @Projection.mul(text.width, text.size)
+
+            x = parseInt(x * @canvas.width)
+            y = parseInt(y * @canvas.height)
+            w = parseInt(w * @canvas.width)
+
+            if text.alignment == "right"
+                @context.fillText(text.text, x+w, y, w)
+            else
+                @context.fillText(text.text, x, y, w)
 
     @WebGLRenderer = class WebGLRenderer extends @BaseRenderer
         constructor: (@canvas, @worldWidth, @worldHeight) ->
-            @gl = canvas.getContext "webgl"
+            @gl = canvas.getContext "webgl", {antialias : false, depth: false}
             if !context?
                 @gl = canvas.getContext "experimental-webgl"
+
+            @gl.enable(@gl.BLEND)
+            @gl.blendFunc(@gl.SRC_ALPHA, @gl.ONE_MINUS_SRC_ALPHA)
 
             @gl.clearColor(1.0, 1.0, 1.0, 1.0)
             @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
@@ -975,6 +1024,7 @@ webvisApp.service 'Renderer', ->
 
                 @gl.uniformMatrix3fv(@texProg.mvMatrixUniform, false, mvmat.elements)
                 @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
+                @gl.bindTexture(@gl.TEXTURE_2D, null)
 
         # BaseRenderer::drawSprite(sprite)
         # Draws the path object to the screen.
@@ -1011,6 +1061,85 @@ webvisApp.service 'Renderer', ->
             @gl.uniformMatrix3fv(@colorProg.mvMatrixUniform, false, mvmat.elements)
             @gl.uniform4fv(@colorProg.color, color)
             @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
+
+        drawText: (text) ->
+            textCanvas = document.createElement 'canvas'
+            ctx = textCanvas.getContext '2d'
+
+            `var getPowerOfTwo = function(value){
+                var p = 1
+              	while(p<value) {
+              		  p *= 2;
+                }
+              	return p;
+            }`
+
+            ctx.font = "bold " + text.size + "px Verdana"
+            metrics = ctx.measureText(text.text)
+            textCanvas.width = getPowerOfTwo(metrics.width)
+            textCanvas.height = getPowerOfTwo(text.size)
+
+            ctx.font = "bold " + text.size + "px Verdana"
+            ctx.fillStyle = "#000000"
+            ctx.textBaseline = 'top'
+            ctx.fillText(text.text, 0, 0, textCanvas.width)
+
+            @gl.bindBuffer(@gl.ARRAY_BUFFER, @texCoords)
+            @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
+                0.0, 0.0,
+                1.0, 0.0,
+                0.0, 1.0,
+                1.0, 1.0
+                ]))
+
+            mvmat = new Matrix3x3
+
+            wtos = @worldWidth/@canvas.width
+            w = if (textCanvas.width*wtos < text.width)
+                textCanvas.width*wtos
+            else
+                text.width
+
+            if text.alignment == "right"
+                console.log (metrics.width * wtos) + " " + (text.width - (metrics.width * wtos))
+                if (metrics.width*wtos) - text.width > 0
+                    wnew = text.position.x
+                else
+                    wnew = text.position.x + text.width - metrics.width*wtos
+                mvmat.translate(wnew, text.position.y)
+            else
+                mvmat.translate(text.position.x, text.position.y)
+            mvmat.scale(w, textCanvas.height * (@worldHeight/@canvas.height))
+
+            @gl.useProgram(@texProg)
+            @gl.enableVertexAttribArray(1)
+
+            @gl.bindBuffer(@gl.ARRAY_BUFFER, @baseRect)
+            @gl.vertexAttribPointer(@texProg.vertexPositionAttribute,
+                @baseRect.itemSize, @gl.FLOAT, false, 0, 0)
+
+            @gl.bindBuffer(@gl.ARRAY_BUFFER, @texCoords)
+            @gl.vertexAttribPointer(@texProg.texCoordAttribute,
+                @texCoords.itemSize, @gl.FLOAT, false, 0, 0)
+
+            textTexture = @gl.createTexture()
+            @gl.bindTexture(@gl.TEXTURE_2D, textTexture)
+            @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @gl.RGBA, @gl.UNSIGNED_BYTE, textCanvas)
+            @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.LINEAR)
+            @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.LINEAR)
+            @gl.activeTexture(@gl.TEXTURE0)
+            @gl.bindTexture(@gl.TEXTURE_2D, textTexture)
+            @gl.uniform1i(@texProg.samplerUniform, 0)
+
+            if text.transform != null
+                @gl.uniformMatrix3fv(@texProg.pMatrixUniform, false, text.transform.elements)
+            else
+                @gl.uniformMatrix3fv(@texProg.pMatrixUniform, false, @Projection.elements)
+
+            @gl.uniformMatrix3fv(@texProg.mvMatrixUniform, false, mvmat.elements)
+            @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
+            @gl.deleteTexture(textTexture)
+            @gl.bindTexture(@gl.TEXTURE_2D, null)
 
     @autoDetectRenderer = (canvas, worldWidth, worldHeight) ->
         context = canvas.getContext "webgl"
