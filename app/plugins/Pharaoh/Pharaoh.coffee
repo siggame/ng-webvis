@@ -107,6 +107,31 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @guiBarLeft.height = 15
             @guiBarLeft.fillColor.setColor(1.0, 0.0, 0.0, 1.0)
 
+            @guiPlayer1 = new Renderer.Text()
+            @guiPlayer1.position.x = 7
+            @guiPlayer1.position.y = 82
+            @guiPlayer1.width = 38
+            @guiPlayer1.size = 25
+
+            @guiPlayer1Scarab = new Renderer.Sprite()
+            @guiPlayer1Scarab.texture = "fullscrb"
+            @guiPlayer1Scarab.width = 4
+            @guiPlayer1Scarab.height = 8
+            @guiPlayer1Scarab.position.x = 7
+            @guiPlayer1Scarab.position.y = 93 - @guiPlayer1Scarab.height
+
+            @guiPlayer1ScarabCount = new Renderer.Text()
+            @guiPlayer1ScarabCount.position.x = 11
+            @guiPlayer1ScarabCount.position.y = 93 - (@guiPlayer1Scarab.height/2) - 1
+            @guiPlayer1ScarabCount.width = 10
+            @guiPlayer1ScarabCount.size = 18
+
+            @guiPlayer1RoundWin = new Renderer.Text()
+            @guiPlayer1RoundWin.position.x = 42
+            @guiPlayer1RoundWin.position.y = 85
+            @guiPlayer1RoundWin.width = 5
+            @guiPlayer1RoundWin.size = 35
+
             @guiBarRight = new Renderer.Rect()
             @guiBarRight.position.x = 53
             @guiBarRight.position.y = 80
@@ -114,18 +139,32 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @guiBarRight.height = 15
             @guiBarRight.fillColor.setColor(0.0, 1.0, 0.0, 1.0)
 
-            @guiPlayer1 = new Renderer.Text()
-            @guiPlayer1.position.x = 7
-            @guiPlayer1.position.y = 82
-            @guiPlayer1.width = 38
-            @guiPlayer1.size = 25
-
             @guiPlayer2 = new Renderer.Text()
             @guiPlayer2.position.x = 55
             @guiPlayer2.position.y = 82
             @guiPlayer2.alignment = "right"
             @guiPlayer2.width = 38
             @guiPlayer2.size = 25
+
+            @guiPlayer2Scarab = new Renderer.Sprite()
+            @guiPlayer2Scarab.texture = "fullscrb"
+            @guiPlayer2Scarab.width = 4
+            @guiPlayer2Scarab.height = 8
+            @guiPlayer2Scarab.position.x = 90
+            @guiPlayer2Scarab.position.y = 93 - (@guiPlayer2Scarab.height)
+
+            @guiPlayer2ScarabCount = new Renderer.Text()
+            @guiPlayer2ScarabCount.alignment = "right"
+            @guiPlayer2ScarabCount.position.x = 80
+            @guiPlayer2ScarabCount.position.y = 93 - (@guiPlayer2Scarab.height/2) - 1
+            @guiPlayer2ScarabCount.width = 10
+            @guiPlayer2ScarabCount.size = 18
+
+            @guiPlayer2RoundWin = new Renderer.Text()
+            @guiPlayer2RoundWin.position.x = 55
+            @guiPlayer2RoundWin.position.y = 85
+            @guiPlayer2RoundWin.width = 5
+            @guiPlayer2RoundWin.size = 35
 
             @pyramid1Lines = []
             @pyramid2Lines = []
@@ -167,14 +206,28 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
         getName: () -> "Pharaoh"
 
-        preDraw: (dt, renderer) ->
+        preDraw: (turn, dt, renderer) ->
             renderer.drawSprite(@background)
             renderer.drawSprite(@pyramid1)
             renderer.drawSprite(@pyramid2)
+
             renderer.drawRect(@guiBarLeft)
-            renderer.drawRect(@guiBarRight)
             renderer.drawText(@guiPlayer1)
+            renderer.drawSprite(@guiPlayer1Scarab)
+            if @gamedata.turns[turn]?
+                @guiPlayer1ScarabCount.text = "x "+ @gamedata.turns[turn].Player[0].scarabs
+                @guiPlayer1RoundWin.text = @gamedata.turns[turn].Player[0].roundsWon + ""
+            renderer.drawText(@guiPlayer1ScarabCount)
+            renderer.drawText(@guiPlayer1RoundWin)
+
+            renderer.drawRect(@guiBarRight)
             renderer.drawText(@guiPlayer2)
+            renderer.drawSprite(@guiPlayer2Scarab)
+            if @gamedata.turns[turn]?
+                @guiPlayer2ScarabCount.text = @gamedata.turns[turn].Player[1].scarabs + " x"
+                @guiPlayer2RoundWin.text = @gamedata.turns[turn].Player[1].roundsWon + ""
+            renderer.drawText(@guiPlayer2ScarabCount)
+            renderer.drawText(@guiPlayer2RoundWin)
 
             for l in @pyramid1Lines
                 renderer.drawLine(l)
@@ -182,7 +235,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             for l in @pyramid2Lines
                 renderer.drawLine(l)
 
-        postDraw: (dt, renderer) ->
+        postDraw: (turn, dt, renderer) ->
 
         resize: (renderer) ->
             proj = renderer.getProjection()
@@ -207,7 +260,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             # pyramid 2 can use the coordinates provided by the game log
             @pyramid2.transform.translate(-(@mapWidth/2), 0);
 
-        loadGame: (gamedata, renderer) ->
+        loadGame: (@gamedata, renderer) ->
             @maxTurn = gamedata.turns.length
             @mapWidth = gamedata.turns[0].mapWidth
             @mapHeight = gamedata.turns[0].mapHeight
