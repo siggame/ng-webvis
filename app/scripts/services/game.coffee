@@ -40,7 +40,8 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @playbackSpeed = pb
 
     @createRenderer = (canvas) ->
-        @renderer = new Renderer.CanvasRenderer(canvas, 100, 100)
+        #@renderer = new Renderer.CanvasRenderer(canvas, 100, 100)
+        @renderer = Renderer.autoDetectRenderer(canvas, 100, 100)
 
     @canvasResized = (newWidth, newHeight) ->
         if PluginManager.isLoaded()
@@ -70,7 +71,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         if @renderer != null
             @renderer.begin()
 
-            if PluginManager.isLoaded() and @renderer.assetManager.isLoaded()
+            if PluginManager.isLoaded() and @renderer.texturesLoaded()
                 entities = PluginManager.getEntities()
 
                 PluginManager.preDraw(dt, @renderer)
@@ -108,7 +109,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         @playing = false
         @setMaxTurns(PluginManager.getMaxTurn())
 
-        @renderer.assetManager.loadTextures gameObject.gameName, () =>
+        @renderer.loadTextures gameObject.gameName, () =>
             currentDate = new Date()
             @lastAnimateTime = currentDate.getTime()
 
