@@ -633,6 +633,11 @@ webvisApp.service 'Renderer', ->
             @textures = {}
             @sheetData = {}
 
+            lineVerts = [
+              0.0, 0.0
+              0.0, 1.0
+            ]
+
             rectVerts = [
               0.0, 0.0,
               1.0, 0.0,
@@ -640,17 +645,23 @@ webvisApp.service 'Renderer', ->
               1.0, 1.0,
             ]
 
+            @baseLine = @gl.createBuffer()
+            @gl.bindBuffer(@gl.ARRAY_BUFFER, @baseLine)
+            @gl.bufferData(@gl.ARRAY_BUFFER, new Float32Array(lineVerts), @gl.DYNAMIC_DRAW)
+            @baseLine.itemSize = 2
+            @baseLine.numItems = 2
+
             @baseRect = @gl.createBuffer()
             @gl.bindBuffer(@gl.ARRAY_BUFFER, @baseRect)
             @gl.bufferData(@gl.ARRAY_BUFFER, new Float32Array(rectVerts), @gl.STATIC_DRAW)
-            @baseRect.itemSize = 2;
-            @baseRect.numItems = 4;
+            @baseRect.itemSize = 2
+            @baseRect.numItems = 4
 
             @texCoords = @gl.createBuffer()
             @gl.bindBuffer(@gl.ARRAY_BUFFER, @texCoords)
             @gl.bufferData(@gl.ARRAY_BUFFER, new Float32Array(rectVerts), @gl.DYNAMIC_DRAW)
-            @texCoords.itemSize = 2;
-            @texCoords.numItems = 4;
+            @texCoords.itemSize = 2
+            @texCoords.numItems = 4
 
             colorVShaderSource = "
                 attribute vec2 aVertexPosition;
@@ -859,6 +870,34 @@ webvisApp.service 'Renderer', ->
         # param line (Renderer::Line) - The line to be drawn
         # param color (Renderer::Color) - the color the drawn line will be.
         drawLine: (line, color) ->
+            @gl.useProgram(@colorProg)
+            @gl.disableVertexAttribArray(1)
+
+            mvmat = new Matrix3x3
+            color = new Float32Array(4)
+            color[0] = line.color.r
+            color[1] = line.color.g
+            color[2] = line.color.b
+            color[3] = line.color.a
+
+            @gl.bindBuffer(@gl.ARRAY_BUFFER, @baseLine)
+            @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
+                line.x1, line.y1,
+                line.x2, line.y2
+            ]))
+
+            @gl.bindBuffer(@gl.ARRAY_BUFFER, @baseLine)
+            @gl.vertexAttribPointer(@colorProg.vertexPositionAttribute,
+                @baseLine.itemSize, @gl.FLOAT, false, 0, 0)
+
+            if line.transform != null
+                @gl.uniformMatrix3fv(@colorProg.pMatrixUniform, false, line.transform.elements)
+            else
+                @gl.uniformMatrix3fv(@colorProg.pMatrixUniform, false, @Projection.elements)
+            @gl.uniformMatrix3fv(@colorProg.mvMatrixUniform, false, mvmat.elements)
+            @gl.uniform4fv(@colorProg.color, color)
+            @gl.drawArrays(@gl.LINES, 0, @baseLine.numItems)
+
 
         # BaseRenderer::drawSprite(sprite)
         # Draws the sprite object to the screen.
