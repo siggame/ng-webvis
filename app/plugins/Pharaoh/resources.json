@@ -58,11 +58,16 @@
         {
             "id": "explosion",
             "image": "explosion.png",
-            "spriteSheet": null
+            "spriteSheet": "explosion.json"
         },
         {
             "id": "mummy",
             "image": "mummy.png",
+            "spriteSheet": null
+        },
+        {
+            "id": "web",
+            "image" "web.png",
             "spriteSheet": null
         }
     ]
