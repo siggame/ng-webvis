@@ -261,20 +261,20 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @pyramid2.transform.translate(-(@mapWidth/2), 0);
 
         loadGame: (@gamedata, renderer) ->
-            @maxTurn = gamedata.turns.length
-            @mapWidth = gamedata.turns[0].mapWidth
-            @mapHeight = gamedata.turns[0].mapHeight
+            @maxTurn = @gamedata.turns.length
+            @mapWidth = @gamedata.turns[0].mapWidth
+            @mapHeight = @gamedata.turns[0].mapHeight
 
             @resize(renderer)
 
-            @guiPlayer1.text = gamedata.turns[0].Player[0].playerName
-            @guiPlayer2.text = gamedata.turns[0].Player[1].playerName
+            @guiPlayer1.text = @gamedata.turns[0].Player[0].playerName
+            @guiPlayer2.text = @gamedata.turns[0].Player[1].playerName
 
             i = -1
-            for turn in gamedata.turns
+            for turn in @gamedata.turns
                 i++
                 if i+1 < @maxTurn and
-                    turn.roundNumber != gamedata.turns[i+1].roundNumber
+                    turn.roundNumber != @gamedata.turns[i+1].roundNumber
                         for id,ent of @entities
                             if ent instanceof Wall and
                                 ent.intervals.length %2 == 1
@@ -343,7 +343,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         @entities[id].animations.push a
 
                     # does not exist, or dies next turn
-                    if i+1 < @maxTurn and !gamedata.turns[i+1].Thief[id]?
+                    if i+1 < @maxTurn and !@gamedata.turns[i+1].Thief[id]?
                         @entities[id].end = i
                         @entities[id].posIntervals.push i
 
@@ -394,7 +394,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         @entities[id].animations.push a
 
                     # does not exist, or dies next turn
-                    if i+1 < @maxTurn and !gamedata.turns[i+1].Trap[id]?
+                    if i+1 < @maxTurn and !@gamedata.turns[i+1].Trap[id]?
                         @entities[id].end = i
                         @entities[id].posIntervals.push i
 
