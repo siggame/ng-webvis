@@ -114,6 +114,19 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @guiBarRight.height = 15
             @guiBarRight.fillColor.setColor(0.0, 1.0, 0.0, 1.0)
 
+            @guiPlayer1 = new Renderer.Text()
+            @guiPlayer1.position.x = 7
+            @guiPlayer1.position.y = 82
+            @guiPlayer1.width = 38
+            @guiPlayer1.size = 25
+
+            @guiPlayer2 = new Renderer.Text()
+            @guiPlayer2.position.x = 55
+            @guiPlayer2.position.y = 82
+            @guiPlayer2.alignment = "right"
+            @guiPlayer2.width = 38
+            @guiPlayer2.size = 25
+
             @pyramid1Lines = []
             @pyramid2Lines = []
             for i in [0..@pyramid1.width]
@@ -160,6 +173,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             renderer.drawSprite(@pyramid2)
             renderer.drawRect(@guiBarLeft)
             renderer.drawRect(@guiBarRight)
+            renderer.drawText(@guiPlayer1)
+            renderer.drawText(@guiPlayer2)
 
             for l in @pyramid1Lines
                 renderer.drawLine(l)
@@ -198,6 +213,9 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @mapHeight = gamedata.turns[0].mapHeight
 
             @resize(renderer)
+
+            @guiPlayer1.text = gamedata.turns[0].Player[0].playerName
+            @guiPlayer2.text = gamedata.turns[0].Player[1].playerName
 
             i = -1
             for turn in gamedata.turns
