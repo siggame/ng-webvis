@@ -1101,7 +1101,6 @@ webvisApp.service 'Renderer', ->
                 text.width
 
             if text.alignment == "right"
-                console.log (metrics.width * wtos) + " " + (text.width - (metrics.width * wtos))
                 if (metrics.width*wtos) - text.width > 0
                     wnew = text.position.x
                 else
