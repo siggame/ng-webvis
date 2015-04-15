@@ -9,7 +9,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
         getAnimations: () -> @animations
 
-    class Thief extends Entity
+    class Unit extends Entity
         constructor: () ->
             super()
             @start = 0
@@ -313,7 +313,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
                 for id,thief of turn.Thief
                     if !@entities[id]?
-                        @entities[id] = new Thief()
+                        @entities[id] = new Unit()
                         @entities[id].sprite.position.x = thief.x
                         @entities[id].sprite.position.y = thief.y
                         if thief.x < 25
@@ -338,12 +338,63 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         @entities[id].positions.push new Renderer.Point(thief.x, thief.y)
                         @entities[id].posIntervals.push i
 
-                        f = Thief.idle(id, @entities)
+                        f = Unit.idle(id, @entities)
                         a = new PluginBase.Animation(0, @maxTurn, f)
                         @entities[id].animations.push a
 
                     # does not exist, or dies next turn
                     if i+1 < @maxTurn and !gamedata.turns[i+1].Thief[id]?
+                        @entities[id].end = i
+                        @entities[id].posIntervals.push i
+
+                for id,trap of turn.Trap
+                    if !@entities[id]?
+                        @entities[id] = new Unit()
+                        @entities[id].sprite.position.x = trap.x
+                        @entities[id].sprite.position.y = trap.y
+                        if trap.x < 25
+                            @entities[id].sprite.transform = @pyramid1.transform
+                        else
+                            @entities[id].sprite.transform = @pyramid2.transform
+
+                        switch trap.trapType
+                            when 0 #sarc
+                                @entities[id].sprite.texture = "sarcred"
+                            when 1 #spike pit
+                                @entities[id].sprite.texture = "fullscrb"
+                            when 2 #swinging blade
+                                @entities[id].sprite.texture = "fullscrb"
+                            when 3 #boulder
+                                @entities[id].sprite.texture = "fullscrb"
+                            when 4 #spider web
+                                @entities[id].sprite.texture = "fullscrb"
+                            when 5 #quicksand
+                                @entities[id].sprite.texture = "fullscrb"
+                            when 6 #oil vases
+                                @entities[id].sprite.texture = "fullscrb"
+                            when 7 #arrow wall
+                                @entities[id].sprite.texture = "fullscrb"
+                            when 8 #head wire
+                                @entities[id].sprite.texture = "fullscrb"
+                            when 9 #mercury pit
+                                @entities[id].sprite.texture = "fullscrb"
+                            when 10 #mummy
+                                @entities[id].sprite.texture = "mummy"
+                            when 11 #fakewall
+                                @entities[id].sprite.texture = "fakeWall"
+
+                        @entities[id].sprite.width = 1
+                        @entities[id].sprite.height = 1
+                        @entities[id].start = i
+                        @entities[id].positions.push new Renderer.Point(trap.x, trap.y)
+                        @entities[id].posIntervals.push i
+
+                        f = Unit.idle(id, @entities)
+                        a = new PluginBase.Animation(0, @maxTurn, f)
+                        @entities[id].animations.push a
+
+                    # does not exist, or dies next turn
+                    if i+1 < @maxTurn and !gamedata.turns[i+1].Trap[id]?
                         @entities[id].end = i
                         @entities[id].posIntervals.push i
 
@@ -356,7 +407,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
                     if moves.length != 0
                         e = @entities[id]
-                        f = Thief.move(id, @entities, moves)
+                        f = Unit.move(id, @entities, moves)
                         a = new PluginBase.Animation(i, i+1, f)
                         @entities[id].animations.push a
 
