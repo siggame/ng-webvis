@@ -46,9 +46,9 @@ webvisApp.service 'PluginManager', ($rootScope, $injector) ->
         else
             throw PluginError("No plugin selected")
 
-    @preDraw = (delta, renderer) ->
+    @preDraw = (turn, delta, renderer) ->
         if @currentPlugin != null
-            @currentPlugin.preDraw(delta, renderer)
+            @currentPlugin.preDraw(turn, delta, renderer)
         else
             throw PluginError("No plugin selected")
 
@@ -59,9 +59,9 @@ webvisApp.service 'PluginManager', ($rootScope, $injector) ->
         else
             throw PluginError("No plugin selected")
 
-    @postDraw = (delta, renderer) ->
+    @postDraw = (turn, delta, renderer) ->
         if @currentPlugin != null
-            @currentPlugin.postDraw(delta, renderer)
+            @currentPlugin.postDraw(turn, delta, renderer)
         else
             throw PluginError("No plugin selected")
 

@@ -74,10 +74,10 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
             if PluginManager.isLoaded() and @renderer.texturesLoaded()
                 entities = PluginManager.getEntities()
 
-                PluginManager.preDraw(dt, @renderer)
+                PluginManager.preDraw(@getCurrentTurn(), dt, @renderer)
                 for id, entity of entities
                     entity.draw @renderer, @getCurrentTurn(), @turnProgress
-                PluginManager.postDraw(dt, @renderer)
+                PluginManager.postDraw(@getCurrentTurn(), dt, @renderer)
             @renderer.end()
         end = new Date()
 

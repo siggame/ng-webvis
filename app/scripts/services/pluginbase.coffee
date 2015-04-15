@@ -61,10 +61,10 @@ webvisApp.factory 'PluginBase', ($log) ->
         getName: () ->
             throw new PluginError("getName not implemented")
 
-        preDraw: (delta, renderer) ->
+        preDraw: (turn, delta, renderer) ->
             throw new PluginError("preDraw not implemented")
 
-        postDraw: (delta, renderer) ->
+        postDraw: (turn, delta, renderer) ->
             throw new PluginError("postDraw not implemented")
 
         resize: (renderer) ->
