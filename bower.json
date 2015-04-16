@@ -16,7 +16,8 @@
     "jquery-ui": "~1.11.0",
     "angular-bootstrap": "~0.11.0",
     "underscore": "~1.6.0",
-    "font-awesome": "~4.1.0"
+    "font-awesome": "~4.1.0",
+    "compressjs": "https://github.com/siggame/compressjs.git#bower"
   },
   "devDependencies": {
     "angular-mocks": "1.2.16",
