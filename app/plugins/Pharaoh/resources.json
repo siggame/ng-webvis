@@ -94,6 +94,11 @@
             "id": "web",
             "image" "web.png",
             "spriteSheet": null
+        },
+        {
+            "id": "spike",
+            "image": "spike.png",
+            "spriteSheet": null
         }
     ]
 }
