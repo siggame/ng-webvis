@@ -58,7 +58,7 @@
         {
             "id": "explosion",
             "image": "explosion.png",
-            "spriteSheet": null
+            "spriteSheet": "explosion.json"
         },
         {
             "id": "mummy",
@@ -90,6 +90,10 @@
             "image": "WireVertAnim.png",
             "spriteSheet": "Anim16x1.json"
         },
-
+        {
+            "id": "web",
+            "image" "web.png",
+            "spriteSheet": null
+        }
     ]
 }
