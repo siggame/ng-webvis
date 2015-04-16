@@ -64,6 +64,32 @@
             "id": "mummy",
             "image": "mummy.png",
             "spriteSheet": null
-        }
+        },
+	{
+            "id": "ArrowSide",
+            "image": "ArrowSideAnim.png",
+            "spriteSheet": "Anim16x1.json"
+        },
+	{
+            "id": "ArrowUp",
+            "image": "ArrowUpAnim.png",
+            "spriteSheet": "Anim16x1.json"
+        },
+	{
+            "id": "ArrowDown",
+            "image": "ArrowDownAnim.png",
+            "spriteSheet": "Anim16x1.json"
+        },
+	{
+            "id": "WireHoriz",
+            "image": "WireHorizAnim.png",
+            "spriteSheet": "Anim16x1.json"
+        },
+	{
+            "id": "WireVert",
+            "image": "WireVertAnim.png",
+            "spriteSheet": "Anim16x1.json"
+        },
+
     ]
 }
