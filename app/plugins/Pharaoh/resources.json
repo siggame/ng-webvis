@@ -94,6 +94,17 @@
             "id": "web",
             "image" "web.png",
             "spriteSheet": null
-        }
+        },
+	{   
+	    "id": "SwingingBlade",
+	    "image" "swingingblade.png",
+	    "spritesSheet": null
+	},
+	{
+	    "id" : "OilVase",
+	    "image" "oilvase.png",
+	    "spriteSheet" : null
+	}
+	    		
     ]
 }
