@@ -104,7 +104,16 @@
 	    "id" : "OilVase",
 	    "image" "oilvase.png",
 	    "spriteSheet" : null
-	}
-	    		
+	},
+	{
+		"id" : "MercPit",
+		"image" : "Mercury Pit.png",
+		"spriteSheet" : null
+	},
+	{
+		"id" : "Quicksand",
+		"image" : "Quicksand.png",
+		"spriteSheet" : null
+	}		
     ]
 }
