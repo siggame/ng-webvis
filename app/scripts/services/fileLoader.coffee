@@ -146,7 +146,7 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
             return verifyFileType("." + a.pop())
 
         error = (jqxhr, textStatus, errorThrown) ->
-            showError message: "File could not be loaded from #{u}"
+            showError "File could not be loaded from #{u}"
 
         success = (data) ->
             file =
@@ -167,7 +167,11 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
             req = new XMLHttpRequest()
             req.open("GET", u, true)
             req.responseType = "blob"
-            req.onload = (event) -> success(req.response)
+            req.onload = (event) ->
+                if req.status == 200
+                    success(req.response)
+                else
+                    error()
             req.onerror = error
             req.send()
 
@@ -179,8 +183,11 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
                 when "gamelog" then fetchText()
                 when "json" then fetchText()
                 else
-                    throw message: "Bad File Extension"
+                    fetchBinary()
         catch error
             showError error.message
+
+    $rootScope.$on 'FileLoader:LoadFromUrl', (event, data) =>
+        @loadFromFile(data)
 
     return this
