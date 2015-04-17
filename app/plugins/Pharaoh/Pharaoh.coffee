@@ -279,6 +279,34 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 l.color.setColor(0.0, 0.0, 0.0, 1.0)
                 @pyramid2Lines.push l
 
+            @endScreen = new Renderer.Rect()
+            @endScreen.fillColor.setColor(1.0, 1.0, 1.0, 0.4)
+            @endScreen.position.x = 0
+            @endScreen.position.y = 0
+            @endScreen.width = 100
+            @endScreen.height = 100
+
+            @endText = new Renderer.Text()
+            @endText.alignment = "center"
+            @endText.position.x = 20
+            @endText.position.y = 40
+            @endText.width = 60
+            @endText.size = 50
+
+            @endReason = new Renderer.Text()
+            @endReason.alignment = "center"
+            @endReason.position.x = 20
+            @endReason.position.y = 55
+            @endReason.width = 60
+            @endReason.size = 35
+
+            @sarcosCapped = new Renderer.Sprite()
+            @sarcosCapped.position.x = 20
+            @sarcosCapped.position.y = 90
+            @sarcosCapped.width = 3
+            @sarcosCapped.height = 6
+
+
         getName: () -> "Pharaoh"
 
         preDraw: (turn, dt, renderer) ->
@@ -304,6 +332,20 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             renderer.drawText(@guiPlayer2ScarabCount)
             renderer.drawText(@guiPlayer2RoundWin)
 
+            @sarcosCapped.position.x = 20
+            @sarcosCapped.texture = "sarcblue"
+            if @gamedata.turns[turn]?
+                for i in [0..@gamedata.turns[turn].Player[0].sarcophagiCaptured]
+                    renderer.drawSprite @sarcosCapped
+                    @sarcosCapped.position.x += 5
+
+            @sarcosCapped.position = 60
+            @sarcosCapped.texture = "sarcred"
+            if @gamedata.turns[turn]?
+                for i in [0..@gamedata.turns[turn].Player[1].sarcophagiCaptured]
+                    renderer.drawSprite @sarcosCapped
+                    @sarcosCapped.position.x += 5
+
             for l in @pyramid1Lines
                 renderer.drawLine(l)
 
@@ -311,6 +353,10 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 renderer.drawLine(l)
 
         postDraw: (turn, dt, renderer) ->
+            if turn == @maxTurn
+                renderer.drawRect @endScreen
+                renderer.drawText @endText
+                renderer.drawText @endReason
 
         resize: (renderer) ->
             proj = renderer.getProjection()
@@ -344,6 +390,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
             @guiPlayer1.text = @gamedata.turns[0].Player[0].playerName
             @guiPlayer2.text = @gamedata.turns[0].Player[1].playerName
+            @endText.text = "Winner: " + @gamedata.gameWinner.team
+            @endReason.text = @gamedata.gameWinner.reason
 
             i = -1
             for turn in @gamedata.turns
@@ -382,7 +430,6 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                             @entities[id].animations.push a
 
                         if @entities[id].intervals.length %2 == 0
-                            console.log "called"
                             @entities[id].intervals.push i
 
                     if tile.type == 0 and @entities[id]? and
@@ -529,7 +576,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         getSexpScheme: () ->
             {
                 gameName : ["gameName"],
-                Player : ["id", "playerName", "time", "scarabs", "roundsWon"],
+                Player : ["id", "playerName", "time", "scarabs", "roundsWon",
+                         "sarcophagiCaptured"],
                 Mappable : ["id", "x", "y"],
                 Tile : ["id", "x", "y", "type"],
                 Trap : ["id", "x", "y", "owner", "trapType", "visible",
