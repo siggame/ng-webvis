@@ -66,17 +66,17 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             return 0
 
     class ArrowWall extends Unit
-        constructor: (trap) ->
+        constructor: (game, trap) ->
             super()
 
             @sprite.width = 1
             @sprite.height = 1
             @sprite.frame = 0
 
-            @north = getTileIdAt(trap.x, trap.y - 1)
-            @south = getTileIdAt(trap.x, trap.y + 1)
-            @east = getTileIdAt(trap.x - 1, trap.y)
-            @west = getTileIdAt(trap.x + 1, trap.y)
+            @north = game.getTileIdAt(trap.x, trap.y - 1)
+            @south = game.getTileIdAt(trap.x, trap.y + 1)
+            @east = game.getTileIdAt(trap.x - 1, trap.y)
+            @west = game.getTileIdAt(trap.x + 1, trap.y)
 
         @idle: (id, entities, gamedata) =>
             (renderer, turn, progress) =>
@@ -102,22 +102,22 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         @activate: () =>
 
     class HeadWire extends Unit
-        constructor: (trap) ->
+        constructor: (game, trap) ->
             super()
 
-            @north = getTileIdAt(trap.x, trap.y - 1)
-            @south = getTileIdAt(trap.x, trap.y + 1)
-            @east = getTileIdAt(trap.x - 1, trap.y)
-            @west = getTileIdAt(trap.x + 1, trap.y)
+            @north = game.getTileIdAt(trap.x, trap.y - 1)
+            @south = game.getTileIdAt(trap.x, trap.y + 1)
+            @east = game.getTileIdAt(trap.x - 1, trap.y)
+            @west = game.getTileIdAt(trap.x + 1, trap.y)
 
         @idle: (id, entities, gamedata) =>
             (renderer, turn, progress) =>
                 e = entities[id]
 
                 j = -1
-                for i in [0 ... e.intervals.length] by 2
+                for i in [0 ... e.posIntervals.length] by 2
                     j++
-                    if e.intervals[i] <= turn < e.intervals[i+1]
+                    if e.posIntervals[i] <= turn < e.posIntervals[i+1]
                         e.sprite.position.x = e.positions[j].x
                         e.sprite.position.y = e.positions[j].y
 
@@ -527,26 +527,28 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                 @entities[id].animations.push a
 
                             when 7 #arrow wall
-                                @entities[id] = new ArrowWall(trap)
-                                @entities[id].start = i
-                                @entities[id].end = @maxTurn
-                                @entities[id].position.push new Renderer.Point(trap.x, trap.y)
-                                @entities[id].posIntervals.push i
+                                e = new ArrowWall(this, trap)
+                                e.start = i
+                                e.end = @maxTurn
+                                e.positions.push new Renderer.Point(trap.x, trap.y)
+                                e.posIntervals.push i
 
                                 f = ArrowWall.idle(id, @entities)
                                 a = new PluginBase.Animation(0, @maxTurn, f)
-                                @entities[id].animations.push a
+                                e.animations.push a
+                                @entities[id] = e
 
                             when 8 #head wire
-                                @entities[id] = new HeadWire(trap)
-                                @entities[id].start = i
-                                @entities[id].end = @maxTurn
-                                @entities[id].position.push new Renderer.Point(trap.x, trap.y)
-                                @entities[id].posIntervals.push i
+                                e = new HeadWire(this, trap)
+                                e.start = i
+                                e.end = @maxTurn
+                                e.positions.push new Renderer.Point(trap.x, trap.y)
+                                e.posIntervals.push i
 
                                 f = HeadWire.idle(id, @entities)
                                 a = new PluginBase.Animation(0, @maxTurn, f)
-                                @entities[id].animation.push a
+                                e.animations.push a
+                                @entities[id] = e
 
                     # does not exist, or dies next turn
                     if i+1 < @maxTurn and !@gamedata.turns[i+1].Trap[id]?
@@ -571,7 +573,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         e.posIntervals.push i
                         e.posIntervals.push i+1
 
-        getTileIdAt: (x, y) -> @tileLookup[""+tile.x+":"+tile.y]
+        getTileIdAt: (x, y) -> @tileLookup[""+x+":"+y]
 
         getSexpScheme: () ->
             {
