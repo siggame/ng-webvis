@@ -880,14 +880,16 @@ webvisApp.service 'Renderer', ->
 
                         tex.img.onload = func(tex)
 
+                        spriteLoad = (id) => (data) =>
+                            @sheetData[id] = data
+
                         if resource.spriteSheet != (null)
                             u = "/plugins/" + pluginName + "/images/" + resource.spriteSheet
                             $.ajax
                                 dataType: "json",
                                 url: u,
                                 data: null,
-                                success: (data) =>
-                                    @sheetData[resource.id] = data
+                                success: spriteLoad(resource.id)
                  error: (jqxhr, textStatus, errorThrown)->
                     console.log textStatus + " " + errorThrown
 
@@ -982,7 +984,7 @@ webvisApp.service 'Renderer', ->
                         ]))
                 else
                     useg = 1/sheetData.width
-                    vset = 1/sheetData.height
+                    vseg = 1/sheetData.height
                     row = parseInt(sprite.frame / sheetData.width)
                     column = sprite.frame % sheetData.width
                     u1 = column * useg
