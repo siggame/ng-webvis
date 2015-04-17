@@ -18,20 +18,18 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @positions = []
             @sprite = new Renderer.Sprite()
 
-        @idle: (id, entities) =>
+        @idle: (id, entities, gamedata) =>
             (renderer, turn, progress) =>
-                intervals = entities[id].posIntervals
-                positions = entities[id].positions
-
+                e = entities[id]
                 j = -1
-                for i in [0 ... intervals.length] by 2
+                for i in [0 ... e.posIntervals.length] by 2
                     j++
-                    if intervals[i] <= turn and turn < intervals[i+1]
-                        entities[id].sprite.position.x = positions[j].x
-                        entities[id].sprite.position.y = positions[j].y
+                    if e.posIntervals[i] <= turn < e.posIntervals[i+1]
+                        e.sprite.position.x = e.positions[j].x
+                        e.sprite.position.y = e.positions[j].y
 
-                if entities[id].start < turn and turn < entities[id].end
-                    renderer.drawSprite entities[id].sprite
+                if e.start <= turn <= e.end+1
+                    renderer.drawSprite e.sprite
 
         @move: (id, entities, moves) =>
             (renderer, turn, progress) =>
@@ -49,14 +47,89 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         constructor: () ->
             super()
             @sprite = new Renderer.Rect()
+            @type = 2
             @intervals = []
 
         @idle: (id, entities) =>
             (renderer, turn, progress) =>
-                intervals = entities[id].intervals
-                for i in [0 ... intervals.length] by 2
-                    if intervals[i] <= turn and turn <= intervals[i+1]
-                        renderer.drawRect entities[id].sprite
+                e = entities[id]
+                for i in [0 ... e.intervals.length] by 2
+                    e.type = e.typeOnTurn(turn)
+                    if e.type == 2
+                        renderer.drawRect e.sprite
+                        break
+
+        typeOnTurn: (turn) ->
+            for i in [0 ... @intervals.length] by 2
+                if @intervals[i] <= turn <= @intervals[i+1]
+                    return 2
+            return 0
+
+    class ArrowWall extends Unit
+        constructor: (trap) ->
+            super()
+
+            @sprite.width = 1
+            @sprite.height = 1
+            @sprite.frame = 0
+
+            @north = getTileIdAt(trap.x, trap.y - 1)
+            @south = getTileIdAt(trap.x, trap.y + 1)
+            @east = getTileIdAt(trap.x - 1, trap.y)
+            @west = getTileIdAt(trap.x + 1, trap.y)
+
+        @idle: (id, entities, gamedata) =>
+            (renderer, turn, progress) =>
+                e = entities[id]
+
+                j = -1
+                for i in [0 ... e.posIntervals.length] by 2
+                    j++
+                    if e.posIntervals[i] <= turn < e.posIntervals[i+1]
+                        e.sprite.position.x = e.positions[j].x
+                        e.sprite.position.y = e.positions[j].y
+
+                if entities[e.north]? and entities[e.north].type == 2
+                    e.sprite.texture = "ArrowDown"
+                else if entities[e.south]? and entities[e.south].type == 2
+                    e.sprite.texture = "ArrowUp"
+                else
+                    e.sprite.texture = "ArrowSide"
+
+                if e.start <= turn < e.end
+                    renderer.drawSprite e.sprite
+
+        @activate: () =>
+
+    class HeadWire extends Unit
+        constructor: (trap) ->
+            super()
+
+            @north = getTileIdAt(trap.x, trap.y - 1)
+            @south = getTileIdAt(trap.x, trap.y + 1)
+            @east = getTileIdAt(trap.x - 1, trap.y)
+            @west = getTileIdAt(trap.x + 1, trap.y)
+
+        @idle: (id, entities, gamedata) =>
+            (renderer, turn, progress) =>
+                e = entities[id]
+
+                j = -1
+                for i in [0 ... e.intervals.length] by 2
+                    j++
+                    if e.intervals[i] <= turn < e.intervals[i+1]
+                        e.sprite.position.x = e.positions[j].x
+                        e.sprite.position.y = e.positions[j].y
+
+                if entities[e.north]? and entities[e.north].type == 2
+                    e.sprite.texture = "WireVert"
+                    e.sprite.height = 2
+                    e.sprite.position.x--
+                else
+                    e.sprite.texture = "WireHoriz"
+                    e.sprite.height = 1
+
+        @activate: () ->
 
     class Pharaoh extends PluginBase.BasePlugin
         constructor: () ->
@@ -69,6 +142,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 ]
             ]
             Options.addPage "Pharaoh", @pharaohOptions
+            @tileLookup = {}
+
             @gameLoaded = false
             @background = new Renderer.Sprite()
             @background.texture = "background"
@@ -278,6 +353,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         for id,ent of @entities
                             if ent instanceof Wall and
                                 ent.intervals.length %2 == 1
+                                    console.log "called"
                                     ent.intervals.push i
 
                 if i+1 == @maxTurn
@@ -285,6 +361,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         if ent instanceof Wall and
                             ent.intervals.length %2 == 1
                                 ent.intervals.push i
+
 
                 for id,tile of turn.Tile
                     if tile.type == 2
@@ -305,11 +382,15 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                             @entities[id].animations.push a
 
                         if @entities[id].intervals.length %2 == 0
+                            console.log "called"
                             @entities[id].intervals.push i
 
                     if tile.type == 0 and @entities[id]? and
                         @entities[id].intervals.length %2 == 1
                             @entities[id].intervals.push i
+
+                    if !@tileLookup[""+tile.x+":"+tile.y]?
+                        @tileLookup[""+tile.x+":"+tile.y] = id
 
                 for id,thief of turn.Thief
                     if !@entities[id]?
@@ -324,21 +405,27 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         switch thief.thiefType
                             when 0
                                 @entities[id].sprite.texture = "bomber"
+                                console.log "made a bomber"
                             when 1
                                 @entities[id].sprite.texture = "digger"
+                                console.log "made digger"
                             when 2
                                 @entities[id].sprite.texture = "ninja"
+                                console.log "made a ninja"
                             when 3
                                 @entities[id].sprite.texture = "guide"
+                                console.log "made a guide"
                             when 4
                                 @entities[id].sprite.texture = "slave"
+                                console.log "made a slave"
                         @entities[id].sprite.width = 1
                         @entities[id].sprite.height = 1
                         @entities[id].start = i
+                        @entities[id].end = @maxTurn
                         @entities[id].positions.push new Renderer.Point(thief.x, thief.y)
                         @entities[id].posIntervals.push i
 
-                        f = Unit.idle(id, @entities)
+                        f = Unit.idle(id, @entities, @gamedata)
                         a = new PluginBase.Animation(0, @maxTurn, f)
                         @entities[id].animations.push a
 
@@ -349,49 +436,70 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
                 for id,trap of turn.Trap
                     if !@entities[id]?
-                        @entities[id] = new Unit()
-                        @entities[id].sprite.position.x = trap.x
-                        @entities[id].sprite.position.y = trap.y
-                        if trap.x < 25
-                            @entities[id].sprite.transform = @pyramid1.transform
-                        else
-                            @entities[id].sprite.transform = @pyramid2.transform
-
                         switch trap.trapType
-                            when 0 #sarc
-                                @entities[id].sprite.texture = "sarcred"
-                            when 1 #spike pit
-                                @entities[id].sprite.texture = "fullscrb"
-                            when 2 #swinging blade
-                                @entities[id].sprite.texture = "fullscrb"
-                            when 3 #boulder
-                                @entities[id].sprite.texture = "fullscrb"
-                            when 4 #spider web
-                                @entities[id].sprite.texture = "fullscrb"
-                            when 5 #quicksand
-                                @entities[id].sprite.texture = "fullscrb"
-                            when 6 #oil vases
-                                @entities[id].sprite.texture = "fullscrb"
+                            when 0, 1, 2, 3, 4, 5, 6, 9, 10, 11
+                                @entities[id] = new Unit()
+                                @entities[id].sprite.position.x = trap.x
+                                @entities[id].sprite.position.y = trap.y
+                                if trap.x < 25
+                                    @entities[id].sprite.transform = @pyramid1.transform
+                                else
+                                    @entities[id].sprite.transform = @pyramid2.transform
+
+                                switch trap.trapType
+                                    when 0 #sarc
+                                        @entities[id].sprite.texture = "sarcred"
+                                    when 1 #spike pit
+                                        @entities[id].sprite.texture = "spike"
+                                    when 2 #swinging blade
+                                        @entities[id].sprite.texture = "SwingingBlade"
+                                    when 3 #boulder
+                                        @entities[id].sprite.texture = "fullscrb"
+                                    when 4 #spider web
+                                        @entities[id].sprite.texture = "web"
+                                    when 5 #quicksand
+                                        @entities[id].sprite.texture = "Quicksand"
+                                    when 6 #oil vases
+                                        @entities[id].sprite.texture = "OilVase"
+                                    when 9 #mercury pit
+                                        @entities[id].sprite.texture = "MercPit"
+                                    when 10 #mummy
+                                        @entities[id].sprite.texture = "mummy"
+                                    when 11 #fakewall
+                                        @entities[id].sprite.texture = "fakeWall"
+
+                                @entities[id].sprite.width = 1
+                                @entities[id].sprite.height = 1
+                                @entities[id].start = i
+                                @entities[id].end = @maxTurn
+                                @entities[id].positions.push new Renderer.Point(trap.x, trap.y)
+                                @entities[id].posIntervals.push i
+
+                                f = Unit.idle(id, @entities)
+                                a = new PluginBase.Animation(0, @maxTurn, f)
+                                @entities[id].animations.push a
+
                             when 7 #arrow wall
-                                @entities[id].sprite.texture = "fullscrb"
+                                @entities[id] = new ArrowWall(trap)
+                                @entities[id].start = i
+                                @entities[id].end = @maxTurn
+                                @entities[id].position.push new Renderer.Point(trap.x, trap.y)
+                                @entities[id].posIntervals.push i
+
+                                f = ArrowWall.idle(id, @entities)
+                                a = new PluginBase.Animation(0, @maxTurn, f)
+                                @entities[id].animations.push a
+
                             when 8 #head wire
-                                @entities[id].sprite.texture = "fullscrb"
-                            when 9 #mercury pit
-                                @entities[id].sprite.texture = "fullscrb"
-                            when 10 #mummy
-                                @entities[id].sprite.texture = "mummy"
-                            when 11 #fakewall
-                                @entities[id].sprite.texture = "fakeWall"
+                                @entities[id] = new HeadWire(trap)
+                                @entities[id].start = i
+                                @entities[id].end = @maxTurn
+                                @entities[id].position.push new Renderer.Point(trap.x, trap.y)
+                                @entities[id].posIntervals.push i
 
-                        @entities[id].sprite.width = 1
-                        @entities[id].sprite.height = 1
-                        @entities[id].start = i
-                        @entities[id].positions.push new Renderer.Point(trap.x, trap.y)
-                        @entities[id].posIntervals.push i
-
-                        f = Unit.idle(id, @entities)
-                        a = new PluginBase.Animation(0, @maxTurn, f)
-                        @entities[id].animations.push a
+                                f = HeadWire.idle(id, @entities)
+                                a = new PluginBase.Animation(0, @maxTurn, f)
+                                @entities[id].animation.push a
 
                     # does not exist, or dies next turn
                     if i+1 < @maxTurn and !@gamedata.turns[i+1].Trap[id]?
@@ -415,6 +523,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         e.positions.push new Renderer.Point(lastMove.toX, lastMove.toY, 0)
                         e.posIntervals.push i
                         e.posIntervals.push i+1
+
+        getTileIdAt: (x, y) -> @tileLookup[""+tile.x+":"+tile.y]
 
         getSexpScheme: () ->
             {

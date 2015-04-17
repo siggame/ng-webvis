@@ -103,7 +103,7 @@
         {
             "id": "SwingingBlade",
             "image": "swingingblade.png",
-            "spritesSheet": null
+            "spriteSheet": null
         },
         {
             "id" : "OilVase",
