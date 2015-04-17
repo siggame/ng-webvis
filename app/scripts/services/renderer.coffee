@@ -1105,6 +1105,12 @@ webvisApp.service 'Renderer', ->
                 else
                     wnew = text.position.x + text.width - metrics.width*wtos
                 mvmat.translate(wnew, text.position.y)
+            else if text.alignment == "center"
+                if(metrics.width*wtos) - text.width > 0
+                    wnew = text.position.x
+                else
+                    wnew = text.position.x + (text.width/2) - ((metrics.width*wtos)/2)
+                mvmat.translate(wnew, text.position.y)
             else
                 mvmat.translate(text.position.x, text.position.y)
             mvmat.scale(w, textCanvas.height * (@worldHeight/@canvas.height))
