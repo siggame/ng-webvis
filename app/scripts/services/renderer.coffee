@@ -981,14 +981,14 @@ webvisApp.service 'Renderer', ->
                             u2, v2
                         ]))
                 else
-                    spriteResX = t.img.width / sheetData.width
-                    spriteResY = t.img.height / sheetData.height
+                    useg = 1/sheetData.width
+                    vset = 1/sheetData.height
                     row = parseInt(sprite.frame / sheetData.width)
                     column = sprite.frame % sheetData.width
-                    u1 = (sprite.u1 * spriteResX) + (column * spriteResX)
-                    u2 = (sprite.u2 * spriteResX) + (column * spriteResX)
-                    v1 = (sprite.v1 * spriteResY) + (row * spriteResY)
-                    v2 = (sprite.v2 * spriteResY) + (row * spriteResY)
+                    u1 = column * useg
+                    v1 = row * vseg
+                    u2 = u1 + useg
+                    v2 = v2 + useg
 
                     @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
                         u1, v1,
