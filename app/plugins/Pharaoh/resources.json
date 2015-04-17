@@ -119,6 +119,11 @@
           "id" : "Quicksand",
           "image" : "Quicksand.png",
           "spriteSheet" : null
+        },
+        {
+          "id" : "guiback",
+          "image" : "GUI-Background.png",
+          "spriteSheet" : null
         }
     ]
 }

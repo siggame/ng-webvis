@@ -175,12 +175,12 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @pyramid2.tileWidth = 15
             @pyramid2.tileHeight = 15
 
-            @guiBarLeft = new Renderer.Rect()
+            @guiBarLeft = new Renderer.Sprite()
+            @guiBarLeft.texture = "guiback"
             @guiBarLeft.position.x = 5
             @guiBarLeft.position.y = 80
             @guiBarLeft.width = 42
             @guiBarLeft.height = 15
-            @guiBarLeft.fillColor.setColor(1.0, 0.0, 0.0, 1.0)
 
             @guiPlayer1 = new Renderer.Text()
             @guiPlayer1.position.x = 7
@@ -207,12 +207,12 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @guiPlayer1RoundWin.width = 5
             @guiPlayer1RoundWin.size = 35
 
-            @guiBarRight = new Renderer.Rect()
+            @guiBarRight = new Renderer.Sprite()
+            @guiBarRight.texture = "guiback"
             @guiBarRight.position.x = 53
             @guiBarRight.position.y = 80
             @guiBarRight.width = 42
             @guiBarRight.height = 15
-            @guiBarRight.fillColor.setColor(0.0, 1.0, 0.0, 1.0)
 
             @guiPlayer2 = new Renderer.Text()
             @guiPlayer2.position.x = 55
@@ -314,7 +314,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             renderer.drawSprite(@pyramid1)
             renderer.drawSprite(@pyramid2)
 
-            renderer.drawRect(@guiBarLeft)
+            renderer.drawSprite(@guiBarLeft)
             renderer.drawText(@guiPlayer1)
             renderer.drawSprite(@guiPlayer1Scarab)
             if @gamedata.turns[turn]?
@@ -323,7 +323,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             renderer.drawText(@guiPlayer1ScarabCount)
             renderer.drawText(@guiPlayer1RoundWin)
 
-            renderer.drawRect(@guiBarRight)
+            renderer.drawSprite(@guiBarRight)
             renderer.drawText(@guiPlayer2)
             renderer.drawSprite(@guiPlayer2Scarab)
             if @gamedata.turns[turn]?
