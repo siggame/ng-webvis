@@ -555,6 +555,15 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         @entities[id].end = i
                         @entities[id].posIntervals.push i
 
+                    if i+1 < @maxTurn and @gamedata.turns[i+1]? and
+                        @gamedata.turns[i+1].Trap[id]?
+                            e = @gamedata.turns[i+1].Trap[id]
+                            if @entities[id].sprite.position.x != e.x or
+                                @entities[id].sprite.position.y != e.y
+                                    @entities[id].positions.push new Renderer.Point(e.x, e.y)
+                                    @entities[id].posIntervals.push i+1
+                                    @entities[id].posIntervals.push i+1
+
                 for id,animList of turn.animations
                     moves = []
                     for anim in animList
@@ -611,8 +620,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 game : ["mapWidth", "mapHeight", "turnNumber",
                        "roundTurnNumber", "maxThieves", "maxTraps", "playerID",
                        "gameNumber", "roundNumber", "scarabsForTraps",
-                       "scarabsForThieves", "maxStack", "roundsToWin",
-                       "roundTurnLimit"]
+                       "scarabsForThieves", "roundsToWin",
+                       "roundTurnLimit", "numberOfSarcophagi"]
             }
 
     return new Pharaoh
