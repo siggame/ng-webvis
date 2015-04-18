@@ -104,6 +104,11 @@
 	    "id" : "OilVase",
 	    "image" "oilvase.png",
 	    "spriteSheet" : null
+	},
+	{
+	    "id" : "SwingBladeAnimation",
+	    "image" "swingbladeanimation.png",
+	    "spriteSheet" : "Anim16x1.json"
 	}
 	    		
     ]
