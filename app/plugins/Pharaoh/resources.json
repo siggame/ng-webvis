@@ -129,6 +129,11 @@
           "id" : "guiback",
           "image" : "GUI-Background.png",
           "spriteSheet" : null
+        },
+	{
+            "id": "wall",
+            "image" : "Wall.png",
+            "spriteSheet": "Anim2x1.json"
         }
     ]
 }
