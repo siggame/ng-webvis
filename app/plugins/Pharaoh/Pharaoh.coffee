@@ -9,59 +9,6 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
         getAnimations: () -> @animations
 
-    class Unit extends Entity
-        constructor: () ->
-            super()
-            @start = 0
-            @end = 0
-            @posIntervals = []
-            @positions = []
-            @sprite = new Renderer.Sprite()
-            @clickable = false
-            @states = {}
-
-        @idle: (id, entities, gamedata) =>
-            (renderer, turn, progress) =>
-                e = entities[id]
-                j = -1
-                for i in [0 ... e.posIntervals.length] by 2
-                    j++
-                    if e.posIntervals[i] <= turn < e.posIntervals[i+1]
-                        e.sprite.position.x = e.positions[j].x
-                        e.sprite.position.y = e.positions[j].y
-
-                if e.start <= turn <= e.end+1
-                    renderer.drawSprite e.sprite
-                    e.clickable = true
-                else
-                    e.clickable = false
-
-        @move: (id, entities, moves) =>
-            (renderer, turn, progress) =>
-                sprite = entities[id].sprite
-                i = Math.floor(moves.length * progress)
-                subt = (moves.length * progress) - i
-
-                diffx = moves[i].toX - moves[i].fromX
-                diffy = moves[i].toY - moves[i].fromY
-
-                sprite.position.x = moves[i].fromX + (diffx * subt)
-                sprite.position.y = moves[i].fromY + (diffy * subt)
-
-    class Thief extends Unit
-        constructor: () ->
-            super()
-
-        @die: (id, entities) =>
-            (renderer, turn, progress) =>
-                s = entities[id].sprite
-                s.texture = "death"
-                s.frame = Math.floor(16 * progress)
-
-    class Trap extends Unit
-        constructor: () ->
-            super()
-
     class Wall extends Entity
         constructor: (game, tile) ->
             super()
@@ -71,7 +18,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @type = 2
             @intervals = []
 
-        @idle: (game, id, entities) =>
+        @idleMake: (game, id, entities) =>
             (renderer, turn, progress) =>
                 e = entities[id]
 
@@ -91,6 +38,76 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                     return 2
             return 0
 
+    class Unit extends Entity
+        constructor: () ->
+            super()
+            @start = 0
+            @end = 0
+            @posIntervals = []
+            @positions = []
+            @sprite = new Renderer.Sprite()
+            @clickable = false
+            @states = {}
+            @normalTex = ""
+
+        @idleMake: (id, entities, gamedata) =>
+            (renderer, turn, progress) =>
+                e = entities[id]
+                j = -1
+                e.sprite.texture = e.normalTex
+
+                for i in [0 ... e.posIntervals.length] by 2
+                    j++
+                    if e.posIntervals[i] <= turn < e.posIntervals[i+1]
+                        e.sprite.position.x = e.positions[j].x
+                        e.sprite.position.y = e.positions[j].y
+
+                if e.start <= turn <= e.end
+                    renderer.drawSprite e.sprite
+                    e.clickable = true
+                else
+                    e.clickable = false
+
+        @move: (id, entities, moves) =>
+            (renderer, turn, progress) =>
+                sprite = entities[id].sprite
+                i = Math.floor(moves.length * progress)
+                subt = (moves.length * progress) - i
+
+                diffx = moves[i].toX - moves[i].fromX
+                diffy = moves[i].toY - moves[i].fromY
+
+                sprite.position.x = moves[i].fromX + (diffx * subt)
+                sprite.position.y = moves[i].fromY + (diffy * subt)
+
+                renderer.drawSprite sprite
+                @clickable = true
+
+    class Thief extends Unit
+        constructor: () ->
+            super()
+
+        @die: (id, entities) =>
+            (renderer, turn, progress) =>
+                s = entities[id].sprite
+                s.texture = "death"
+                s.frame = Math.floor(16 * progress)
+                renderer.drawSprite s
+                @clickable = true
+
+        @bomb: (id, entities, anim) =>
+            (renderer, turn, progress) =>
+                ts = entities[anim.target].sprite
+                ts.texture = "explosion"
+                ts.frame = Math.floor(16 * progress)
+                renderer.drawSprite s
+                @clickable = true
+
+
+    class Trap extends Unit
+        constructor: () ->
+            super()
+
     class ArrowWall extends Trap
         constructor: (game, trap) ->
             super()
@@ -104,7 +121,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @east = game.getTileIdAt(trap.x - 1, trap.y)
             @west = game.getTileIdAt(trap.x + 1, trap.y)
 
-        @idle: (id, entities, gamedata) =>
+        @idleMake: (id, entities, gamedata) =>
             (renderer, turn, progress) =>
                 e = entities[id]
                 e.sprite.frame = 0
@@ -117,11 +134,11 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         e.sprite.position.y = e.positions[j].y
 
                 if entities[e.north]? and entities[e.north].type == 2
-                    e.sprite.texture = "ArrowDown"
+                    e.sprite.texture = "fullscrb"
                 else if entities[e.south]? and entities[e.south].type == 2
-                    e.sprite.texture = "ArrowUp"
+                    e.sprite.texture = "fullscrb"
                 else
-                    e.sprite.texture = "ArrowSide"
+                    e.sprite.texture = "fullscrb"
 
                 if e.start <= turn < e.end
                     e.clickable = true
@@ -132,6 +149,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         @activate: (id, entities) =>
             (renderer, turn, progress) =>
                 entities[id].sprite.frame = Math.floor(16 * progress)
+                renderer.drawSprite entities[id].sprite
 
     class HeadWire extends Trap
         constructor: (game, trap) ->
@@ -142,7 +160,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @east = game.getTileIdAt(trap.x - 1, trap.y)
             @west = game.getTileIdAt(trap.x + 1, trap.y)
 
-        @idle: (id, entities, gamedata) =>
+        @idleMake: (id, entities, gamedata) =>
             (renderer, turn, progress) =>
                 e = entities[id]
                 e.sprite.frame = 0
@@ -155,11 +173,11 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         e.sprite.position.y = e.positions[j].y
 
                 if entities[e.north]? and entities[e.north].type == 2
-                    e.sprite.texture = "WireVert"
-                    e.sprite.height = 2
-                    e.sprite.position.x--
+                    e.sprite.texture = "fullscrb"
+                    #e.sprite.height = 2
+                    #e.sprite.position.x--
                 else
-                    e.sprite.texture = "WireHoriz"
+                    e.sprite.texture = "fullscrb"
                     e.sprite.height = 1
 
                 if e.start <= turn < e.end
@@ -171,6 +189,9 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         @activate: (id, entities) =>
             (renderer, turn, progress) =>
                 entities[id].sprite.frame = Math.floor(16 * progress)
+                renderer.drawSprite entities[id].sprite
+
+    class
 
     class Pharaoh extends PluginBase.BasePlugin
         constructor: () ->
@@ -375,11 +396,9 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             p1x -= 1.0
             p1y = -p1y
 
-            console.log "#{p1x} #{p1y}"
             for id,e of @entities
                 if e instanceof Thief or e instanceof Trap
                     if e.sprite.transform == @pyramid2.transform
-                        console.log "#{id} #{e.sprite.position.x} #{e.sprite.position.y}"
                         if e.sprite.position.x <= p1x <= e.sprite.position.x +
                             e.sprite.width and
                             e.sprite.position.y <= p1y <= e.sprite.position.y +
@@ -513,9 +532,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                             sp.width = 1
                             sp.height = 1
 
-                            f = Wall.idle(this, id, @entities)
-                            a = new PluginBase.Animation(0, @maxTurn, f)
-                            @entities[id].animations.push a
+                            @entities[id].idle = Wall.idleMake(this, id, @entities)
 
                         if @entities[id].intervals.length %2 == 0
                             @entities[id].intervals.push i
@@ -540,14 +557,19 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         switch thief.thiefType
                             when 0
                                 @entities[id].sprite.texture = "bomber"
+                                @entities[id].normalTex = "bomber"
                             when 1
                                 @entities[id].sprite.texture = "digger"
+                                @entities[id].normalTex = "digger"
                             when 2
                                 @entities[id].sprite.texture = "ninja"
+                                @entities[id].normalTex = "ninja"
                             when 3
                                 @entities[id].sprite.texture = "guide"
+                                @entities[id].normalTex = "guide"
                             when 4
                                 @entities[id].sprite.texture = "slave"
+                                @entities[id].normalTex = "slave"
                         @entities[id].sprite.width = 1
                         @entities[id].sprite.height = 1
                         @entities[id].start = i
@@ -555,19 +577,20 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         @entities[id].positions.push new Renderer.Point(thief.x, thief.y)
                         @entities[id].posIntervals.push i
 
-                        f = Thief.idle(id, @entities, @gamedata)
-                        a = new PluginBase.Animation(0, @maxTurn, f)
-                        @entities[id].animations.push a
+                        @entities[id].idle = Thief.idleMake(id, @entities, @gamedata)
 
                     # does not exist, or dies next turn
-                    if i+1 < @maxTurn and !@gamedata.turns[i+1].Thief[id]?
-                        @entities[id].end = i
-                        @entities[id].posIntervals.push i
+                    if i+1 < @maxTurn and thief.alive == 1 and
+                        @gamedata.turns[i+1].Thief[id]? and
+                        @gamedata.turns[i+1].Thief[id].alive == 0
 
-                        e = @entities[id]
-                        f = Thief.die(id, @entities)
-                        a = new PluginBase.Animation(i, i+1, f)
-                        @entities[id].animations.push a
+                            @entities[id].end = i+1
+                            @entities[id].posIntervals.push i+1
+
+                            e = @entities[id]
+                            f = Thief.die(id, @entities)
+                            a = new PluginBase.Animation(i+2, i+3, f)
+                            @entities[id].animations.push a
 
                     @entities[id].states["#{i}"] = thief
 
@@ -587,26 +610,37 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                     when 0 #sarc
                                         if trap.x < 25
                                             @entities[id].sprite.texture = "sarcred"
+                                            @entities[id].normalTex = "sarcred"
                                         else
                                             @entities[id].sprite.texture = "sarcblu"
+                                            @entities[id].normalTex = "sarcblu"
                                     when 1 #spike pit
                                         @entities[id].sprite.texture = "spike"
+                                        @entities[id].normalTex = "spike"
                                     when 2 #swinging blade
                                         @entities[id].sprite.texture = "SwingingBlade"
+                                        @entities[id].normalTex = "SwingingBlade"
                                     when 3 #boulder
-                                        @entities[id].sprite.texture = "fullscrb"
+                                        @entities[id].sprite.texture = "boulder"
+                                        @entities[id].normalTex = "boulder"
                                     when 4 #spider web
                                         @entities[id].sprite.texture = "web"
+                                        @entities[id].normalTex = "web"
                                     when 5 #quicksand
                                         @entities[id].sprite.texture = "Quicksand"
+                                        @entities[id].normalTex = "Quicksand"
                                     when 6 #oil vases
                                         @entities[id].sprite.texture = "OilVase"
+                                        @entities[id].normalTex = "OilVase"
                                     when 9 #mercury pit
                                         @entities[id].sprite.texture = "MercPit"
+                                        @entities[id].normalTex = "MercPit"
                                     when 10 #mummy
                                         @entities[id].sprite.texture = "mummy"
+                                        @entities[id].normalTex = "mummy"
                                     when 11 #fakewall
                                         @entities[id].sprite.texture = "fakeWall"
+                                        @entities[id].normalTex = "fakeWall"
 
                                 @entities[id].sprite.width = 1
                                 @entities[id].sprite.height = 1
@@ -615,9 +649,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                 @entities[id].positions.push new Renderer.Point(trap.x, trap.y)
                                 @entities[id].posIntervals.push i
 
-                                f = Trap.idle(id, @entities)
-                                a = new PluginBase.Animation(0, @maxTurn, f)
-                                @entities[id].animations.push a
+                                @entities[id].idle = Trap.idleMake(id, @entities)
 
                             when 7 #arrow wall
                                 e = new ArrowWall(this, trap)
@@ -626,9 +658,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                 e.positions.push new Renderer.Point(trap.x, trap.y)
                                 e.posIntervals.push i
 
-                                f = ArrowWall.idle(id, @entities)
-                                a = new PluginBase.Animation(0, @maxTurn, f)
-                                e.animations.push a
+                                e.idle = ArrowWall.idleMake(id, @entities)
                                 @entities[id] = e
 
                             when 8 #head wire
@@ -638,24 +668,21 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                 e.positions.push new Renderer.Point(trap.x, trap.y)
                                 e.posIntervals.push i
 
-                                f = HeadWire.idle(id, @entities)
-                                a = new PluginBase.Animation(0, @maxTurn, f)
-                                e.animations.push a
+                                e.idle = HeadWire.idleMake(id, @entities)
                                 @entities[id] = e
 
                     # does not exist, or dies next turn
-                    if i+1 < @maxTurn and !@gamedata.turns[i+1].Trap[id]?
-                        @entities[id].end = i
-                        @entities[id].posIntervals.push i
+                    if i+1 < @maxTurn and @gamedata.turns[i+1].Trap[id]? and
+                        @gamedata.turns[i+1].Trap[id].active == 0 and
+                        @gamedata.turns[i+1].Trap[id].activationsRemaining = 0
+                            @entities[id].end = i
+                            @entities[id].posIntervals.push i
 
-                    if i+1 < @maxTurn and @gamedata.turns[i+1]? and
-                        @gamedata.turns[i+1].Trap[id]?
-                            e = @gamedata.turns[i+1].Trap[id]
-                            if @entities[id].sprite.position.x != e.x or
-                                @entities[id].sprite.position.y != e.y
-                                    @entities[id].positions.push new Renderer.Point(e.x, e.y)
-                                    @entities[id].posIntervals.push i+1
-                                    @entities[id].posIntervals.push i+1
+                    if i+1 < @maxTurn and !@gamedata.turns[i+1].Trap[id]? and
+                        @entities[id].end == @maxTurn
+                            @entities[id].end = i
+                            @entities[id].posIntervals.push i
+
 
                     @entities[id].states["#{i}"] = trap
 
