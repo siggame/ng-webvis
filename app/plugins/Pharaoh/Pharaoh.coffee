@@ -481,6 +481,13 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         @entities[id].end = i
                         @entities[id].posIntervals.push i
 
+                        ###
+                        e = @entities[id]
+                        f = e.die(id, @entities, @gamedata)
+                        a = new PluginBase.Animation(i, i+1, f)
+                        @entities[id].animations.push a
+                        ###
+
                 for id,trap of turn.Trap
                     if !@entities[id]?
                         switch trap.trapType
@@ -570,6 +577,14 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         switch(anim.type)
                             when "move"
                                 moves.push anim
+                            ###
+                            when "activate"
+                                e = @entities[id]
+                                f = e.activate(id, @entities, anim)
+                                a = new PluginBase.Animation(i, i+1, f)
+                                e.animations.push a
+                            ###
+
 
                     if moves.length != 0
                         e = @entities[id]
