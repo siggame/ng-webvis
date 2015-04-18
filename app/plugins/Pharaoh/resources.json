@@ -120,12 +120,11 @@
             "image": "swingingblade.png",
             "spriteSheet": null
         },
-	{
-	    "id" : "SwingBladeAnimation",
-	    "image": "swingbladeanimation.png",
-	    "spriteSheet" : "Anim16x1.json"
-	},
-	    		
+      	{
+      	    "id" : "SwingBladeAnimation",
+      	    "image": "swingingbladeanimation.png",
+      	    "spriteSheet" : "Anim16x1.json"
+      	},
         {
             "id" : "OilVase",
             "image": "oilvase.png",
