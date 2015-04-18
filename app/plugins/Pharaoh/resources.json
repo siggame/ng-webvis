@@ -66,6 +66,11 @@
             "spriteSheet": "Anim16x1.json"
         },
         {
+            "id": "spawn",
+            "image": "spawn.png",
+            "spriteSheet": "Anim16x1.json"
+        },
+        {
             "id": "mummy",
             "image": "mummy.png",
             "spriteSheet": null
