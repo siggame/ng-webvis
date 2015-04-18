@@ -117,7 +117,7 @@
         },
 	{
 	    "id" : "SwingBladeAnimation",
-	    "image" "swingbladeanimation.png",
+	    "image": "swingbladeanimation.png",
 	    "spriteSheet" : "Anim16x1.json"
 	},
 	    		
