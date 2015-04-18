@@ -21,10 +21,17 @@ webvisApp.factory 'PluginBase', ($log) ->
             throw new PluginError("getAnimations not implemented")
 
         draw: (renderer, turnNum, turnProgress) =>
+            @animPlayed = false
             for anim in @getAnimations()
                 if anim.getStartTurn() <= turnNum + turnProgress and
                     anim.getEndTurn() > turnNum + turnProgress
+                        @animPlayed = true
                         anim.animate renderer, turnNum, turnProgress
+            if @animPlayed == false
+                @idle(renderer, turnNum, turnProgress)
+
+        idle: (renderer, turnNum, turnProgress) =>
+            throw new PluginError("idle not implemented")
 
 
     class Animation
