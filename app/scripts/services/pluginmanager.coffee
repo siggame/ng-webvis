@@ -22,6 +22,18 @@ webvisApp.service 'PluginManager', ($rootScope, $injector) ->
         else
             @currentPlugin = null
 
+    @selectEntities = (renderer, turn, x, y) ->
+        if @currentPlugin != null
+            return @currentPlugin.selectEntities(renderer, turn, x, y)
+        else
+            throw PluginError("No plugin selected")
+
+    @verifyEntities = (renderer, turn, selection) ->
+        if @currentPlugin != null
+            return @currentPlugin.verifyEntities(renderer, turn, selection)
+        else
+            throw PluginError("No plugin selected")
+
     @getName = () ->
         if @currentPlugin != null
             return @currentPlugin.getName()

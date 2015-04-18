@@ -39,12 +39,6 @@ angular.module('webvisApp').service 'Options', ($rootScope, alert) ->
             "Mode",
             ["normal","arena"],
             "normal"
-        ],
-        [
-            "dropdown",
-            "Renderer",
-            ["canvas"],
-            "canvas"
         ]
     ]
 
