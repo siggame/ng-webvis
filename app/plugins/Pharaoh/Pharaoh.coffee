@@ -111,6 +111,10 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
     class ArrowWall extends Trap
         constructor: (game, trap) ->
             super()
+            if trap < 25
+                @sprite.transform = game.pyramid1.transform
+            else
+                @sprite.transform = game.pyramid2.transform
 
             @sprite.width = 1
             @sprite.height = 1
@@ -154,6 +158,13 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
     class HeadWire extends Trap
         constructor: (game, trap) ->
             super()
+            @sprite.width = 1
+            @sprite.height = 1
+
+            if trap.x < 25
+                @sprite.transform = game.pyramid1.transform
+            else
+                @sprite.transform = game.pyramid2.transform
 
             @north = game.getTileIdAt(trap.x, trap.y - 1)
             @south = game.getTileIdAt(trap.x, trap.y + 1)
@@ -173,11 +184,11 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         e.sprite.position.y = e.positions[j].y
 
                 if entities[e.north]? and entities[e.north].type == 2
-                    e.sprite.texture = "fullscrb"
-                    #e.sprite.height = 2
-                    #e.sprite.position.x--
+                    e.sprite.texture = "WireVert"
+                    e.sprite.height = 2
+                    e.sprite.position.y--
                 else
-                    e.sprite.texture = "fullscrb"
+                    e.sprite.texture = "WireHoriz"
                     e.sprite.height = 1
 
                 if e.start <= turn < e.end
@@ -663,6 +674,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                 e = new ArrowWall(this, trap)
                                 e.start = i
                                 e.end = @maxTurn
+                                e.sprite.position.x = trap.x
+                                e.sprite.position.y = trap.y
                                 e.positions.push new Renderer.Point(trap.x, trap.y)
                                 e.posIntervals.push i
 
@@ -673,11 +686,21 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                 e = new HeadWire(this, trap)
                                 e.start = i
                                 e.end = @maxTurn
+                                e.sprite.position.x = trap.x
+                                e.sprite.position.y = trap.y
                                 e.positions.push new Renderer.Point(trap.x, trap.y)
                                 e.posIntervals.push i
 
                                 e.idle = HeadWire.idleMake(id, @entities)
                                 @entities[id] = e
+
+                    if i+1 < @maxTurn and @gamedata.turns[i+1].Trap[id]?
+                            ent = @gamedata.turns[i+1].Trap[id]
+                            if @entities[id].sprite.position.x != ent.x or
+                                @entities[id].sprite.position.y != ent.y
+                                    @entities[id].posIntervals.push i+1
+                                    @entities[id].posIntervals.push i+1
+                                    @entities[id].positions.push new Renderer.Point(ent.x, ent.y)
 
                     # does not exist, or dies next turn
                     if i+1 < @maxTurn and
