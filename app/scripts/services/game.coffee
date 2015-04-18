@@ -107,8 +107,10 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer, Options) -
                 option = Options.get 'Webvis', 'Mode'
                 url = Options.get 'Webvis', 'Arena Url'
                 if option.currentValue == "arena"
-                    setTimeout($rootScope.$broadcast, 3000,
-                        'FileLoader:LoadFromUrl', url.text + "/api/next_game/")
+                    url = "http://" + url.text + "/api/next_game/"
+                    onTimeout = () =>
+                        $rootScope.$broadcast("FileLoader:LoadFromUrl")
+                    setTimeout(onTimeout, 3000)
 
         @lastAnimateTime = currentTime
         return dtSeconds
@@ -125,6 +127,9 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer, Options) -
         @renderer.loadTextures gameObject.gameName, () =>
             currentDate = new Date()
             @lastAnimateTime = currentDate.getTime()
+            option = Options.get 'Webvis', 'Mode'
+            if option.currentValue == 'arena'
+                @start()
 
     window.requestAnimationFrame @animate
     return this

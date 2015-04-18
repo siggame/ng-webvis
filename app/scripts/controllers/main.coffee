@@ -34,7 +34,12 @@ webvisApp.controller 'MainCtrl', ($rootScope, $scope, FileLoader, Options) ->
 
         option = Options.get 'Webvis', 'Arena Url'
 
-        FileLoader.loadFromUrl(option.text + "/api/next_game/")
+        $.ajax
+          dataType: "text",
+          url: "http://" + option.text + "/api/next_game/",
+          data: null,
+          success: (data) =>
+              FileLoader.loadFromUrl decodeURIComponent(data)
 
     else if params.logUrl?
         FileLoader.loadFromUrl decodeURIComponent(params.logUrl)

@@ -188,6 +188,12 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
             showError error.message
 
     $rootScope.$on 'FileLoader:LoadFromUrl', (event, data) =>
-        @loadFromFile(data)
+        url = Options.get 'Webvis', 'Arena Url'
+        $.ajax
+          dataType: "text",
+          url: "http://" + url.text + "/api/next_game/",
+          data: null,
+          success: (data) =>
+              @loadFromUrl decodeURIComponent(data)
 
     return this

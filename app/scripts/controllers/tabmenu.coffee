@@ -27,7 +27,13 @@ angular.module('webvisApp').controller 'TabmenuCtrl', ($scope, Game, FileLoader,
 
     $scope.$on 'Webvis:Mode:updated', (event, data) =>
         url = Options.get 'Webvis', 'Arena Url'
-        FileLoader.loadFromUrl(url.text + "/api/next_game")
+        $.ajax
+          dataType: "text",
+          url: "http://" + url.text + "/api/next_game/",
+          data: null,
+          success: (data) =>
+              FileLoader.loadFromUrl decodeURIComponent(data)
+
 
     $scope.$on 'selection:updated', (event, data) =>
         $scope.currentSelection = Game.getCurrentSelection()
