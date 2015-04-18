@@ -1025,7 +1025,7 @@ webvisApp.service 'Renderer', ->
                     u1 = column * useg
                     v1 = row * vseg
                     u2 = u1 + useg
-                    v2 = v2 + useg
+                    v2 = v1 + vseg
 
                     @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
                         u1, v1,
