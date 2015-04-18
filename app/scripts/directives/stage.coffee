@@ -16,6 +16,7 @@ webvisApp.directive 'stage', ($log, $window, Game) ->
         canvas = document.createElement 'canvas'
         canvas.width = attrs['width']
         canvas.height = attrs['height']
+        canvas.onclick = attrs['click']
         element.append canvas
 
         Game.createRenderer canvas

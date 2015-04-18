@@ -2,7 +2,7 @@
 
 webvisApp = angular.module('webvisApp')
 
-webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
+webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer, Options) ->
     @minTurn = 0
     @maxTurn = 0
     @playing = false
@@ -12,6 +12,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
     @turnProgress = 0
     @lastRenderTime = new Date()
     @frames = 0
+    @currentSelection = []
 
     @getCurrentTurn = () -> @currentTurn
 
@@ -23,6 +24,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
 
     @setCurrentTurn = (t) ->
         if t != @currentTurn
+            @currentSelection = PluginManager.verifyEntities(@renderer, @getCurrentTurn(), @currentSelection)
             $rootScope.$broadcast('currentTurn:updated', t)
 
         @currentTurn = t
@@ -38,6 +40,13 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
 
     @setPlaybackSpeed = (pb) ->
         @playbackSpeed = pb
+
+    @updateSelection = (x, y) ->
+        if PluginManager.isLoaded()
+            @currentSelection = PluginManager.selectEntities @renderer, @getCurrentTurn(), x, y
+            $rootScope.$broadcast('selection:updated')
+
+    @getCurrentSelection = () -> @currentSelection
 
     @createRenderer = (canvas) ->
         #@renderer = new Renderer.CanvasRenderer(canvas, 100, 100)
@@ -64,7 +73,6 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
         dt = @updateTime()
         now = new Date()
         if now - @lastRenderTime > 1000
-            console.log "fps: " +  @frames
             @frames = 0
             @lastRenderTime = now
 
@@ -96,6 +104,11 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer) ->
             if curTurn >= PluginManager.getMaxTurn()
                 @turnProgress = 0
                 @stop()
+                option = Options.get 'Webvis', 'Mode'
+                url = Options.get 'Webvis', 'Arena Url'
+                if option.currentValue == "arena"
+                    setTimeout($rootScope.$broadcast, 3000,
+                        'FileLoader:LoadFromUrl', url.text + "/api/next_game/")
 
         @lastAnimateTime = currentTime
         return dtSeconds

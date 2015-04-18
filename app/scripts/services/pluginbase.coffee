@@ -58,6 +58,12 @@ webvisApp.factory 'PluginBase', ($log) ->
             @mapWidth = 0
             @mapheight = 0
 
+        selectEntities: (renderer, turn, x, y) ->
+            throw new PluginError("selectEntities not implemented")
+
+        verifyEntities: (renderer, turn, selection) ->
+            throw new PluginError("verifyEntities not implemented")
+
         getName: () ->
             throw new PluginError("getName not implemented")
 

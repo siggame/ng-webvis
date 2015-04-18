@@ -12,5 +12,6 @@ angular.module('webvisApp').directive('gameOption', ->
     scope: {
         name: '='
         option: '='
+        page: '='
     }
   )

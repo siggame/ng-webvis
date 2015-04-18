@@ -1,8 +1,8 @@
 <div class="main-stage row-fluid">
   <div id="fullscreen-container" class="col-xs-12 fullscreen-container well well-sm">
-    <div class="row-fluid">
+    <div class="row-fluid" ng-controller="StageCtrl as stage">
       <div class="col-xs-12" style="padding:0px;">
-        <stage width="800" height="600" style="width:100%;"></stage>
+        <stage width="800" height="600" ng-click="click($event);" style="width:100%;"></stage>
       </div>
     </div>
 

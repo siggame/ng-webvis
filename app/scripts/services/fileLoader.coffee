@@ -40,24 +40,56 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
 
         return {
             extension : ext
-            fileName : file
+            file : file
         }
 
-    readFromLocal = (fileData, callback) ->
-        reader = new FileReader()
-        reader.onload = (event) =>
+    readCompressed = (fileData, callback) ->
+        prepareFile = (event) ->
             file = {
                 extension : fileData.extension
                 data : event.target.result
             }
             callback(file)
-        reader.readAsText(fileData.fileName)
+
+        decompress = (file) ->
+            buffer = new Uint8Array(file.target.result)
+            decompressed = compressjs.Bzip2.decompressFile(buffer)
+
+            textReader = new FileReader()
+            textReader.onload = prepareFile
+            textReader.readAsText(new Blob([decompressed]))
+
+        reader = new FileReader()
+        reader.onload = decompress
+
+        $log.debug "Reading compressed file"
+        reader.readAsArrayBuffer(fileData.file)
+
+    readDecompressed = (fileData, callback) ->
+        reader = new FileReader()
+        reader.onload = (event) ->
+            file = {
+                extension : fileData.extension
+                data : event.target.result
+            }
+            callback(file)
+
+        $log.debug "Reading decompressed file"
+        reader.readAsText(fileData.file)
+
+    preProcessFile = (file) ->
+        if file.extension == "glog"
+            readCompressed(file, processFile)
+        else
+            readDecompressed(file, processFile)
 
     processFile = (file) ->
         # TODO Trigger progress bar
         parser = null
         switch file.extension
-            when "gamelog" or "glog"
+            when "gamelog"
+                parser = Parser.SexpParser
+            when "glog"
                 parser = Parser.SexpParser
             when "json"
                 parser = Parser.JsonParser
@@ -102,37 +134,60 @@ webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game, Parse
         try
             fileData = checkDroppedFiles files
             $log.info "Extension looks ok. Ready to read gamelog"
-            readFromLocal(fileData, processFile)
+            preProcessFile(fileData)
         catch error
             showError error.message
 
     @loadFromUrl = (u) ->
-        try
-            checkExtension = (url) ->
-                a = url.split('.')
-                if a.length == 1 or (a[1] == "")
-                    return ""
-                return verifyFileType("." + a.pop())
+        checkExtension = (url) ->
+            a = url.split('.')
+            if a.length == 1 or (a[1] == "")
+                return ""
+            return verifyFileType("." + a.pop())
 
+        error = (jqxhr, textStatus, errorThrown) ->
+            showError "File could not be loaded from #{u}"
+
+        success = (data) ->
+            file =
+                extension : ext
+                file : new Blob([data])
+            preProcessFile(file)
+
+        fetchText = () ->
+            $.ajax
+                type: "GET"
+                dataType: "text"
+                url: u
+                data: null
+                success: success
+                error: error
+
+        fetchBinary = () ->
+            req = new XMLHttpRequest()
+            req.open("GET", u, true)
+            req.responseType = "blob"
+            req.onload = (event) ->
+                if req.status == 200
+                    success(req.response)
+                else
+                    error()
+            req.onerror = error
+            req.send()
+
+        try
             ext = checkExtension(u)
 
-            if ext != ""
-                $.ajax
-                    type: "GET",
-                    dataType: "text",
-                    url: u,
-                    data: null,
-                    success: (d) =>
-                        file = {
-                            extension : ext
-                            data : d
-                        }
-                        processFile(file)
-                    error: (jqxhr, textStatus, errorThrown) ->
-                        showError {message: "File could not be loaded from " + u}
-            else
-                throw message: "Bad File Extension"
+            switch ext
+                when "glog" then fetchBinary()
+                when "gamelog" then fetchText()
+                when "json" then fetchText()
+                else
+                    fetchBinary()
         catch error
             showError error.message
+
+    $rootScope.$on 'FileLoader:LoadFromUrl', (event, data) =>
+        @loadFromFile(data)
 
     return this

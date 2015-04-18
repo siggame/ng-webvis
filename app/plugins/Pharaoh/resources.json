@@ -61,55 +61,95 @@
             "spriteSheet": "explosion.json"
         },
         {
+            "id": "death",
+            "image": "death.png",
+            "spriteSheet": "Anim16x1.json"
+        },
+        {
+            "id": "spawn",
+            "image": "spawn.png",
+            "spriteSheet": "Anim16x1.json"
+        },
+        {
             "id": "mummy",
             "image": "mummy.png",
             "spriteSheet": null
         },
-	{
+        {
             "id": "ArrowSide",
             "image": "ArrowSideAnim.png",
             "spriteSheet": "Anim16x1.json"
         },
-	{
+        {
             "id": "ArrowUp",
             "image": "ArrowUpAnim.png",
             "spriteSheet": "Anim16x1.json"
         },
-	{
+	      {
             "id": "ArrowDown",
             "image": "ArrowDownAnim.png",
             "spriteSheet": "Anim16x1.json"
         },
-	{
+	      {
             "id": "WireHoriz",
             "image": "WireHorizAnim.png",
             "spriteSheet": "Anim16x1.json"
         },
-	{
+	      {
             "id": "WireVert",
             "image": "WireVertAnim.png",
             "spriteSheet": "Anim16x1.json"
         },
         {
             "id": "web",
-            "image" "web.png",
+            "image": "web.png",
             "spriteSheet": null
         },
-	{   
-	    "id": "SwingingBlade",
-	    "image" "swingingblade.png",
-	    "spritesSheet": null
-	},
-	{
-	    "id" : "OilVase",
-	    "image" "oilvase.png",
-	    "spriteSheet" : null
-	},
+        {
+            "id": "spike",
+            "image": "spike.png",
+            "spriteSheet": null
+        },
+        {
+            "id": "SwingingBlade",
+            "image": "swingingblade.png",
+            "spriteSheet": null
+        },
 	{
 	    "id" : "SwingBladeAnimation",
 	    "image" "swingbladeanimation.png",
 	    "spriteSheet" : "Anim16x1.json"
-	}
+	},
 	    		
+        {
+            "id" : "OilVase",
+            "image": "oilvase.png",
+            "spriteSheet" : null
+        },
+        {
+          "id" : "MercPit",
+          "image" : "Mercury Pit.png",
+          "spriteSheet" : null
+        },
+        {
+          "id" : "Quicksand",
+          "image" : "Quicksand.png",
+          "spriteSheet" : null
+        },
+        {
+          "id" : "guiback",
+          "image" : "GUI-Background.png",
+          "spriteSheet" : null
+        },
+	      {
+            "id": "Wall",
+            "image" : "Wall.png",
+            "spriteSheet": "Anim2x1.json"
+        },
+        {
+            "id": "WallTurn",
+            "image" : "WallTurning.png",
+            "spriteSheet": "Anim8x1.json"
+        }
     ]
 }

@@ -22,6 +22,9 @@ angular.module('webvisApp').service 'Options', ($rootScope, alert) ->
         constructor: (@type, @options, initialValue) ->
             @currentValue = initialValue
 
+        onChanged: (pageName, name) ->
+            $rootScope.$broadcast( pageName+":"+name+":updated", @currentValue)
+
     # Members
     @_options = {}
 
@@ -29,19 +32,13 @@ angular.module('webvisApp').service 'Options', ($rootScope, alert) ->
     @_webvisOptions = [
         [   "textbox",
             "Arena Url",
-            ""
+            "arena.megaminerai.com"
         ],
         [
             "dropdown",
             "Mode",
             ["normal","arena"],
             "normal"
-        ],
-        [
-            "dropdown",
-            "Renderer",
-            ["canvas"],
-            "canvas"
         ]
     ]
 

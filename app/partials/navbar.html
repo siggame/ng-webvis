@@ -1,7 +1,7 @@
 <div ng-controller="NavbarCtrl as navbar" class="text-center" style="height:100%;">
   <div id="game-info" class="row-fluid">
-    <h2 style="padding-top:20px; padding-bottom:10px"> 
-      {{ navbar.gameName }} 
+    <h2 style="padding-top:20px; padding-bottom:10px">
+      {{ navbar.gameName }}
       <small class="text-muted">{{ navbar.version }}</small>
     </h2>
     <div class="btn-group btn-group-justified">
@@ -18,7 +18,21 @@
         </div>
       </tab>
       <tab heading="Debug">
-        <p>To Be Implemented</p>
+        <div class="well" style="height:40%;">
+          <table class="table table-bordered table-hover">
+            <tr ng-repeat="(id, object) in currentSelection">
+                <td ng-click="focus(id);"> {{id}} </td>
+            </tr>
+          </table>
+        </div>
+        <div class="well" style="height:60%;overflow:auto;">
+          <table class="table table-bordered table-hover">
+            <tr ng-repeat="(key, value) in focusData">
+              <td> {{key}} </td>
+              <td> {{value}} </td>
+            </tr>
+          </table>
+        </div>
       </tab>
       <tab>
         <tab-heading>
@@ -36,7 +50,7 @@
         </tab-heading>
           <div class="vis-tab-content">
             <div ng-repeat="(id, object) in currentPage">
-              <game-option name="id" option="object"></game-option>
+              <game-option name="id" page="currentPageName" option="object"></game-option>
             </div>
           </div>
       </tab>
