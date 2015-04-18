@@ -191,8 +191,6 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 entities[id].sprite.frame = Math.floor(16 * progress)
                 renderer.drawSprite entities[id].sprite
 
-    class
-
     class Pharaoh extends PluginBase.BasePlugin
         constructor: () ->
             super()
@@ -592,6 +590,16 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                             a = new PluginBase.Animation(i+2, i+3, f)
                             @entities[id].animations.push a
 
+                    if i+1 < @maxTurn and !@gamedata.turns[i+1].Thief[id]? and
+                        @entities[id].end == @maxTurn
+                            @entities[id].end = i+1
+                            @entities[id].posIntervals.push i+1
+
+                            e = @entities[id]
+                            f = Thief.die(id, @entities)
+                            a = new PluginBase.Animation(i+2, i+3, f)
+                            @entities[id].animations.push a
+
                     @entities[id].states["#{i}"] = thief
 
                 for id,trap of turn.Trap
@@ -672,7 +680,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                 @entities[id] = e
 
                     # does not exist, or dies next turn
-                    if i+1 < @maxTurn and @gamedata.turns[i+1].Trap[id]? and
+                    if i+1 < @maxTurn and
+                        @gamedata.turns[i+1].Trap[id]? and
                         @gamedata.turns[i+1].Trap[id].active == 0 and
                         @gamedata.turns[i+1].Trap[id].activationsRemaining = 0
                             @entities[id].end = i
