@@ -17,6 +17,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @posIntervals = []
             @positions = []
             @sprite = new Renderer.Sprite()
+            @clickable = false
+            @states = {}
 
         @idle: (id, entities, gamedata) =>
             (renderer, turn, progress) =>
@@ -30,6 +32,9 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
                 if e.start <= turn <= e.end+1
                     renderer.drawSprite e.sprite
+                    e.clickable = true
+                else
+                    e.clickable = false
 
         @move: (id, entities, moves) =>
             (renderer, turn, progress) =>
@@ -97,7 +102,10 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                     e.sprite.texture = "ArrowSide"
 
                 if e.start <= turn < e.end
+                    e.clickable = true
                     renderer.drawSprite e.sprite
+                else
+                    e.clickable = false
 
         @activate: () =>
 
@@ -128,6 +136,12 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 else
                     e.sprite.texture = "WireHoriz"
                     e.sprite.height = 1
+
+                if e.start <= turn < e.end
+                    e.clickable = true
+                    renderer.drawSprite e.sprite
+                else
+                    e.clickable = false
 
         @activate: () ->
 
@@ -306,6 +320,54 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @sarcosCapped.width = 3
             @sarcosCapped.height = 6
 
+        selectEntities: (renderer, turn, x, y) ->
+            selections = {}
+
+            [sw, sh] = renderer.getScreenSize()
+
+            scw = x/(sw-20) * 2 - 1
+            sch = (y-60)/(sh) * 2 + 1
+
+            pyra1 = @pyramid1.transform.invert()
+
+            [p1x, p1y] = pyra1.mul(scw, sch)
+            p1y = -p1y
+
+            for id,e of @entities
+                if e instanceof Unit
+                    if e.sprite.transform == @pyramid1.transform
+                        if e.sprite.position.x <= p1x <= e.sprite.position.x +
+                            e.sprite.width and
+                            e.sprite.position.y <= p1y <= e.sprite.position.y +
+                            e.sprite.height and
+                            e.clickable
+                                selections[id] = e.states[turn]
+
+            pyra2 = @pyramid2.transform.invert()
+            [p1x, p1y] = pyra2.mul(scw, sch)
+            p1x -= 1.0
+            p1y = -p1y
+
+            console.log "#{p1x} #{p1y}"
+            for id,e of @entities
+                if e instanceof Unit
+                    if e.sprite.transform == @pyramid2.transform
+                        console.log "#{id} #{e.sprite.position.x} #{e.sprite.position.y}"
+                        if e.sprite.position.x <= p1x <= e.sprite.position.x +
+                            e.sprite.width and
+                            e.sprite.position.y <= p1y <= e.sprite.position.y +
+                            e.sprite.height and
+                            e.clickable
+                                selections[id] = e.states[turn]
+
+            return selections
+
+        verifyEntities: (renderer, turn, selection) ->
+            newselection = {}
+            for id, s of selection
+                if @entities[id].states[turn]? and @entities[id].clickable
+                    newselection[id] = @entities[id].states[turn]
+            return newselection
 
         getName: () -> "Pharaoh"
 
@@ -401,7 +463,6 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         for id,ent of @entities
                             if ent instanceof Wall and
                                 ent.intervals.length %2 == 1
-                                    console.log "called"
                                     ent.intervals.push i
 
                 if i+1 == @maxTurn
@@ -452,19 +513,14 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         switch thief.thiefType
                             when 0
                                 @entities[id].sprite.texture = "bomber"
-                                console.log "made a bomber"
                             when 1
                                 @entities[id].sprite.texture = "digger"
-                                console.log "made digger"
                             when 2
                                 @entities[id].sprite.texture = "ninja"
-                                console.log "made a ninja"
                             when 3
                                 @entities[id].sprite.texture = "guide"
-                                console.log "made a guide"
                             when 4
                                 @entities[id].sprite.texture = "slave"
-                                console.log "made a slave"
                         @entities[id].sprite.width = 1
                         @entities[id].sprite.height = 1
                         @entities[id].start = i
@@ -487,6 +543,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         a = new PluginBase.Animation(i, i+1, f)
                         @entities[id].animations.push a
                         ###
+
+                    @entities[id].states["#{i}"] = thief
 
                 for id,trap of turn.Trap
                     if !@entities[id]?
@@ -571,19 +629,21 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                     @entities[id].posIntervals.push i+1
                                     @entities[id].posIntervals.push i+1
 
+                    @entities[id].states["#{i}"] = trap
+
                 for id,animList of turn.animations
                     moves = []
                     for anim in animList
                         switch(anim.type)
                             when "move"
                                 moves.push anim
-                            ###
-                            when "activate"
-                                e = @entities[id]
-                                f = e.activate(id, @entities, anim)
-                                a = new PluginBase.Animation(i, i+1, f)
-                                e.animations.push a
-                            ###
+                                ###
+                                when "activate"
+                                    e = @entities[id]
+                                    f = e.activate(id, @entities, anim)
+                                    a = new PluginBase.Animation(i, i+1, f)
+                                    e.animations.push a
+                                ###
 
 
                     if moves.length != 0
