@@ -35,7 +35,6 @@ angular.module('webvisApp').controller 'TabmenuCtrl', ($scope, Game, FileLoader,
     $scope.$on 'currentTurn:updated', (event, data) =>
         $scope.currentSelection = Game.getCurrentSelection()
         if !$scope.currentSelection[$scope.focusData.id]?
-            console.log "called"
             $scope.focusData = {}
         else
             $scope.focusData = $scope.currentSelection[$scope.focusData.id]
