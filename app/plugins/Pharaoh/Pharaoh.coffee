@@ -48,6 +48,20 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 sprite.position.x = moves[i].fromX + (diffx * subt)
                 sprite.position.y = moves[i].fromY + (diffy * subt)
 
+    class Thief extends Unit
+        constructor: () ->
+            super()
+
+        @die: (id, entities) =>
+            (renderer, turn, progress) =>
+                s = entities[id].sprite
+                s.texture = "death"
+                s.frame = Math.floor(16 * progress)
+
+    class Trap extends Unit
+        constructor: () ->
+            super()
+
     class Wall extends Entity
         constructor: (game, tile) ->
             super()
@@ -77,7 +91,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                     return 2
             return 0
 
-    class ArrowWall extends Unit
+    class ArrowWall extends Trap
         constructor: (game, trap) ->
             super()
 
@@ -116,7 +130,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
         @activate: () =>
 
-    class HeadWire extends Unit
+    class HeadWire extends Trap
         constructor: (game, trap) ->
             super()
 
@@ -341,7 +355,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             p1y = -p1y
 
             for id,e of @entities
-                if e instanceof Unit
+                if e instanceof Thief or e instanceof Trap
                     if e.sprite.transform == @pyramid1.transform
                         if e.sprite.position.x <= p1x <= e.sprite.position.x +
                             e.sprite.width and
@@ -357,7 +371,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
             console.log "#{p1x} #{p1y}"
             for id,e of @entities
-                if e instanceof Unit
+                if e instanceof Thief or e instanceof Trap
                     if e.sprite.transform == @pyramid2.transform
                         console.log "#{id} #{e.sprite.position.x} #{e.sprite.position.y}"
                         if e.sprite.position.x <= p1x <= e.sprite.position.x +
@@ -509,7 +523,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
                 for id,thief of turn.Thief
                     if !@entities[id]?
-                        @entities[id] = new Unit()
+                        @entities[id] = new Thief()
                         @entities[id].sprite.position.x = thief.x
                         @entities[id].sprite.position.y = thief.y
                         if thief.x < 25
@@ -535,7 +549,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         @entities[id].positions.push new Renderer.Point(thief.x, thief.y)
                         @entities[id].posIntervals.push i
 
-                        f = Unit.idle(id, @entities, @gamedata)
+                        f = Thief.idle(id, @entities, @gamedata)
                         a = new PluginBase.Animation(0, @maxTurn, f)
                         @entities[id].animations.push a
 
@@ -544,12 +558,10 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         @entities[id].end = i
                         @entities[id].posIntervals.push i
 
-                        ###
                         e = @entities[id]
-                        f = e.die(id, @entities, @gamedata)
+                        f = Thief.die(id, @entities)
                         a = new PluginBase.Animation(i, i+1, f)
                         @entities[id].animations.push a
-                        ###
 
                     @entities[id].states["#{i}"] = thief
 
@@ -557,7 +569,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                     if !@entities[id]?
                         switch trap.trapType
                             when 0, 1, 2, 3, 4, 5, 6, 9, 10, 11
-                                @entities[id] = new Unit()
+                                @entities[id] = new Trap()
                                 @entities[id].sprite.position.x = trap.x
                                 @entities[id].sprite.position.y = trap.y
                                 if trap.x < 25
@@ -594,7 +606,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                 @entities[id].positions.push new Renderer.Point(trap.x, trap.y)
                                 @entities[id].posIntervals.push i
 
-                                f = Unit.idle(id, @entities)
+                                f = Trap.idle(id, @entities)
                                 a = new PluginBase.Animation(0, @maxTurn, f)
                                 @entities[id].animations.push a
 
