@@ -107,6 +107,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         @idle: (id, entities, gamedata) =>
             (renderer, turn, progress) =>
                 e = entities[id]
+                e.sprite.frame = 0
 
                 j = -1
                 for i in [0 ... e.posIntervals.length] by 2
@@ -128,7 +129,9 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 else
                     e.clickable = false
 
-        @activate: () =>
+        @activate: (id, entities) =>
+            (renderer, turn, progress) =>
+                entities[id].sprite.frame = Math.floor(16 * progress)
 
     class HeadWire extends Trap
         constructor: (game, trap) ->
@@ -142,6 +145,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         @idle: (id, entities, gamedata) =>
             (renderer, turn, progress) =>
                 e = entities[id]
+                e.sprite.frame = 0
 
                 j = -1
                 for i in [0 ... e.posIntervals.length] by 2
@@ -164,7 +168,9 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 else
                     e.clickable = false
 
-        @activate: () ->
+        @activate: (id, entities) =>
+            (renderer, turn, progress) =>
+                entities[id].sprite.frame = Math.floor(16 * progress)
 
     class Pharaoh extends PluginBase.BasePlugin
         constructor: () ->
@@ -579,7 +585,10 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
                                 switch trap.trapType
                                     when 0 #sarc
-                                        @entities[id].sprite.texture = "sarcred"
+                                        if trap.x < 25
+                                            @entities[id].sprite.texture = "sarcred"
+                                        else
+                                            @entities[id].sprite.texture = "sarcblu"
                                     when 1 #spike pit
                                         @entities[id].sprite.texture = "spike"
                                     when 2 #swinging blade
