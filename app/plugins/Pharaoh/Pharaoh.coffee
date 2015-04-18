@@ -49,19 +49,26 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 sprite.position.y = moves[i].fromY + (diffy * subt)
 
     class Wall extends Entity
-        constructor: () ->
+        constructor: (game, tile) ->
             super()
-            @sprite = new Renderer.Rect()
+            @sprite = new Renderer.Sprite()
+            @sprite.texture = "Wall"
+            @sprite.frame = 1
             @type = 2
             @intervals = []
 
-        @idle: (id, entities) =>
+        @idle: (game, id, entities) =>
             (renderer, turn, progress) =>
                 e = entities[id]
+
+                south = game.getTileIdAt(e.sprite.position.x, e.sprite.position.y + 1)
+                if entities[south]? and entities[south].type == 2
+                    e.sprite.frame = 0
+
                 for i in [0 ... e.intervals.length] by 2
                     e.type = e.typeOnTurn(turn)
                     if e.type == 2
-                        renderer.drawRect e.sprite
+                        renderer.drawSprite e.sprite
                         break
 
         typeOnTurn: (turn) ->
@@ -475,7 +482,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 for id,tile of turn.Tile
                     if tile.type == 2
                         if !@entities[id]?
-                            @entities[id] = new Wall()
+                            @entities[id] = new Wall(tile)
                             sp = @entities[id].sprite
                             if tile.x < 25
                                 sp.transform = @pyramid1.transform
@@ -485,8 +492,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                             sp.position.y = tile.y
                             sp.width = 1
                             sp.height = 1
-                            sp.fillColor.setColor(0.0, 0.0, 0.0, 1.0)
-                            f = Wall.idle(id, @entities)
+
+                            f = Wall.idle(this, id, @entities)
                             a = new PluginBase.Animation(0, @maxTurn, f)
                             @entities[id].animations.push a
 
