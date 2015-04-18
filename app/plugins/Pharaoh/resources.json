@@ -136,9 +136,14 @@
           "spriteSheet" : null
         },
 	{
-            "id": "wall",
+            "id": "Wall",
             "image" : "Wall.png",
             "spriteSheet": "Anim2x1.json"
+        },
+	{
+            "id": "WallTurn",
+            "image" : "WallTurning.png",
+            "spriteSheet": "Anim8x1.json"
         }
     ]
 }
