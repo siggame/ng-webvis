@@ -76,6 +76,42 @@ webvisApp.service 'Renderer', ->
                 y = (@elements[1] * xt) + (@elements[4] * yt) + @elements[7]
             return [x, y]
 
+        invert: () ->
+            m = new Matrix3x3(this)
+
+            d = 0
+            for i in [0..2]
+                elem = 1
+                str = ""
+                for j in [0..2]
+                    str += @get((j+i)%3, j) + " * "
+                    elem *= @get((j+i)%3, j)
+                d += elem
+
+            for i in [0..2]
+                elem = 1
+                k = -1
+                str = ""
+                for j in [2..0] by -1
+                    k++
+                    str += @get((i + k) %3, j) + " * "
+                    elem *= @get((i + k)%3, j)
+                d -= elem
+
+            m.elements[0] = 1/d *((@get(1, 1) * @get(2,2)) - (@get(2,1) * @get(1, 2)))
+            m.elements[1] = -1/d *((@get(0, 1) * @get(2,2)) - (@get(2, 1) * @get(0, 2)))
+            m.elements[2] = 1/d *((@get(0, 1) * @get(1, 2))- (@get(1,1) * @get(0, 2)))
+
+            m.elements[3] = -1/d * ((@get(1, 0) * @get(2, 2)) - (@get(2, 0) * @get(1, 2)))
+            m.elements[4] = 1/d * ((@get(0, 0) * @get(2, 2)) - (@get(2, 0) * @get(0, 2)))
+            m.elements[5] = -1/d * ((@get(0, 0) * @get(1, 2)) - (@get(1, 0) * @get(0, 2)))
+
+            m.elements[6] = 1/d * ((@get(1, 0) * @get(2, 1)) - (@get(2, 0) * @get(1, 1)))
+            m.elements[7] = -1/d * ((@get(0, 0) * @get(2, 1)) - (@get(2, 0) * @get(0, 1)))
+            m.elements[8] = 1/d * ((@get(0, 0) * @get(1, 1)) - (@get(1, 0) * @get(0, 1)))
+
+            return m
+
 
         translate: (x, y) ->
             @elements[6] = (x * @elements[0]) + (y * @elements[3]) + @elements[6]
@@ -989,7 +1025,7 @@ webvisApp.service 'Renderer', ->
                     u1 = column * useg
                     v1 = row * vseg
                     u2 = u1 + useg
-                    v2 = v2 + useg
+                    v2 = v1 + vseg
 
                     @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
                         u1, v1,

@@ -12,6 +12,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer, Options) -
     @turnProgress = 0
     @lastRenderTime = new Date()
     @frames = 0
+    @currentSelection = []
 
     @getCurrentTurn = () -> @currentTurn
 
@@ -23,6 +24,7 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer, Options) -
 
     @setCurrentTurn = (t) ->
         if t != @currentTurn
+            @currentSelection = PluginManager.verifyEntities(@renderer, @getCurrentTurn(), @currentSelection)
             $rootScope.$broadcast('currentTurn:updated', t)
 
         @currentTurn = t
@@ -38,6 +40,13 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer, Options) -
 
     @setPlaybackSpeed = (pb) ->
         @playbackSpeed = pb
+
+    @updateSelection = (x, y) ->
+        if PluginManager.isLoaded()
+            @currentSelection = PluginManager.selectEntities @renderer, @getCurrentTurn(), x, y
+            $rootScope.$broadcast('selection:updated')
+
+    @getCurrentSelection = () -> @currentSelection
 
     @createRenderer = (canvas) ->
         #@renderer = new Renderer.CanvasRenderer(canvas, 100, 100)
@@ -64,7 +73,6 @@ webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer, Options) -
         dt = @updateTime()
         now = new Date()
         if now - @lastRenderTime > 1000
-            console.log "fps: " +  @frames
             @frames = 0
             @lastRenderTime = now
 

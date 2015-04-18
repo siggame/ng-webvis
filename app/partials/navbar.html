@@ -18,7 +18,21 @@
         </div>
       </tab>
       <tab heading="Debug">
-        <p>To Be Implemented</p>
+        <div class="well" style="height:40%;">
+          <table class="table table-bordered table-hover">
+            <tr ng-repeat="(id, object) in currentSelection">
+                <td ng-click="focus(id);"> {{id}} </td>
+            </tr>
+          </table>
+        </div>
+        <div class="well" style="height:60%;overflow:auto;">
+          <table class="table table-bordered table-hover">
+            <tr ng-repeat="(key, value) in focusData">
+              <td> {{key}} </td>
+              <td> {{value}} </td>
+            </tr>
+          </table>
+        </div>
       </tab>
       <tab>
         <tab-heading>
