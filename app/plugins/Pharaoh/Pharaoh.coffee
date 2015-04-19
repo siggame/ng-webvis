@@ -25,6 +25,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 south = game.getTileIdAt(e.sprite.position.x, e.sprite.position.y + 1)
                 if entities[south]? and entities[south].type == 2
                     e.sprite.frame = 0
+                else
+                    e.sprite.frame = 1
 
                 for i in [0 ... e.intervals.length] by 2
                     e.type = e.typeOnTurn(turn)
@@ -111,7 +113,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
     class ArrowWall extends Trap
         constructor: (game, trap) ->
             super()
-            if trap < 25
+            if trap.x < 25
                 @sprite.transform = game.pyramid1.transform
             else
                 @sprite.transform = game.pyramid2.transform
@@ -460,8 +462,9 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         verifyEntities: (renderer, turn, selection) ->
             newselection = {}
             for id, s of selection
-                if @entities[id].states[turn]? and @entities[id].clickable
-                    newselection[id] = @entities[id].states[turn]
+                if @entities[id].states? and
+                    @entities[id].states[turn]? and @entities[id].clickable
+                        newselection[id] = @entities[id].states[turn]
             return newselection
 
         getName: () -> "Pharaoh"
