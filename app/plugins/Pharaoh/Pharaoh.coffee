@@ -499,6 +499,11 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @pyramid2.transform.translate(-(@mapWidth/2), 0);
 
         loadGame: (@gamedata, renderer) ->
+            @entities = {}
+            @tileLookup = {}
+
+            console.log "called"
+
             @maxTurn = @gamedata.turns.length
             @mapWidth = @gamedata.turns[0].mapWidth
             @mapHeight = @gamedata.turns[0].mapHeight
