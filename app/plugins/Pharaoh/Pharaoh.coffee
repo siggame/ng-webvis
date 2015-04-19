@@ -138,11 +138,11 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                         e.sprite.position.y = e.positions[j].y
 
                 if entities[e.north]? and entities[e.north].type == 2
-                    e.sprite.texture = "fullscrb"
+                    e.sprite.texture = "ArrowDown"
                 else if entities[e.south]? and entities[e.south].type == 2
-                    e.sprite.texture = "fullscrb"
+                    e.sprite.texture = "ArrowUp"
                 else
-                    e.sprite.texture = "fullscrb"
+                    e.sprite.texture = "ArrowSide"
 
                 if e.start <= turn < e.end
                     e.clickable = true
@@ -201,6 +201,46 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             (renderer, turn, progress) =>
                 entities[id].sprite.frame = Math.floor(16 * progress)
                 renderer.drawSprite entities[id].sprite
+
+    class RotatingWall extends Trap
+        constructor: (game, trap) ->
+            super()
+            @sprite.width = 1
+            @sprite.height = 1
+
+            if trap.x < 25
+                @sprite.transform = game.pyramid1.transform
+            else
+                @sprite.transform = game.pyramid2.transform
+
+            @sprite.texture = "WallTurn"
+            @sprite.position.x = trap.x
+            @sprite.position.y = trap.y
+            @sprite.frame = 0
+
+        @idleMake: (id, entities, gamedata) =>
+            (renderer, turn, progress) =>
+                e = entities[id]
+                e.sprite.frame = 0
+
+                j = -1
+                for i in [0 ... e.posIntervals.length] by 2
+                    j++
+                    if e.posIntervals[i] <= turn < e.posIntervals[i+1]
+                        e.sprite.position.x = e.positions[j].x
+                        e.sprite.position.y = e.positions[j].y
+
+                if e.start <= turn < e.end
+                    e.clickable = true
+                    renderer.drawSprite e.sprite
+                else
+                    e.clickable = false
+
+        @activate: (id, entities) =>
+            (renderer, turn, progress) =>
+                entities[id].sprite.frame = Math.floor(8 * progress)
+                renderer.drawSprite entities[id].sprite
+
 
     class Pharaoh extends PluginBase.BasePlugin
         constructor: () ->
@@ -502,8 +542,6 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @entities = {}
             @tileLookup = {}
 
-            console.log "called"
-
             @maxTurn = @gamedata.turns.length
             @mapWidth = @gamedata.turns[0].mapWidth
             @mapHeight = @gamedata.turns[0].mapHeight
@@ -603,17 +641,17 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
                             e = @entities[id]
                             f = Thief.die(id, @entities)
-                            a = new PluginBase.Animation(i+2, i+3, f)
+                            a = new PluginBase.Animation(i+1, i+2, f)
                             @entities[id].animations.push a
 
                     if i+1 < @maxTurn and !@gamedata.turns[i+1].Thief[id]? and
                         @entities[id].end == @maxTurn
-                            @entities[id].end = i+1
-                            @entities[id].posIntervals.push i+1
+                            @entities[id].end = i
+                            @entities[id].posIntervals.push i
 
                             e = @entities[id]
                             f = Thief.die(id, @entities)
-                            a = new PluginBase.Animation(i+2, i+3, f)
+                            a = new PluginBase.Animation(i, i+1, f)
                             @entities[id].animations.push a
 
                     @entities[id].states["#{i}"] = thief
@@ -621,7 +659,7 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 for id,trap of turn.Trap
                     if !@entities[id]?
                         switch trap.trapType
-                            when 0, 1, 2, 3, 4, 5, 6, 9, 10, 11
+                            when 0, 1, 2, 3, 4, 5, 6, 9, 10
                                 @entities[id] = new Trap()
                                 @entities[id].sprite.position.x = trap.x
                                 @entities[id].sprite.position.y = trap.y
@@ -662,9 +700,6 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                     when 10 #mummy
                                         @entities[id].sprite.texture = "mummy"
                                         @entities[id].normalTex = "mummy"
-                                    when 11 #fakewall
-                                        @entities[id].sprite.texture = "fakeWall"
-                                        @entities[id].normalTex = "fakeWall"
 
                                 @entities[id].sprite.width = 1
                                 @entities[id].sprite.height = 1
@@ -698,6 +733,17 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
                                 e.idle = HeadWire.idleMake(id, @entities)
                                 @entities[id] = e
+                            when 11
+                                e = new RotatingWall(this, trap)
+                                e.start = i
+                                e.end = @maxTurn
+                                e.sprite.position.x = trap.x
+                                e.sprite.position.y = trap.y
+                                e.positions.push new Renderer.Point(trap.x, trap.y)
+                                e.posIntervals.push i
+
+                                e.idle = RotatingWall.idleMake(id, @entities)
+                                @entities[id] = e
 
                     if i+1 < @maxTurn and @gamedata.turns[i+1].Trap[id]?
                             ent = @gamedata.turns[i+1].Trap[id]
@@ -725,18 +771,16 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
 
                 for id,animList of turn.animations
                     moves = []
+
                     for anim in animList
                         switch(anim.type)
                             when "move"
                                 moves.push anim
-                                ###
-                                when "activate"
-                                    e = @entities[id]
-                                    f = e.activate(id, @entities, anim)
-                                    a = new PluginBase.Animation(i, i+1, f)
-                                    e.animations.push a
-                                ###
-
+                            when "activate"
+                                e = @entities[id]
+                                f = e.activate(id, @entities, anim)
+                                a = new PluginBase.Animation(i, i+1, f)
+                                e.animations.push a
 
                     if moves.length != 0
                         e = @entities[id]
