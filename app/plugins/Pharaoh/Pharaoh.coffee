@@ -256,6 +256,10 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             ]
             Options.addPage "Pharaoh", @pharaohOptions
             @tileLookup = {}
+            @redPharaohSpeak = []
+            @redPharaohIntervals = []
+            @bluePharaohSpeak = []
+            @bluePharaohIntervals = []
 
             @gameLoaded = false
             @background = new Renderer.Sprite()
@@ -353,6 +357,20 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
             @guiPlayer2RoundWin.position.y = 85
             @guiPlayer2RoundWin.width = 5
             @guiPlayer2RoundWin.size = 35
+
+            @redPharaohTalk = new Renderer.Text()
+            @redPharaohTalk.position.x = 20
+            @redPharaohTalk.position.y = 88
+            @redPharaohTalk.width = 20
+            @redPharaohTalk.size = 22
+            @redPharaohTalk.text= ""
+
+            @bluePharaohTalk = new Renderer.Text()
+            @bluePharaohTalk.position.x = 63
+            @bluePharaohTalk.position.y = 88
+            @bluePharaohTalk.width = 20
+            @bluePharaohTalk.size = 22
+            @bluePharaohTalk.text = ""
 
             @pyramid1Lines = []
             @pyramid2Lines = []
@@ -491,6 +509,8 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 @guiPlayer2RoundWin.text = @gamedata.turns[turn].Player[1].roundsWon + ""
             renderer.drawText(@guiPlayer2ScarabCount)
             renderer.drawText(@guiPlayer2RoundWin)
+            renderer.drawText(@redPharaohTalk)
+            renderer.drawText(@bluePharaohTalk)
 
             @sarcosCapped.position.x = 20
             @sarcosCapped.texture = "sarcblue"
@@ -505,6 +525,17 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                 for i in [0..@gamedata.turns[turn].Player[1].sarcophagiCaptured]
                     renderer.drawSprite @sarcosCapped
                     @sarcosCapped.position.x += 5
+
+            for i in [0..@redPharaohIntervals.length]
+                upper = if @redPharaohIntervals[i+1]? then @redPharaohIntervals[i+1] else @maxTurn
+                if @redPharaohIntervals[i] <= turn < upper
+                    @redPharaohTalk.text = @redPharaohSpeak[i]
+
+            for i in [0..@bluePharaohIntervals.length]
+                upper = if @bluePharaohIntervals[i+1]? then @bluePharaohIntervals[i+1] else @maxTurn
+                if @bluePharaohIntervals[i] <= turn < upper
+                    @bluePharaohTalk.text = @bluePharaohSpeak[i]
+
 
             for l in @pyramid1Lines
                 renderer.drawLine(l)
@@ -784,6 +815,15 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
                                 f = e.activate(id, @entities, anim)
                                 a = new PluginBase.Animation(i, i+1, f)
                                 e.animations.push a
+                            when "pharaohTalk"
+                                if anim.playerID == 0
+                                    @redPharaohSpeak.push anim.message
+                                    @redPharaohIntervals.push i
+                                else
+                                    @bluePharaohSpeak.push anim.message
+                                    @bluePharaohSpeak.push i
+
+
 
                     if moves.length != 0
                         e = @entities[id]
