@@ -488,6 +488,14 @@ angular.module('webvisApp').provide.factory 'Pharaoh', (PluginBase, Renderer, Op
         getName: () -> "Pharaoh"
 
         preDraw: (turn, dt, renderer) ->
+            @background.tileOffsetX += 0.05 * dt
+            if @background.tileOffsetX > 1.0
+                @background.tileOffsetX %= 1.0
+
+            @background.tileOffsetY += 0.05 * dt
+            if @background.tileOffsetY >  1.0
+                @background.tileOFfsetY %= 1.0
+
             renderer.drawSprite(@background)
             renderer.drawSprite(@pyramid1)
             renderer.drawSprite(@pyramid2)
