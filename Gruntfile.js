@@ -198,9 +198,9 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '<%= yeoman.app %>/scripts',
-          src: '{,*/}*.coffee',
-          dest: '.tmp/scripts',
+          cwd: '<%= yeoman.app %>',
+          src: ['scripts/{,*/}*.coffee', 'plugins/{,*/}*.coffee'],
+          dest: '.tmp',
           ext: '.js'
         }]
       },
