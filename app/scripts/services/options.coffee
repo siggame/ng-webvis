@@ -7,87 +7,92 @@
  # # options
  # Service in the webvisApp.
 ###
-angular.module('webvisApp').service 'Options', ($rootScope, alert) ->
-    # Option classes
-    @CheckBox = class CheckBox
-        constructor: (@type, @isChecked) ->
 
-    @Slider = class Slider
-        constructor: (@type, @minimum, @maximum, @current) ->
+define [
+    'services/alert'
+], () ->
+    webvisApp = angular.module('webvisApp')
+    webvisApp.service 'Options', ($rootScope, alert) ->
+        # Option classes
+        @CheckBox = class CheckBox
+            constructor: (@type, @isChecked) ->
 
-    @Textbox = class Textbox
-        constructor: (@type, @text) ->
+        @Slider = class Slider
+            constructor: (@type, @minimum, @maximum, @current) ->
 
-    @Dropdown = class Dropdown
-        constructor: (@type, @options, initialValue) ->
-            @currentValue = initialValue
+        @Textbox = class Textbox
+            constructor: (@type, @text) ->
 
-        onChanged: (pageName, name) ->
-            $rootScope.$broadcast( pageName+":"+name+":updated", @currentValue)
+        @Dropdown = class Dropdown
+            constructor: (@type, @options, initialValue) ->
+                @currentValue = initialValue
 
-    # Members
-    @_options = {}
+            onChanged: (pageName, name) ->
+                $rootScope.$broadcast( pageName+":"+name+":updated", @currentValue)
 
-    # this option page is always present for non-plugin specific options
-    @_webvisOptions = [
-        [   "textbox",
-            "Arena Url",
-            "arena.megaminerai.com"
-        ],
-        [
-            "dropdown",
-            "Mode",
-            ["normal","arena"],
-            "normal"
+        # Members
+        @_options = {}
+
+        # this option page is always present for non-plugin specific options
+        @_webvisOptions = [
+            [   "textbox",
+                "Arena Url",
+                "arena.megaminerai.com"
+            ],
+            [
+                "dropdown",
+                "Mode",
+                ["normal","arena"],
+                "normal"
+            ]
         ]
-    ]
 
 
-    # private
-    @_createOption = (init) ->
-        option = null
-        switch init[0]
-            when "checkbox"
-                option = new @CheckBox(init[0], init[2])
-            when "slider"
-                option = new @Slider(init[0], init[2], init[3], init[4])
-            when "textbox"
-                option = new @Textbox(init[0], init[2])
-            when "dropdown"
-                option = new @Dropdown(init[0], init[2], init[3])
-        return option
+        # private
+        @_createOption = (init) ->
+            option = null
+            switch init[0]
+                when "checkbox"
+                    option = new @CheckBox(init[0], init[2])
+                when "slider"
+                    option = new @Slider(init[0], init[2], init[3], init[4])
+                when "textbox"
+                    option = new @Textbox(init[0], init[2])
+                when "dropdown"
+                    option = new @Dropdown(init[0], init[2], init[3])
+            return option
 
-    @_parsePageConstructor = (options) ->
-        page = {}
-        for option in options
-            page[option[1]] = @_createOption(option)
-        return page
+        @_parsePageConstructor = (options) ->
+            page = {}
+            for option in options
+                page[option[1]] = @_createOption(option)
+            return page
 
-    # public
-    @addPage = (name, options) ->
-        if !@_options[name]?
-            if options?
-                @_options[name] = @_parsePageConstructor(options)
+        # public
+        @addPage = (name, options) ->
+            if !@_options[name]?
+                if options?
+                    @_options[name] = @_parsePageConstructor(options)
+                else
+                    @_options[name] = {}
+                $rootScope.$broadcast('Options:pageAdded')
             else
-                @_options[name] = {}
-            $rootScope.$broadcast('Options:pageAdded')
-        else
-            throw {message: "Page already exists"}
+                throw {message: "Page already exists"}
 
-    @add = (page, initData) ->
-        if @_options[page]?
-            @_options[page] = @_createOption(initData)
+        @add = (page, initData) ->
+            if @_options[page]?
+                @_options[page] = @_createOption(initData)
 
-    @get = (page, name) ->
-        if @_options[page]? and @_options[page][name]?
-            return @_options[page][name]
-        else
-            return null
+        @get = (page, name) ->
+            if @_options[page]? and @_options[page][name]?
+                return @_options[page][name]
+            else
+                return null
 
-    @getOptions = () -> @_options
+        @getOptions = () -> @_options
 
-    # constructor
-    # during construction add the webvis option page
-    @_options["Webvis"] = @_parsePageConstructor(@_webvisOptions)
+        # constructor
+        # during construction add the webvis option page
+        @_options["Webvis"] = @_parsePageConstructor(@_webvisOptions)
 
-    return this
+        return this

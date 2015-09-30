@@ -7,90 +7,91 @@
  # # PluginBase
  # Factory in the webvisApp.
 ###
-webvisApp = angular.module('webvisApp')
-
-webvisApp.factory 'PluginBase', ($log) ->
-
-    class PluginError
-        constructor: (@msg) ->
-
-    class BaseEntity
-        constructor: () ->
-
-        getAnimations: () ->
-            throw new PluginError("getAnimations not implemented")
-
-        draw: (renderer, turnNum, turnProgress) =>
-            @animPlayed = false
-            for anim in @getAnimations()
-                if anim.getStartTurn() <= turnNum + turnProgress and
-                    anim.getEndTurn() > turnNum + turnProgress
-                        @animPlayed = true
-                        anim.animate renderer, turnNum, turnProgress
-            if @animPlayed == false
-                @idle(renderer, turnNum, turnProgress)
-
-        idle: (renderer, turnNum, turnProgress) =>
-            throw new PluginError("idle not implemented")
 
 
-    class Animation
-        constructor: (@startTurn, @endTurn, @animate) ->
+define () ->
+    webvisApp = angular.module('webvisApp')
+    webvisApp.factory 'PluginBase', ($log) ->
+        class PluginError
+            constructor: (@msg) ->
 
-        getStartTurn: () -> @startTurn
+        class BaseEntity
+            constructor: () ->
 
-        getEndTurn: () -> @endTurn
+            getAnimations: () ->
+                throw new PluginError("getAnimations not implemented")
 
-        animate: (renderer, turn, progress) ->
-            throw new PluginError("animate not implemented")
+            draw: (renderer, turnNum, turnProgress) =>
+                @animPlayed = false
+                for anim in @getAnimations()
+                    if anim.getStartTurn() <= turnNum + turnProgress and
+                        anim.getEndTurn() > turnNum + turnProgress
+                            @animPlayed = true
+                            anim.animate renderer, turnNum, turnProgress
+                if @animPlayed == false
+                    @idle(renderer, turnNum, turnProgress)
 
-    class BasePlugin
-        constructor: () ->
-            @entities = {}
-            @maxTurn = 0
-            @mapWidth = 0
-            @mapHeight = 0
+            idle: (renderer, turnNum, turnProgress) ->
+                throw new PluginError("idle not implemented")
 
-        getMaxTurn: () -> @maxTurn
 
-        getMapWidth: () -> @mapWidth
+        class Animation
+            constructor: (@startTurn, @endTurn, @animate) ->
 
-        getMapHeight: () -> @mapHeight
+            getStartTurn: () -> @startTurn
 
-        getEntities: () -> @entities
+            getEndTurn: () -> @endTurn
 
-        clear: () ->
-            @entities = {}
-            @maxTurn = 0
-            @mapWidth = 0
-            @mapheight = 0
+            animate: (renderer, turn, progress) ->
+                throw new PluginError("animate not implemented")
 
-        selectEntities: (renderer, turn, x, y) ->
-            throw new PluginError("selectEntities not implemented")
+        class BasePlugin
+            constructor: () ->
+                @entities = {}
+                @maxTurn = 0
+                @mapWidth = 0
+                @mapHeight = 0
 
-        verifyEntities: (renderer, turn, selection) ->
-            throw new PluginError("verifyEntities not implemented")
+            getMaxTurn: () -> @maxTurn
 
-        getName: () ->
-            throw new PluginError("getName not implemented")
+            getMapWidth: () -> @mapWidth
 
-        preDraw: (turn, delta, renderer) ->
-            throw new PluginError("preDraw not implemented")
+            getMapHeight: () -> @mapHeight
 
-        postDraw: (turn, delta, renderer) ->
-            throw new PluginError("postDraw not implemented")
+            getEntities: () -> @entities
 
-        resize: (renderer) ->
-            throw new PluginError("resize not implemented")
+            clear: () ->
+                @entities = {}
+                @maxTurn = 0
+                @mapWidth = 0
+                @mapheight = 0
 
-        loadGame: (gamedata, renderer) ->
-            throw new PluginError("loadGame not implemented")
+            selectEntities: (renderer, turn, x, y) ->
+                throw new PluginError("selectEntities not implemented")
 
-        getSexpScheme: () ->
-            throw new PluginError("getSexpScheme not implemented")
+            verifyEntities: (renderer, turn, selection) ->
+                throw new PluginError("verifyEntities not implemented")
 
-    return {
-        BaseEntity: BaseEntity
-        Animation: Animation
-        BasePlugin: BasePlugin
-    }
+            getName: () ->
+                throw new PluginError("getName not implemented")
+
+            preDraw: (turn, delta, renderer) ->
+                throw new PluginError("preDraw not implemented")
+
+            postDraw: (turn, delta, renderer) ->
+                throw new PluginError("postDraw not implemented")
+
+            resize: (renderer) ->
+                throw new PluginError("resize not implemented")
+
+            loadGame: (gamedata, renderer) ->
+                throw new PluginError("loadGame not implemented")
+
+            getSexpScheme: () ->
+                throw new PluginError("getSexpScheme not implemented")
+
+        return {
+            BaseEntity: BaseEntity
+            Animation: Animation
+            BasePlugin: BasePlugin
+        }

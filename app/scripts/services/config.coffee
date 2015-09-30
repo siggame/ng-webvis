@@ -7,11 +7,12 @@
  # # config
  # Factory in the webvisApp.
 ###
-webvisApp = angular.module('webvisApp')
 
 
-webvisApp.factory 'config', ->
-    version: "0.0.0"
+define () ->
+    webvisApp = angular.module('webvisApp')
+    webvisApp.factory 'config', ->
+        version: "0.0.0"
 
-    alert:
-        timeoutAfter: 10000
+        alert:
+            timeoutAfter: 10000

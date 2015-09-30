@@ -7,15 +7,17 @@
  # # AlertCtrl
  # Controller of the webvisApp
 ###
-app = angular.module('webvisApp')
+define [
+    'services/alert'
+], ()->
+    app = angular.module('webvisApp')
+    app.controller 'AlertCtrl', (alert) ->
+        @alert = alert
 
-app.controller 'AlertCtrl', (alert) ->
-    @alert = alert
+        @hasAlert = () ->
+            alerts = alert.getAlerts()
+            for a in alerts
+                if a.isVisible()
+                    return true
 
-    @hasAlert = () ->
-        alerts = alert.getAlerts()
-        for a in alerts
-            if a.isVisible()
-                return true
-
-    return this
+        return this

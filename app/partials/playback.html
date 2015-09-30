@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-xs-12 playback-controls" style="margin-top:10px;">
+      <div class="col-xs-12 playback-controls">
         <div class="btn-group pull-left">
           <!-- Step back button -->
           <button class="btn btn-default" ng-click="playback.stepBack()">
@@ -27,33 +27,44 @@
         </div>
 
         <!-- Fullscreen button -->
-        <div class="btn-group pull-right">
-            <button class="btn btn-default" ng-click="playback.fullscreen()">
-                <i class="fa fa-desktop"></i>
-            </button>
-        </div>
-
-        <!-- Current Turn -->
-        <div class="turn-display pull-right">
+        <div class="pull-right playback-controls-right">
           <p>Turn:</p>
           <div class="btn btn-default slider-value disabled" style="margin-right:5px;">
               {{ playback.currentTurn || 0 }}
           </div>
-        </div>
 
-        <!-- Time Slider -->
-        <div class="time-slider pull-right">
           <p>Time:</p>
           <slider max-value="10" current-value="playback.timeDt" live-value="playback.timeDt"></slider>
-          <p>x{{playback.timeDt/4}}</p>
+          <p style="width:40px;">x{{playback.timeDt/4}}</p>
           <script id="time-slide-handler">
               var div = $(document.getElementById("time-slide-handler")).parent();
               var pt = div.find("p").next().next();
               pt.ready(function(){div.find("slider").css("width", div.width() - 100);});
           </script>
+
+          <button class="btn btn-default" ng-click="playback.fullscreen()">
+              <i class="fa fa-desktop"></i>
+          </button>
         </div>
 
       </div>
     </div>
   </div>
 </div>
+
+<script>
+    $(document).ready( function() {
+        var resizeStage = function() {
+            console.log("resizing things");
+            var totalheight = $('#fullscreen-container').innerHeight();
+            var playbackHeight = $('#playback-container').height();
+
+            console.log(totalheight + ' ' + playbackHeight);
+
+            $('#stage-container').height(totalheight - playbackHeight);
+        };
+
+        $(window).resize(resizeStage);
+        resizeStage();
+    });
+</script>

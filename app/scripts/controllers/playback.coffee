@@ -7,60 +7,63 @@
  # # PlaybackCtrl
  # Controller of the webvisApp
 ###
-webvisApp = angular.module('webvisApp')
 
-webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
-    @currentTurn = Game.getCurrentTurn()
-    @maxTurn = Game.getMaxTurn()
-    @minTurn = Game.getMinTurn()
-    @isFullscreen = false
+define [
+    'services/game'
+], ()->
+    webvisApp = angular.module('webvisApp')
+    webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
+        @currentTurn = Game.getCurrentTurn()
+        @maxTurn = Game.getMaxTurn()
+        @minTurn = Game.getMinTurn()
+        @isFullscreen = false
 
-    @timeDt = Game.getPlaybackSpeed() * 4
+        @timeDt = Game.getPlaybackSpeed() * 4
 
-    $scope.$on 'currentTurn:updated', (event, data) =>
-        if !$scope.$$phase
-            @currentTurn = data
-            $scope.$apply()
+        $scope.$on 'currentTurn:updated', (event, data) =>
+            if !$scope.$$phase
+                @currentTurn = data
+                $scope.$apply()
 
-    $scope.$on 'maxTurn:updated', (event, data) =>
-        if !$scope.$$phase
-            @maxTurn = data
-            $scope.$apply()
+        $scope.$on 'maxTurn:updated', (event, data) =>
+            if !$scope.$$phase
+                @maxTurn = data
+                $scope.$apply()
 
-    $scope.$watch 'playback.currentTurn', (newValue) =>
-        if angular.isDefined(newValue) and newValue != Game.getCurrentTurn()
-            Game.setCurrentTurn newValue
+        $scope.$watch 'playback.currentTurn', (newValue) ->
+            if angular.isDefined(newValue) and newValue != Game.getCurrentTurn()
+                Game.setCurrentTurn newValue
 
-    $scope.$watch 'playback.timeDt', (newValue) =>
-        if angular.isDefined(newValue) and newValue/4 != Game.getPlaybackSpeed()
-            Game.setPlaybackSpeed newValue/4
+        $scope.$watch 'playback.timeDt', (newValue) ->
+            if angular.isDefined(newValue) and newValue/4 != Game.getPlaybackSpeed()
+                Game.setPlaybackSpeed newValue/4
 
-    @isPlaying = -> Game.isPlaying()
+        @isPlaying = -> Game.isPlaying()
 
-    @stepBack = ->
-        if Game.getCurrentTurn() > Game.getMinTurn()
-            Game.setCurrentTurn(Game.getCurrentTurn() - 1)
-            @currentTurn--
-        else
-            Game.setCurrentTurn(Game.getMinTurn())
+        @stepBack = ->
+            if Game.getCurrentTurn() > Game.getMinTurn()
+                Game.setCurrentTurn(Game.getCurrentTurn() - 1)
+                @currentTurn--
+            else
+                Game.setCurrentTurn(Game.getMinTurn())
 
-    @stepForward = ->
-        if Game.getCurrentTurn() < Game.getMaxTurn()
-            Game.setCurrentTurn(Game.getCurrentTurn() + 1)
-            @currentTurn++
-        else
-            Game.setCurrentTurn(Game.getMaxTurn())
+        @stepForward = ->
+            if Game.getCurrentTurn() < Game.getMaxTurn()
+                Game.setCurrentTurn(Game.getCurrentTurn() + 1)
+                @currentTurn++
+            else
+                Game.setCurrentTurn(Game.getMaxTurn())
 
-    @playPause = ->
-        $log.info "Play/Pause Pressed"
-        if(!Game.isPlaying())
-            Game.start()
-        else
-            Game.stop()
+        @playPause = ->
+            $log.info "Play/Pause Pressed"
+            if(!Game.isPlaying())
+                Game.start()
+            else
+                Game.stop()
 
-    @fullscreen = ->
-        elem = document.getElementById "fullscreen-container";
-        if(document.fullscreenElement ||
+        @fullscreen = ->
+            elem = document.getElementById "fullscreen-container"
+            if(document.fullscreenElement ||
             document.webkitFullscreenElement ||
             document.mozFullScreenElement ||
             document.msFullscreenElement)
@@ -72,15 +75,15 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
                     document.mozCancelFullScreen()
                 else if document.msExitFullscreen
                     document.msExitFullscreen()
-        else
-            if elem.requestFullscreen
-                elem.requestFullscreen()
-            else if elem.msRequestFullscreen
-                elem.msRequestFullscreen()
-            else if elem.mozRequestFullscreen
-                elem.mozRequestFullscreen()
-            else if elem.webkitRequestFullscreen
-                elem.webkitRequestFullscreen()
+            else
+                if elem.requestFullscreen
+                    elem.requestFullscreen()
+                else if elem.msRequestFullscreen
+                    elem.msRequestFullscreen()
+                else if elem.mozRequestFullscreen
+                    elem.mozRequestFullscreen()
+                else if elem.webkitRequestFullscreen
+                    elem.webkitRequestFullscreen()
 
 
 
@@ -88,4 +91,4 @@ webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
 
 
 
-    return this
+        return this
