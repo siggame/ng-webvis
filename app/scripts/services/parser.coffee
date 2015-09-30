@@ -39,6 +39,17 @@ define ()->
                 if @log != null then @log = null
                 @log = @loadFile(file_contents)
 
+        class JsonParser extends Parser
+            loadFile: (data) -> JSON.parse(data)
+
+            getGameID: () -> @log.gameSession;
+
+            getGameName: () -> @log.gameName;
+
+            getGameWinner: () -> @log.winners[0];
+
+            getTurns:() -> @log.deltas;
+
 
         class SexpParser extends Parser
 
@@ -140,4 +151,5 @@ define ()->
         # Public API here
         return {
             SexpParser: new SexpParser()
+            JsonParser: new JsonParser()
         }
