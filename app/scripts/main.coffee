@@ -22,7 +22,7 @@ requirejs.config {
 
 define [
     'services/fileLoader'
-    'services/Options'
+    'services/options'
     'controllers/alert'
     'controllers/navbar'
     'controllers/playback'
