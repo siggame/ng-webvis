@@ -2,7 +2,7 @@
 
 define [
     'services/config'
-    'services/PluginManager'
+    'services/pluginmanager'
 ], ()->
     webvisApp = angular.module('webvisApp')
     webvisApp.controller 'NavbarCtrl', ($window, $scope, config, PluginManager) ->

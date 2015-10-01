@@ -3,8 +3,8 @@
 
 
 define [
-    'services/PluginManager',
-    'services/Renderer'
+    'services/pluginmanager',
+    'services/renderer'
 ], ()->
     webvisApp = angular.module('webvisApp')
     webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer,
