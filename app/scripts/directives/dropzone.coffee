@@ -1,8 +1,8 @@
 'use strict'
 
 define [
-    'services/alert'
-    'services/fileLoader'
+    'scripts/services/alert'
+    'scripts/services/fileLoader'
 ], ()->
     webvisApp = angular.module('webvisApp')
     webvisApp.directive 'dropzone', ($log, alert, FileLoader) ->

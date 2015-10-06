@@ -1,7 +1,7 @@
 'use strict'
 
 define [
-    'services/alert'
+    'scripts/services/alert'
 ], () ->
     webvisApp = angular.module('webvisApp')
     webvisApp.directive 'slider', ($rootScope, $log, alert)->

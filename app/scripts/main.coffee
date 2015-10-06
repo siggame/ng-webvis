@@ -16,23 +16,22 @@ webvisApp = angular.module 'webvisApp', [
 ]
 
 requirejs.config {
-    baseUrl: 'scripts',
     enforceDefine: true
 }
 
 define [
-    'services/fileLoader'
-    'services/options'
-    'controllers/alert'
-    'controllers/navbar'
-    'controllers/playback'
-    'controllers/stageCtrl'
-    'controllers/tabmenu'
-    'directives/dropzone'
-    'directives/fileDialog'
-    'directives/game-option'
-    'directives/slider'
-    'directives/stage'
+    'scripts/services/fileLoader'
+    'scripts/services/options'
+    'scripts/controllers/alert'
+    'scripts/controllers/navbar'
+    'scripts/controllers/playback'
+    'scripts/controllers/stageCtrl'
+    'scripts/controllers/tabmenu'
+    'scripts/directives/dropzone'
+    'scripts/directives/fileDialog'
+    'scripts/directives/game-option'
+    'scripts/directives/slider'
+    'scripts/directives/stage'
 ], ()->
     console.log("starting main.coffee");
     injector = angular.injector(['ng', 'webvisApp'])

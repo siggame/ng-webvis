@@ -9,7 +9,7 @@
 ###
 
 define [
-    'services/fileLoader'
+    'scripts/services/fileLoader'
 ], ()->
     webvisApp = angular.module('webvisApp')
     webvisApp.controller 'TabmenuCtrl', ($scope, Game, FileLoader,

@@ -8,7 +8,7 @@
  # Controller of the webvisApp
 ###
 define [
-    'services/alert'
+    'scripts/services/alert'
 ], ()->
     app = angular.module('webvisApp')
     app.controller 'AlertCtrl', (alert) ->

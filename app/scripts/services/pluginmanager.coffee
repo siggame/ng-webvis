@@ -10,18 +10,28 @@
 
 define ()->
     webvisApp = angular.module('webvisApp')
-    webvisApp.service 'PluginManager', ($rootScope, $injector) ->
+    webvisApp.service 'PluginManager', ($rootScope) ->
         class PluginError
             constructor: (@msg) ->
 
+        @pluginConstructors = {};
         @currentPlugin = null
 
-        @changePlugin = (plugin) ->
-            if $injector.has plugin
-                @currentPlugin = $injector.get plugin
-                $rootScope.$broadcast('currentPlugin:updated')
+        @changePlugin = (plugin, success) ->
+            if @pluginConstructors[plugin]?
+                @currentPlugin = new @pluginConstructors[plugin]
+                success()
             else
-                @currentPlugin = null
+                require([
+                    'plugins/' + plugin + '/' + plugin
+                    ]
+                    (newplugin) =>
+                        @pluginConstructors[plugin] = newplugin
+                        @currentPlugin = new newplugin()
+                        success()
+                    (err) =>
+                        throw PluginError("The plugin '"+plugin +"' could not be found")
+                )
 
         @selectEntities = (renderer, turn, x, y) ->
             if @currentPlugin != null
