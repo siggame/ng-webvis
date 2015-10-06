@@ -3,8 +3,8 @@
 
 
 define [
-    'services/pluginmanager',
-    'services/renderer'
+    'scripts/services/pluginmanager',
+    'scripts/services/renderer'
 ], ()->
     webvisApp = angular.module('webvisApp')
     webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer,
@@ -122,8 +122,6 @@ define [
             return dtSeconds
 
         @fileLoaded = (gameObject) =>
-            PluginManager.clear()
-            PluginManager.changePlugin gameObject.gameName
             PluginManager.loadGame gameObject, @renderer
 
             @currentTurn = 0

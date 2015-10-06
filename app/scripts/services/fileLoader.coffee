@@ -9,14 +9,15 @@
 ###
 
 define [
-    'services/alert'
-    'services/game'
-    'services/parser'
-    'services/options'
+    'scripts/services/alert'
+    'scripts/services/game'
+    'scripts/services/parser'
+    'scripts/services/options'
+    'scripts/services/pluginmanager'
 ], () ->
     webvisApp = angular.module('webvisApp')
     webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game,
-        Parser, Options) ->
+        Parser, Options, PluginManager) ->
         # A helper function for showing errors
         acceptFileExtensions = ["gamelog", "glog", "json"]
 
@@ -112,7 +113,14 @@ define [
             gameObject["gameID"] = parser.getGameID()
             gameObject["gameWinner"] = parser.getGameWinner()
 
+            PluginManager.changePlugin parser.getGameName(), ()=>
+                sexpScheme = PluginManager.getSexpScheme()
+                gameObject["turns"] = parser.getTurns(sexpScheme)
+                parser.clear()
+                Game.fileLoaded gameObject
 
+
+            ###
             if $injector.has parser.getGameName()
                 plugin = $injector.get parser.getGameName()
                 gameObject["turns"] = parser.getTurns(plugin.getSexpScheme())
@@ -121,6 +129,7 @@ define [
             else
                 pluginUrl = ("/plugins/" + parser.getGameName() +
                 "/" + parser.getGameName() + ".js")
+
                 $.ajax
                     dataType: "script",
                     url: pluginUrl,
@@ -140,6 +149,7 @@ define [
                         " could not be loaded. " + errorThrown)
                         $rootScope.$digest()
                         parser.clear()
+            ###
 
         @loadFile = (files) ->
             try

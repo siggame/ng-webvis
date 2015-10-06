@@ -9,7 +9,7 @@
 ###
 
 define [
-    'services/game'
+    'scripts/services/game'
 ], ()->
     webvisApp = angular.module('webvisApp')
     webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->

@@ -1,8 +1,8 @@
 'use strict'
 
 define [
-    'services/config'
-    'services/pluginmanager'
+    'scripts/services/config'
+    'scripts/services/pluginmanager'
 ], ()->
     webvisApp = angular.module('webvisApp')
     webvisApp.controller 'NavbarCtrl', ($window, $scope, config, PluginManager) ->

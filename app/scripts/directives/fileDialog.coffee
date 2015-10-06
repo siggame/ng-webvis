@@ -8,7 +8,7 @@
 ###
 
 define [
-    'services/fileLoader'
+    'scripts/services/fileLoader'
 ], () ->
     webvisApp = angular.module('webvisApp')
     webvisApp.directive 'fileDialog', ($log, FileLoader) ->

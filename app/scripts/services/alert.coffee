@@ -10,7 +10,7 @@
 
 
 define [
-    'services/config'
+    'scripts/services/config'
 ], ()->
     webvisApp = angular.module('webvisApp')
     webvisApp.factory 'alert', ($rootScope, $timeout, $log, config) ->

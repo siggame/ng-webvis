@@ -9,7 +9,7 @@
 ###
 
 define [
-    'services/alert'
+    'scripts/services/alert'
 ], () ->
     webvisApp = angular.module('webvisApp')
     webvisApp.service 'Options', ($rootScope, alert) ->

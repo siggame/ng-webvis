@@ -8,7 +8,7 @@
 ###
 
 define [
-    'services/game'
+    'scripts/services/game'
 ], ()->
     webvisApp = angular.module('webvisApp')
     webvisApp.directive 'stage', ($log, $window, Game) ->
