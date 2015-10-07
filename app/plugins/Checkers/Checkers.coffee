@@ -13,7 +13,29 @@ define [
         class Checkers extends BasePlugin.Plugin
             constructor: () ->
                 super()
-                @checkersOptions = []
+                @checkersOptions = [
+                    [
+                        "checkbox",
+                        "test checkbox",
+                        false
+                    ],
+                    [
+                        "slider",
+                        "test slider",
+                        0, 3, 1
+                    ],
+                    [
+                        "textbox",
+                        "test textbox",
+                        "this is some text"
+                    ],
+                    [
+                        "dropdown",
+                        "test dropdown",
+                        ["blah", "blah2", "blah3"],
+                        "blah2"
+                    ]
+                ]
                 Options.addPage "Checkers", @checkersOptions
 
             selectEntities: (renderer, turn, x, y) ->
@@ -34,9 +56,8 @@ define [
 
         return Checkers
 
-    # the dependencies are manually injected here
+    # the dependencies are manually specified
     explicit.$inject = ['Options', 'Renderer']
-    $injector = angular.injector(['webvisApp'])
 
     # the constructor function for the main checkers object is returned here
-    return $injector.invoke(explicit)
+    return angular.module('webvisApp').injector.invoke(explicit)
