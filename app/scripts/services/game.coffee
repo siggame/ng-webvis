@@ -1,14 +1,7 @@
 'use strict'
 
-
-
-define [
-    'scripts/services/pluginmanager',
-    'scripts/services/renderer'
-], ()->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.service 'Game', ($rootScope, $log, PluginManager, Renderer,
-        Options) ->
+define ()->
+    Game = ($rootScope, $log, PluginManager, Renderer, Options) ->
         @minTurn = 0
         @maxTurn = 0
         @playing = false
@@ -134,3 +127,6 @@ define [
 
         window.requestAnimationFrame @animate
         return this
+
+    Game.$inject =['$rootScope', '$log', 'PluginManager', 'Renderer', 'Options']
+    return Game

@@ -8,15 +8,8 @@
  # Service in the webvisApp.
 ###
 
-define [
-    'scripts/services/alert'
-    'scripts/services/game'
-    'scripts/services/parser'
-    'scripts/services/options'
-    'scripts/services/pluginmanager'
-], () ->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.service 'FileLoader', ($rootScope, $log, $injector, alert, Game,
+define () ->
+    FileLoader = ($rootScope, $log, $injector, alert, Game,
         Parser, Options, PluginManager) ->
         # A helper function for showing errors
         acceptFileExtensions = ["gamelog", "glog", "json"]
@@ -212,3 +205,15 @@ define [
             @loadFromFile(data)
 
         return this
+
+    FileLoader.$inject = [
+        '$rootScope',
+        '$log',
+        '$injector',
+        'alert',
+        'Game',
+        'Parser',
+        'Options',
+        'PluginManager'
+    ]
+    return FileLoader

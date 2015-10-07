@@ -3,7 +3,7 @@
   <div class="playback-controls well well-sm">
     <div class="row" style="padding-left:10px;padding-right:10px">
       <div class="col-xs-12">
-        <slider max-value="playback.maxTurn" current-value="playback.currentTurn" live-value="playback.currentTurn"></slider>
+        <slider max-value="maxTurn" current-value="currentTurn" live-value="currentTurn"></slider>
       </div>
     </div>
     <div class="row">
@@ -30,12 +30,12 @@
         <div class="pull-right playback-controls-right">
           <p>Turn:</p>
           <div class="btn btn-default slider-value disabled" style="margin-right:5px;">
-              {{ playback.currentTurn || 0 }}
+              {{ currentTurn || 0 }}
           </div>
 
           <p>Time:</p>
-          <slider max-value="10" current-value="playback.timeDt" live-value="playback.timeDt"></slider>
-          <p style="width:40px;">x{{playback.timeDt/4}}</p>
+          <slider max-value="10" current-value="timeDt" live-value="timeDt"></slider>
+          <p style="width:40px;">x{{timeDt/4}}</p>
           <script id="time-slide-handler">
               var div = $(document.getElementById("time-slide-handler")).parent();
               var pt = div.find("p").next().next();
@@ -55,11 +55,8 @@
 <script>
     $(document).ready( function() {
         var resizeStage = function() {
-            console.log("resizing things");
             var totalheight = $('#fullscreen-container').innerHeight();
             var playbackHeight = $('#playback-container').height();
-
-            console.log(totalheight + ' ' + playbackHeight);
 
             $('#stage-container').height(totalheight - playbackHeight);
         };

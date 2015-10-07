@@ -10,9 +10,7 @@
 
 
 define ()->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.factory 'Parser', ->
-
+    Parser = () ->
         class Parser
             constructor: () ->
                 @log = null

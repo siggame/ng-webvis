@@ -1,8 +1,8 @@
 <div ng-controller="NavbarCtrl as navbar" class="text-center" style="height:100%;">
   <div id="game-info" class="row-fluid">
     <h2 style="padding-top:20px; padding-bottom:10px">
-      {{ navbar.gameName }}
-      <small class="text-muted">{{ navbar.version }}</small>
+      {{ gameName }}
+      <small class="text-muted">{{version }}</small>
     </h2>
     <div class="btn-group btn-group-justified">
       <div class="btn-group btn-group-vertical">
@@ -48,11 +48,11 @@
             </ul>
           </div>
         </tab-heading>
-          <div class="vis-tab-content">
-            <div ng-repeat="(id, object) in currentPage">
-              <game-option name="id" page="currentPageName" option="object"></game-option>
-            </div>
+        <div class="vis-tab-content">
+          <div ng-repeat="(id, object) in currentPage">
+            <game-option name="id" page="currentPageName" option="object"></game-option>
           </div>
+        </div>
       </tab>
     </tabset>
   </div>

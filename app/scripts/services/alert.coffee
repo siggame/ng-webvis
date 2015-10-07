@@ -9,11 +9,8 @@
 ###
 
 
-define [
-    'scripts/services/config'
-], ()->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.factory 'alert', ($rootScope, $timeout, $log, config) ->
+define ()->
+    alert = ($rootScope, $timeout, $log, config) ->
         class Alert
             constructor: (message, type) ->
                 @message = message
@@ -72,3 +69,6 @@ define [
 
         # return the created object
         return exports
+
+    alert.$inject = ['$rootScope', '$timeout', '$log', 'config']
+    return alert

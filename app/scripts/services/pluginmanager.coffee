@@ -9,8 +9,8 @@
 ###
 
 define ()->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.service 'PluginManager', ($rootScope) ->
+
+    PluginManager = ($rootScope) ->
         class PluginError
             constructor: (@msg) ->
 
@@ -119,3 +119,6 @@ define ()->
                 throw new PluginError("No plugin selected")
 
         return this
+
+    PluginManager.$inject = ['$rootScope']
+    return PluginManager

@@ -8,8 +8,7 @@
 ###
 
 define ()->
-    webvisApp = angular.module('webvisApp');
-    webvisApp.directive('gameOption', ->
+    gameOption = ()->
         templateUrl: 'views/game-option.html'
         restrict: 'E'
         scope: {
@@ -17,4 +16,4 @@ define ()->
             option: '='
             page: '='
         }
-      )
+    return gameOption

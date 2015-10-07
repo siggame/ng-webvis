@@ -1,11 +1,7 @@
 'use strict'
 
-define [
-    'scripts/services/alert'
-    'scripts/services/fileLoader'
-], ()->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.directive 'dropzone', ($log, alert, FileLoader) ->
+define ()->
+    dropzone = ($log, alert, FileLoader) ->
         restrict: 'A'
         link: (scope, element) ->
 
@@ -18,3 +14,5 @@ define [
                 event.preventDefault()
 
                 FileLoader.loadFile event.originalEvent.dataTransfer.files
+    dropzone.$inject = ['$log', 'alert', 'FileLoader']
+    return dropzone

@@ -7,16 +7,12 @@
  # # Stage
 ###
 
-define [
-    'scripts/services/game'
-], ()->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.directive 'stage', ($log, $window, Game) ->
+define ()->
+    stage = ($log, $window, Game) ->
         template: ''
         restrict: 'E'
         link: (scope, element, attrs) ->
-            console.log "called"
-
+            
             canvas = document.createElement 'canvas'
             canvas.width = attrs['width']
             canvas.height = attrs['height']
@@ -45,3 +41,5 @@ define [
 
             angular.element($window).on 'resize', () ->
                 do resizeRendererView
+    stage.$inject = ['$log', '$window', 'Game']
+    return stage
