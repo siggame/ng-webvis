@@ -9,8 +9,7 @@
 ###
 
 define ()->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.service 'Renderer', ->
+    Renderer = () ->
         ###
          # Renderer::Point
          # represents a single 3D point. The z parameter can be
@@ -1221,3 +1220,5 @@ define ()->
                 return new @WebGLRenderer(canvas, worldWidth, worldHeight)
 
         return this
+
+    return Renderer

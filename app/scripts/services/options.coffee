@@ -8,11 +8,27 @@
  # Service in the webvisApp.
 ###
 
-define [
-    'scripts/services/alert'
-], () ->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.service 'Options', ($rootScope, alert) ->
+define () ->
+    console.log "I'm in options"
+    Options = ($rootScope, alert) ->
+        console.log "and i'm the constructor"
+        # Members
+        @_options = {}
+
+        # this option page is always present
+        @_webvisOptions = [
+            [   "textbox",
+                "Arena Url",
+                "arena.megaminerai.com"
+            ],
+            [
+                "dropdown",
+                "Mode",
+                ["normal","arena"],
+                "normal"
+            ]
+        ]
+
         # Option classes
         @CheckBox = class CheckBox
             constructor: (@type, @isChecked) ->
@@ -29,24 +45,6 @@ define [
 
             onChanged: (pageName, name) ->
                 $rootScope.$broadcast( pageName+":"+name+":updated", @currentValue)
-
-        # Members
-        @_options = {}
-
-        # this option page is always present for non-plugin specific options
-        @_webvisOptions = [
-            [   "textbox",
-                "Arena Url",
-                "arena.megaminerai.com"
-            ],
-            [
-                "dropdown",
-                "Mode",
-                ["normal","arena"],
-                "normal"
-            ]
-        ]
-
 
         # private
         @_createOption = (init) ->
@@ -75,7 +73,6 @@ define [
                     @_options[name] = @_parsePageConstructor(options)
                 else
                     @_options[name] = {}
-                $rootScope.$broadcast('Options:pageAdded')
             else
                 throw {message: "Page already exists"}
 
@@ -89,10 +86,12 @@ define [
             else
                 return null
 
-        @getOptions = () -> @_options
+        @getOptions = () ->
+            return @_options
 
-        # constructor
-        # during construction add the webvis option page
         @_options["Webvis"] = @_parsePageConstructor(@_webvisOptions)
 
         return this
+
+    Options.$inject = ['$rootScope', 'alert']
+    return Options

@@ -11,23 +11,21 @@
 define [
     'scripts/services/game'
 ], ()->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.controller 'PlaybackCtrl', ($scope, $log, Game) ->
-        @currentTurn = Game.getCurrentTurn()
-        @maxTurn = Game.getMaxTurn()
-        @minTurn = Game.getMinTurn()
-        @isFullscreen = false
-
-        @timeDt = Game.getPlaybackSpeed() * 4
+    PlaybackCtrl = ($scope, $log, Game) ->
+        $scope.currentTurn = Game.getCurrentTurn()
+        $scope.maxTurn = Game.getMaxTurn()
+        $scope.minTurn = Game.getMinTurn()
+        $scope.isFullscreen = false
+        $scope.timeDt = Game.getPlaybackSpeed() * 4
 
         $scope.$on 'currentTurn:updated', (event, data) =>
             if !$scope.$$phase
-                @currentTurn = data
+                $scope.currentTurn = data
                 $scope.$apply()
 
         $scope.$on 'maxTurn:updated', (event, data) =>
             if !$scope.$$phase
-                @maxTurn = data
+                $scope.maxTurn = data
                 $scope.$apply()
 
         $scope.$watch 'playback.currentTurn', (newValue) ->
@@ -43,14 +41,14 @@ define [
         @stepBack = ->
             if Game.getCurrentTurn() > Game.getMinTurn()
                 Game.setCurrentTurn(Game.getCurrentTurn() - 1)
-                @currentTurn--
+                $scope.currentTurn--
             else
                 Game.setCurrentTurn(Game.getMinTurn())
 
         @stepForward = ->
             if Game.getCurrentTurn() < Game.getMaxTurn()
                 Game.setCurrentTurn(Game.getCurrentTurn() + 1)
-                @currentTurn++
+                $scope.currentTurn++
             else
                 Game.setCurrentTurn(Game.getMaxTurn())
 
@@ -85,10 +83,5 @@ define [
                 else if elem.webkitRequestFullscreen
                     elem.webkitRequestFullscreen()
 
-
-
-
-
-
-
-        return this
+    PlaybackCtrl.$inject = ['$scope', '$log', 'Game']
+    return PlaybackCtrl

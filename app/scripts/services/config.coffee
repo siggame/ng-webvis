@@ -10,9 +10,9 @@
 
 
 define () ->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.factory 'config', ->
+    config = ()->
         version: "0.0.0"
 
         alert:
             timeoutAfter: 10000
+    return config

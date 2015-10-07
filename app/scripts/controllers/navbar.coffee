@@ -1,13 +1,9 @@
 'use strict'
 
-define [
-    'scripts/services/config'
-    'scripts/services/pluginmanager'
-], ()->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.controller 'NavbarCtrl', ($window, $scope, config, PluginManager) ->
-        @version = config.version
-        @gameName = PluginManager.getName()
+define ()->
+    NavbarCtrl = ($window, $scope, config, PluginManager) ->
+        $scope.version = config.version
+        $scope.gameName = PluginManager.getName()
 
         $scope.$on 'currentPlugin:updated', (event, data) =>
             if !$scope.$$phase
@@ -35,4 +31,5 @@ define [
         angular.element($window).on 'resize', () ->
             do resizeTabWindow
 
-        return this
+    NavbarCtrl.$inject = ['$window', '$scope', 'config', 'PluginManager']
+    return NavbarCtrl

@@ -1,10 +1,7 @@
 'use strict'
 
-define [
-    'scripts/services/alert'
-], () ->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.directive 'slider', ($rootScope, $log, alert)->
+define () ->
+    slider = ($rootScope, $log, alert)->
         template: '<div></div>'
         restrict: 'E'
         scope:
@@ -36,3 +33,6 @@ define [
             scope.$watch 'maxValue', (newValue, oldValue) ->
                 if newValue != oldValue
                     $(slider).slider "option", "max", newValue
+
+    slider.$inject = ['$rootScope', '$log', 'alert']
+    return slider

@@ -23,7 +23,7 @@
           adjust = parseInt(fcont.css('margin-bottom'), 10) + parseInt(fcont.css('margin-top'), 10) +
               parseInt(fcont.css('padding-bottom'), 10) + parseInt(fcont.css('padding-top'), 10) +
               parseInt(fcont.css('border-bottom'), 10) + parseInt(fcont.css('border-top'), 10);
-          console.log(parentHeight + ' ' + adjust);
+              
           $('#fullscreen-container').height(parentHeight - adjust);
       };
       $(window).resize(resizeFcont);

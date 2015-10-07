@@ -7,11 +7,8 @@
  # # AlertCtrl
  # Controller of the webvisApp
 ###
-define [
-    'scripts/services/alert'
-], ()->
-    app = angular.module('webvisApp')
-    app.controller 'AlertCtrl', (alert) ->
+define ()->
+    AlertCtrl = (alert) ->
         @alert = alert
 
         @hasAlert = () ->
@@ -21,3 +18,5 @@ define [
                     return true
 
         return this
+    AlertCtrl.$inject = ['alert'];
+    return AlertCtrl

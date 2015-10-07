@@ -7,11 +7,8 @@
  # # fileDialog
 ###
 
-define [
-    'scripts/services/fileLoader'
-], () ->
-    webvisApp = angular.module('webvisApp')
-    webvisApp.directive 'fileDialog', ($log, FileLoader) ->
+define () ->
+    fileDialog = ($log, FileLoader) ->
         restrict: 'A'
 
         transclude: true
@@ -34,3 +31,6 @@ define [
                 $log.debug "File dialog input changed"
                 FileLoader.loadFile event.target.files
                 inputTag.val null
+
+    fileDialog.$inject = ['$log', 'FileLoader']
+    return fileDialog
