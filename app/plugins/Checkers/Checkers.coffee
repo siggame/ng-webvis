@@ -13,30 +13,6 @@ define [
         class Checkers extends BasePlugin.Plugin
             constructor: () ->
                 super()
-                @checkersOptions = [
-                    [
-                        "checkbox",
-                        "test checkbox",
-                        false
-                    ],
-                    [
-                        "slider",
-                        "test slider",
-                        0, 3, 1
-                    ],
-                    [
-                        "textbox",
-                        "test textbox",
-                        "this is some text"
-                    ],
-                    [
-                        "dropdown",
-                        "test dropdown",
-                        ["blah", "blah2", "blah3"],
-                        "blah2"
-                    ]
-                ]
-                Options.addPage "Checkers", @checkersOptions
 
             selectEntities: (renderer, turn, x, y) ->
 
