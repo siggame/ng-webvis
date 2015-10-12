@@ -912,6 +912,7 @@ define ()->
                         console.log textStatus
                     success: (data) =>
                         console.log "recieved"
+                        @_texturesLoaded = true
                         numPictures = data.resources.length
                         for resource in data.resources
                             tex = @gl.createTexture()
