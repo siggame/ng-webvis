@@ -20,9 +20,9 @@ define [
 
             getName: () -> 'Checkers'
 
-            predraw: (turn, dt, renderer) ->
+            preDraw: (turn, dt, renderer) ->
 
-            postdraw: (turn, dt, renderer) ->
+            postDraw: (turn, dt, renderer) ->
 
             resize: (renderer) ->
 
