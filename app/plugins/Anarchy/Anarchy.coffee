@@ -22,6 +22,7 @@ define [
             getAnimations: () -> @animations
 
             idle: (renderer, turnNum, turnProgress) ->
+                console.log "calling digdug animation " + turnNum
                 if @startTurn <= turnNum < @endTurn
                     renderer.drawSprite(@sprite)
 
@@ -55,8 +56,8 @@ define [
                 blah1.sprite.texture = "myUnit"
                 blah1.sprite.position.x = 20
                 blah1.sprite.position.y = 20
-                blah1.sprite.width = 1
-                blah1.sprite.height = 1
+                blah1.sprite.width = 20
+                blah1.sprite.height = 20
 
             getSexpScheme: () -> null
 

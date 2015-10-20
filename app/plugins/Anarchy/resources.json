@@ -1,3 +1,9 @@
 {
-    "resources":[]
+    "resources":[
+        {
+			"id": "myUnit",
+			"image": "digdug.png",
+			"spriteSheet": null
+		}
+    ]
 }
