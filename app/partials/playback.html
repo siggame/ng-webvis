@@ -36,12 +36,6 @@
           <p>Time:</p>
           <slider max-value="10" current-value="timeDt" live-value="timeDt"></slider>
           <p style="width:40px;">x{{timeDt/4}}</p>
-          <script id="time-slide-handler">
-              var div = $(document.getElementById("time-slide-handler")).parent();
-              var pt = div.find("p").next().next();
-              pt.ready(function(){div.find("slider").css("width", div.width() - 100);});
-          </script>
-
           <button class="btn btn-default" ng-click="playback.fullscreen()">
               <i class="fa fa-desktop"></i>
           </button>
