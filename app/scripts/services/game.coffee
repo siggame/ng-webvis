@@ -30,10 +30,9 @@ define ()->
             @currentTurn = t
 
         @setMaxTurns = (maxTurn) ->
-            if maxTurn != @maxTurn
-                $rootScope.$broadcast('maxTurn:updated', maxTurn)
-
-            @maxTurn = maxTurn
+            $rootScope.$apply ()=>
+                if maxTurn != @maxTurn
+                    @maxTurn = maxTurn
 
         @setMinTurns = (minTurn) ->
             @minTurn = minTurn
