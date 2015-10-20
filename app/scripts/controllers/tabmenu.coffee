@@ -39,12 +39,5 @@ define ()->
         $scope.$on 'selection:updated', (event, data) ->
             $scope.currentSelection = Game.getCurrentSelection()
 
-        $scope.$on 'currentTurn:updated', (event, data) ->
-            $scope.currentSelection = Game.getCurrentSelection()
-            if !$scope.currentSelection[$scope.focusData.id]?
-                $scope.focusData = {}
-            else
-                $scope.focusData = $scope.currentSelection[$scope.focusData.id]
-
     TabmenuCtrl.$inject = ['$scope', 'Game', 'FileLoader', 'Options']
     return TabmenuCtrl

@@ -911,8 +911,9 @@ define ()->
                     complete: (jqxhr, textStatus) =>
                         console.log textStatus
                     success: (data) =>
-                        console.log "recieved"
-                        @_texturesLoaded = true
+                        if data.resources.length == 0
+                            @_texturesLoaded = true
+
                         numPictures = data.resources.length
                         for resource in data.resources
                             tex = @gl.createTexture()
