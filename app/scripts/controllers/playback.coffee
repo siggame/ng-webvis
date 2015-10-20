@@ -37,7 +37,8 @@ define [
                 console.log "updating max turn in playback bar." + $scope.maxTurn
         )
 
-        $scope.$watch 'playback.currentTurn', (newValue) ->
+        $scope.$watch 'currentTurn', (newValue) ->
+            console.log "current time changed"
             if angular.isDefined(newValue) and newValue != Game.getCurrentTurn()
                 Game.setCurrentTurn newValue
 
@@ -45,30 +46,31 @@ define [
             if angular.isDefined(newValue) and newValue/4 != Game.getPlaybackSpeed()
                 Game.setPlaybackSpeed newValue/4
 
-        @isPlaying = -> Game.isPlaying()
+        $scope.isPlaying = -> Game.isPlaying()
 
-        @stepBack = ->
+        $scope.stepBack = ->
             if Game.getCurrentTurn() > Game.getMinTurn()
                 Game.setCurrentTurn(Game.getCurrentTurn() - 1)
                 $scope.currentTurn--
             else
                 Game.setCurrentTurn(Game.getMinTurn())
 
-        @stepForward = ->
+        $scope.stepForward = ->
+            console.log "forward pressed"
             if Game.getCurrentTurn() < Game.getMaxTurn()
                 Game.setCurrentTurn(Game.getCurrentTurn() + 1)
                 $scope.currentTurn++
             else
                 Game.setCurrentTurn(Game.getMaxTurn())
 
-        @playPause = ->
+        $scope.playPause = ->
             $log.info "Play/Pause Pressed"
             if(!Game.isPlaying())
                 Game.start()
             else
                 Game.stop()
 
-        @fullscreen = ->
+        $scope.fullscreen = ->
             elem = document.getElementById "fullscreen-container"
             if(document.fullscreenElement ||
             document.webkitFullscreenElement ||
