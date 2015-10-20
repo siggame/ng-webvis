@@ -28,6 +28,15 @@ define [
                 $scope.maxTurn = data
                 $scope.$apply()
 
+        $scope.$watch(
+            ()=>
+                return Game.getMaxTurn()
+            (newval, oldval)->
+
+                $scope.maxTurn = Game.getMaxTurn()
+                console.log "updating max turn in playback bar." + $scope.maxTurn
+        )
+
         $scope.$watch 'playback.currentTurn', (newValue) ->
             if angular.isDefined(newValue) and newValue != Game.getCurrentTurn()
                 Game.setCurrentTurn newValue
