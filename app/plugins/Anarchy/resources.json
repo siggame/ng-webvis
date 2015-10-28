@@ -1,9 +1,14 @@
 {
     "resources":[
         {
-			"id": "myUnit",
-			"image": "digdug.png",
-			"spriteSheet": null
-		}
+          "id": "myUnit",
+          "image": "digdug.png",
+          "spriteSheet": null
+		    },
+        {
+          "id": "building",
+          "image": "building.png",
+          "spriteSheet": null
+        }
     ]
 }
