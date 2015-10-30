@@ -9,6 +9,11 @@
           "id": "building",
           "image": "building.png",
           "spriteSheet": null
+        },
+        {
+          "id": "firehouse",
+          "image": "firehouse.png",
+          "spriteSheet": null
         }
     ]
 }
