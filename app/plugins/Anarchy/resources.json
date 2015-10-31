@@ -14,6 +14,26 @@
           "id": "firehouse",
           "image": "firehouse.png",
           "spriteSheet": null
+        },
+        {
+          "id": "road",
+          "image": "BaseRoad.png",
+          "spriteSheet": null
+        },
+        {
+          "id": "sidewalk",
+          "image": "Sidewalk.png",
+          "spriteSheet": null
+        },
+        {
+          "id": "crosswalk",
+          "image": "Crosswalks.png",
+          "spriteSheet": null
+        },
+        {
+          "id": "grass",
+          "image": "Grass.png",
+          "spriteSheet": null
         }
     ]
 }
