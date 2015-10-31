@@ -65,9 +65,9 @@ define [
                         @mapWidth = turn.game.gameWidth
                         @mapHeight = turn.game.gameHeight
                         map = []
-                        for i in [0..mapWidth-1]
+                        for i in [0..@mapWidth-1]
                             temp = []
-                            for j in [0..mapHeight-1]
+                            for j in [0..@mapHeight-1]
                                 temp.push null
                             map.push temp
                         for id, obj of turn.game.gameObjects
