@@ -28,6 +28,7 @@ define [
         class Building
             constructor: () ->
                 super()
+                @type = "Building"
                 @animations = []
                 @startTurn = 0
                 @endTurn = 0
@@ -41,7 +42,38 @@ define [
                 if @startTurn <= turnNum < @endTurn
                     console.log "drawing building sprite"
                     renderer.drawSprite(@sprite)
+        class Road
+            constructor: () ->
+                super()
+                @type = "Road"
+                @animations = []
+                @startTurn = 0
+                @endTurn = 0
+                @sprite = new Renderer.Sprite()
+                @sideWalkSprite = new Renderer.Sprite()
+                @id = -1
+                @sideWalkN = false
+                @sideWalkS = false
+                @sideWalkE = false
+                @sideWalkW = false
                 
+            getAnimations: () -> @animations
+            
+            idle: (renderer, turnNum, turnProgress) ->
+                if @startTurn <= turnNum < @endTurn
+                    console.log "drawing road sprite"
+                    renderer.drawSprite(@sprite)
+                    if @sprite.texture == "road"
+                        #@TODO, change sprite or rotate based on which sidewalk needs to be drawn
+                        if @sideWalkN == true
+                            renderer.drawSprite(@sideWalkSprite)
+                        if @sideWalkS == true
+                            renderer.drawSprite(@sideWalkSprite)
+                        if @sideWalkE == true
+                            renderer.drawSprite(@sideWalkSprite)
+                        if @sideWalkW == true
+                            renderer.drawSprite(@sideWalkSprite)
+                 
 
         class Anarchy extends BasePlugin.Plugin
             constructor: () ->
@@ -76,15 +108,121 @@ define [
                             map[obj.x][obj.y] = newBldg = new Building
                             switch obj.type
                                 when "Warehouse"
+                                    newBldg.type = "Warehouse"
                                     newBldg.sprite.texture = "building"
                                 when "WeatherStation"
+                                    newBldg.type = "WeatherStation"
                                     newBldg.sprite.texture = "building"
                                 when "PoliceStation"
+                                    newBldg.type = "PoliceStation"
                                     newBldg.sprite.texture = "building"
                                 when "FireDepartment"
+                                    newBldg.type = "FireDepartment"
                                     newBldg.sprite.texture = "firehouse"
                             newBldg.id = id 
                         # logic for tiles
+                        isRoad = false
+                        north3 = 0
+                        south3 = 0
+                        east3 = 0
+                        west3 = 0
+                        for i in [0..@mapWidth-1]
+                            for j in [0..@mapHeight-1]
+                                if map[i][j] == null
+                                    map[i][j] = newRoad = new Road
+                                    if i > 0 
+                                        #North
+                                        if map[i-1][j] != null and map[i-1][j].type != "Road" 
+                                            newRoad.sideWalkN = true
+                                            isRoad = true
+                                        else 
+                                            north3 += 1
+                                        #North West
+                                        else if j > 0
+                                            if map[i-1][j-1] != null and map[i-1][j].type != "Road" 
+                                                isRoad = true
+                                            else
+                                                north3 += 1
+                                                west3 += 1
+                                        #North East
+                                        else if j < @mapWidth - 1
+                                            if map[i-1][j+1] != null and map[i-1][j].type != "Road" 
+                                                isRoad = true
+                                            else
+                                                north3 += 1
+                                                east3 += 1
+                                    else 
+                                        newRoad.sideWalkN = true
+                                        isRoad = true
+                                        
+                                    if i < @mapHeight-1
+                                        #South
+                                        if map[i+1][j] != null and map[i-1][j].type != "Road" 
+                                            newRoad.sideWalkS = true  
+                                            isRoad = true
+                                        else
+                                            south3 += 1
+                                        #South West
+                                        else if j > 0
+                                            if map[i+1][j-1] != null and map[i-1][j].type != "Road" 
+                                                isRoad = true
+                                            else
+                                                south3 += 1
+                                                west3 += 1
+                                        #South East
+                                        else if j < @mapWidth - 1
+                                            if map[i+1][j+1] != null and map[i-1][j].type != "Road" 
+                                                isRoad = true
+                                            else
+                                                south3 += 1
+                                                east3 += 1
+                                            
+                                    else 
+                                        newRoad.sideWalkS = true 
+                                        isRoad = true
+                                        
+                                    if j > 0
+                                        #West
+                                        if map[i][j-1] != null and map[i-1][j].type != "Road" 
+                                            newRoad.sideWalkW = true
+                                        else
+                                            west3 += 1
+                                    else
+                                        newRoad.sideWalkW = true
+                                        isRoad = true
+                                        
+                                    if i < @mapWidth-1
+                                        #East
+                                        if map[i][j+1] != null and map[i-1][j].type != "Road" 
+                                            newRoad.sideWalkE = true
+                                            isRoad = true
+                                        else
+                                            east3 += 1
+                                    else
+                                        newRoad.sideWalkE = true
+                                        isRoad = true
+                                        
+                                        
+                                    #replacing the road with building
+                                    if isRoad == false
+                                        newRoad.sprite.texture = "building"
+                                    #if adjacent/diagonal building, keeping it road
+                                    else
+                                        newRoad.sprite.texture = "road"
+                                        if north3 == 3
+                                            map[i][j].sideWalkN = true
+                                        if south3 == 3
+                                            map[i][j].sideWalkS = true
+                                        if east3 == 3
+                                            map[i][j].sideWalkE = true
+                                        if west3 == 3
+                                            map[i][j].sideWalkW = true
+                                 
+                                isRoad = false
+                                north3 = 0
+                                south3 = 0
+                                east3 = 0
+                                west3 = 0           
                         for row in map
                             for ent in row
                                 @entities[ent.id] = ent
