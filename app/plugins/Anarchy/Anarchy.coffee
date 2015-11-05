@@ -54,9 +54,9 @@ define [
             getName: () -> 'Anarchy'
 
             preDraw: (turn, dt, renderer) ->  
-	      
+          
             postDraw: (turn, dt, renderer) ->
-		
+        
             resize: (renderer) ->
 
             loadGame: (@gamedata, renderer) ->
