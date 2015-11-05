@@ -10,22 +10,9 @@ define [
     # The explicit block lists the angular services/factories you need
     # all game logic/entity classes go inside this block
     explicit = (Options, Renderer) ->
-        class DigDug extends BasePlugin.Entity
-            constructor: () ->
-                super()
-                @animations = []
-                @startTurn = 0
-                @endTurn = 0
-                @sprite = new Renderer.Sprite()
-                @drawEnabled = false
 
-            getAnimations: () -> @animations
 
-            idle: (renderer, turnNum, turnProgress) ->
-                if @startTurn <= turnNum < @endTurn
-                    console.log "i made it to the draw"
-                    renderer.drawSprite(@sprite)
-        class Building
+        class Building extends BasePlugin.Entity
             constructor: () ->
                 super()
                 @type = "Building"
@@ -34,14 +21,25 @@ define [
                 @endTurn = 0
                 @sprite = new Renderer.Sprite()
                 @fire = new Renderer.Sprite()
+                #setup fire sprite
+                @ignite = new Renderer.Sprite()
+                #setup ignite sprite
                 @id = -1
-                
+                                
+   
             getAnimations: () -> @animations
             
             idle: (renderer, turnNum, turnProgress) ->
                 if @startTurn <= turnNum < @endTurn
                     console.log "drawing building sprite"
                     renderer.drawSprite(@sprite)
+                    
+            setFire: (entity) =>
+                (renderer, turnNum, turnProgress) =>
+                    renderer.drawSprite(entity.sprite)
+                    entity.ignite.frame = entity.Math.floor(turnProgress * 8)
+                    renderer.drawSprite(entity.ignite) 
+
         class Road
             constructor: () ->
                 super()
@@ -73,11 +71,11 @@ define [
                             renderer.drawSprite(@sideWalkSprite)
                         if @sideWalkW == true
                             renderer.drawSprite(@sideWalkSprite)
-                 
 
         class Anarchy extends BasePlugin.Plugin
             constructor: () ->
                 super()
+            @gamestates = []
 
             selectEntities: (renderer, turn, x, y) ->
 
@@ -86,14 +84,16 @@ define [
             getName: () -> 'Anarchy'
 
             preDraw: (turn, dt, renderer) ->  
-	      
+      
             postDraw: (turn, dt, renderer) ->
-		
+
             resize: (renderer) ->
 
             loadGame: (@gamedata, renderer) ->
+                animations = []
                 for turn in @gamedata.turns
                     if turn.type = "start"
+                        animations.push []
                         @mapWidth = turn.game.gameWidth
                         @mapHeight = turn.game.gameHeight
                         map = []
@@ -115,11 +115,15 @@ define [
                                     newBldg.sprite.texture = "building"
                                 when "PoliceStation"
                                     newBldg.type = "PoliceStation"
-                                    newBldg.sprite.texture = "building"
+                                    newBldg.sprite.texture = "policestation"
                                 when "FireDepartment"
                                     newBldg.type = "FireDepartment"
                                     newBldg.sprite.texture = "firehouse"
                             newBldg.id = id 
+                            newBldg.sprite.position.x = obj.x
+                            newBldg.sprite.position.y = obj.y 
+                            newBldg.sprite.width = 1
+                            newBldg.sprite.height = 1
                         # logic for tiles
                         isRoad = false
                         north3 = 0
@@ -226,8 +230,24 @@ define [
                         for row in map
                             for ent in row
                                 @entities[ent.id] = ent
-                                
-                                
+                    
+					if turn.type = "ran"
+						animations[animations.length - 1].push turn
+							
+					if turn.type = "finished"
+						@gamestates.push(turn.game)
+						animations.push []
+						if turn.data.run.functionName = "ignite"
+							burnie = turn.data.run.args.building.id
+							bribed = turn.data.run.caller.id
+							
+				for i in [0..animations.length - 1]
+					for anim in animations[i]
+						
+						f = Building.setFire(@entities[data.run.args.building.id])
+						a = new BasePlugin.Animation(i, i+1, f)
+						@entities[data.run.args.building.id].animations.push a
+							
             getSexpScheme: () -> null
 
         return Anarchy

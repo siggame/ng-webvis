@@ -16,6 +16,11 @@
           "spriteSheet": null
         },
         {
+          "id": "policestation",
+          "image": "policestation.png",
+          "spriteSheet": null
+        },
+        {
           "id": "road",
           "image": "BaseRoad.png",
           "spriteSheet": null
@@ -34,6 +39,11 @@
           "id": "grass",
           "image": "Grass.png",
           "spriteSheet": null
+        },
+        {
+          "id": "explosion",
+          "image": "explosion.png",
+          "spriteSheet": "Anim8x1.json"
         }
     ]
 }
