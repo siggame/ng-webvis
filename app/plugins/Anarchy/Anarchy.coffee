@@ -75,7 +75,7 @@ define [
         class Anarchy extends BasePlugin.Plugin
             constructor: () ->
                 super()
-            @gamestates = []
+                @gamestates = []
 
             selectEntities: (renderer, turn, x, y) ->
 
@@ -141,20 +141,20 @@ define [
                                             isRoad = true
                                         else 
                                             north3 += 1
-                                        #North West
-                                        else if j > 0
-                                            if map[i-1][j-1] != null and map[i-1][j].type != "Road" 
-                                                isRoad = true
-                                            else
-                                                north3 += 1
-                                                west3 += 1
-                                        #North East
-                                        else if j < @mapWidth - 1
-                                            if map[i-1][j+1] != null and map[i-1][j].type != "Road" 
-                                                isRoad = true
-                                            else
-                                                north3 += 1
-                                                east3 += 1
+                                    #North West
+                                    else if j > 0
+                                        if map[i-1][j-1] != null and map[i-1][j].type != "Road" 
+                                            isRoad = true
+                                        else
+                                            north3 += 1
+                                            west3 += 1
+                                    #North East
+                                    else if j < @mapWidth - 1
+                                        if map[i-1][j+1] != null and map[i-1][j].type != "Road" 
+                                            isRoad = true
+                                        else
+                                            north3 += 1
+                                            east3 += 1
                                     else 
                                         newRoad.sideWalkN = true
                                         isRoad = true
@@ -166,21 +166,21 @@ define [
                                             isRoad = true
                                         else
                                             south3 += 1
-                                        #South West
-                                        else if j > 0
-                                            if map[i+1][j-1] != null and map[i-1][j].type != "Road" 
-                                                isRoad = true
-                                            else
-                                                south3 += 1
-                                                west3 += 1
-                                        #South East
-                                        else if j < @mapWidth - 1
-                                            if map[i+1][j+1] != null and map[i-1][j].type != "Road" 
-                                                isRoad = true
-                                            else
-                                                south3 += 1
-                                                east3 += 1
-                                            
+                                    #South West
+                                    else if j > 0
+                                        if map[i+1][j-1] != null and map[i-1][j].type != "Road" 
+                                            isRoad = true
+                                        else
+                                            south3 += 1
+                                            west3 += 1
+                                    #South East
+                                    else if j < @mapWidth - 1
+                                        if map[i+1][j+1] != null and map[i-1][j].type != "Road" 
+                                            isRoad = true
+                                        else
+                                            south3 += 1
+                                            east3 += 1
+                                        
                                     else 
                                         newRoad.sideWalkS = true 
                                         isRoad = true
