@@ -40,7 +40,7 @@ define [
                     entity.ignite.frame = entity.Math.floor(turnProgress * 8)
                     renderer.drawSprite(entity.ignite) 
 
-        class Road
+        class Road extends BasePlugin.Entity
             constructor: () ->
                 super()
                 @type = "Road"
@@ -231,13 +231,13 @@ define [
                             for ent in row
                                 @entities[ent.id] = ent
                     
-                    else if turn.type = "ran"
+                    else if turn.type == "ran"
                         animations[animations.length - 1].push turn
-                        if turn.data.run.functionName = "ignite"
+                        if turn.data.run.functionName == "ignite"
                             burnie = turn.data.run.args.building.id
                             bribed = turn.data.run.caller.id                       
                         
-                    else if turn.type = "finished"
+                    else if turn.type == "finished"
                         @gamestates.push(turn.game)
                         animations.push []
                         
