@@ -231,15 +231,16 @@ define [
                             for ent in row
                                 @entities[ent.id] = ent
                     
-                    if turn.type = "ran"
+                    else if turn.type = "ran"
                         animations[animations.length - 1].push turn
-                            
-                    if turn.type = "finished"
-                        @gamestates.push(turn.game)
-                        animations.push []
                         if turn.data.run.functionName = "ignite"
                             burnie = turn.data.run.args.building.id
-                            bribed = turn.data.run.caller.id
+                            bribed = turn.data.run.caller.id                       
+                        
+                    else if turn.type = "finished"
+                        @gamestates.push(turn.game)
+                        animations.push []
+                        
                             
                 for i in [0..animations.length - 1]
                     for anim in animations[i]
