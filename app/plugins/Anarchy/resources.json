@@ -20,6 +20,10 @@
           "image": "policestation.png",
           "spriteSheet": null
         },
+	{ "id": "weatherstation",
+	  "image": "WeatherStation.png",
+	  "spriteSheet": null
+	},
         {
           "id": "road",
           "image": "BaseRoad.png",
