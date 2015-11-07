@@ -30,8 +30,23 @@
           "spriteSheet": null
         },
         {
-          "id": "sidewalk",
+          "id": "sidewalkn",
           "image": "SidewalkN.png",
+          "spriteSheet": null
+        },
+        {
+          "id": "sidewalks",
+          "image": "SidewalkS.png",
+          "spriteSheet": null
+        },
+        {
+          "id": "sidewalke",
+          "image": "SidewalkE.png",
+          "spriteSheet": null
+        },
+        {
+          "id": "sidewalkw",
+          "image": "SidewalkW.png",
           "spriteSheet": null
         },
         {
