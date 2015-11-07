@@ -185,7 +185,7 @@ define [
                                                 west3 += 1
 
                                         #South West
-                                        if j < @mapHeight - 2
+                                        if j < @mapHeight - 1
                                             if map[i-1][j+1] != null and map[i-1][j+1].type != "Road"
                                                 isRoad = true
                                             else
@@ -195,7 +195,7 @@ define [
                                         newRoad.sideWalkW = true
                                         isRoad = true
 
-                                    if i < @mapWidth-2
+                                    if i < @mapWidth-1
                                         #East
                                         if map[i+1][j] != null and map[i+1][j].type != "Road"
                                             newRoad.sideWalkE = true
@@ -212,7 +212,7 @@ define [
                                                 east3 += 1
 
                                         #South East
-                                        if j < @mapHeight - 2
+                                        if j < @mapHeight - 1
                                             if map[i+1][j+1] != null and map[i+1][j+1].type != "Road"
                                                 isRoad = true
                                             else
@@ -227,13 +227,14 @@ define [
                                         #North
                                         if map[i][j-1] != null and map[i][j-1].type != "Road"
                                             newRoad.sideWalkN = true
+                                            isRoad = true
                                         else
                                             north3 += 1
                                     else
                                         newRoad.sideWalkN = true
                                         isRoad = true
 
-                                    if j < @mapHeight-2
+                                    if j < @mapHeight-1
                                         #South
                                         if map[i][j+1] != null and map[i][j+1].type != "Road"
                                             newRoad.sideWalkS = true
@@ -279,14 +280,20 @@ define [
                                         newRoad.sideWalkSpriteW.height = 1
 
                                         newRoad.sprite.texture = "road"
-                                        if north3 == 3
-                                            newRoad.sideWalkN = true
-                                        if south3 == 3
-                                            newRoad.sideWalkS = true
-                                        if east3 == 3
-                                            newRoad.sideWalkE = true
-                                        if west3 == 3
-                                            newRoad.sideWalkW = true
+                                        isbuildingNorth = newRoad.sideWalkN
+                                        isbuildingSouth = newRoad.sideWalkS
+                                        isbuildingEast = newRoad.sideWalkE
+                                        isbuildingWest = newRoad.sideWalkW
+                                        if isbuildingEast != true and isbuildingWest != true
+                                            if north3 == 3 
+                                                newRoad.sideWalkN = true
+                                            if south3 == 3
+                                                newRoad.sideWalkS = true
+                                        if isbuildingNorth != true and isbuildingSouth != true
+                                            if east3 == 3
+                                                newRoad.sideWalkE = true
+                                            if west3 == 3
+                                                newRoad.sideWalkW = true
 
                                     newRoad.sprite.transform = @worldMat
                                     newRoad.sprite.position.x = i
