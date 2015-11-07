@@ -52,7 +52,10 @@ define [
                 @startTurn = 0
                 @endTurn = 0
                 @sprite = new Renderer.Sprite()
-                @sideWalkSprite = new Renderer.Sprite()
+                @sideWalkSpriteN = new Renderer.Sprite()
+                @sideWalkSpriteS = new Renderer.Sprite()
+                @sideWalkSpriteE = new Renderer.Sprite()
+                @sideWalkSpriteW = new Renderer.Sprite()
                 @id = -1
                 @sideWalkN = false
                 @sideWalkS = false
@@ -68,13 +71,13 @@ define [
                     if @sprite.texture == "road"
                         #@TODO, change sprite or rotate based on which sidewalk needs to be drawn
                         if @sideWalkN == true
-                            renderer.drawSprite(@sideWalkSprite)
+                            renderer.drawSprite(@sideWalkSpriteN)
                         if @sideWalkS == true
-                            renderer.drawSprite(@sideWalkSprite)
+                            renderer.drawSprite(@sideWalkSpriteS)
                         if @sideWalkE == true
-                            renderer.drawSprite(@sideWalkSprite)
+                            renderer.drawSprite(@sideWalkSpriteE)
                         if @sideWalkW == true
-                            renderer.drawSprite(@sideWalkSprite)
+                            renderer.drawSprite(@sideWalkSpriteW)
 
         class Anarchy extends BasePlugin.Plugin
             constructor: () ->
@@ -217,16 +220,21 @@ define [
                                         newRoad.sprite.texture = "building"
                                     #if adjacent/diagonal building, keeping it road
                                     else
+                                        newRoad.sideWalkSpriteN.texture = "sidewalkn"
+                                        newRoad.sideWalkSpriteS.texture = "sidewalks"
+                                        newRoad.sideWalkSpriteE.texture = "sidewalke"
+                                        newRoad.sideWalkSpriteW.texture = "sidewalkw"
                                         newRoad.sprite.texture = "road"
                                         if north3 == 3
-                                            map[i][j].sideWalkN = true
+                                            newRoad.sideWalkN = true
                                         if south3 == 3
-                                            map[i][j].sideWalkS = true
+                                            newRoad.sideWalkS = true
                                         if east3 == 3
-                                            map[i][j].sideWalkE = true
+                                            newRoad.sideWalkE = true
                                         if west3 == 3
-                                            map[i][j].sideWalkW = true
-                                 
+                                            newRoad.sideWalkW = true
+                                    
+                                     
                                 isRoad = false
                                 north3 = 0
                                 south3 = 0
