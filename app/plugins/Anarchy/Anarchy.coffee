@@ -20,6 +20,8 @@ define [
                 @startTurn = 0
                 @endTurn = 0
                 @sprite = new Renderer.Sprite()
+                @team = new Renderer.Sprite()
+                @team.color.a = 0.5
                 @fire = new Renderer.Sprite()
                 #setup fire sprite
                 @ignite = new Renderer.Sprite()
@@ -33,10 +35,12 @@ define [
                 if @startTurn <= turnNum < @endTurn
                     console.log "drawing building sprite"
                     renderer.drawSprite(@sprite)
+                    renderer.drawSprite(@team)
                     
             setFire: (entity) =>
                 (renderer, turnNum, turnProgress) =>
                     renderer.drawSprite(entity.sprite)
+                    renderer.drawSprite(@team)
                     entity.ignite.frame = entity.Math.floor(turnProgress * 8)
                     renderer.drawSprite(entity.ignite) 
 
@@ -106,6 +110,7 @@ define [
                             if obj.type != "Warehouse" and obj.type != "WeatherStation" and obj.type != "PoliceStation" and obj.type != "FireDepartment"
                                 continue
                             map[obj.x][obj.y] = newBldg = new Building
+                            newBldg.team = if obj.owner = 0 then "graffiti1" else "graffiti2"
                             switch obj.type
                                 when "Warehouse"
                                     newBldg.type = "Warehouse"
