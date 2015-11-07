@@ -20,14 +20,45 @@
           "image": "policestation.png",
           "spriteSheet": null
         },
+	    { "id": "weatherstation",
+            "image": "WeatherStation.png",
+            "spriteSheet": null
+        },
+        { "id": "drab",
+            "image": "drab.png",
+            "spriteSheet": null
+        },
+        { "id": "graffiti1",
+            "image": "graffiti1.png",
+            "spriteSheet": null
+        },
+        { "id": "graffiti2",
+            "image": "graffiti2.png",
+            "spriteSheet": null
+        },
         {
           "id": "road",
           "image": "BaseRoad.png",
           "spriteSheet": null
         },
         {
-          "id": "sidewalk",
+          "id": "sidewalkn",
           "image": "SidewalkN.png",
+          "spriteSheet": null
+        },
+        {
+          "id": "sidewalks",
+          "image": "SidewalkS.png",
+          "spriteSheet": null
+        },
+        {
+          "id": "sidewalke",
+          "image": "SidewalkE.png",
+          "spriteSheet": null
+        },
+        {
+          "id": "sidewalkw",
+          "image": "SidewalkW.png",
           "spriteSheet": null
         },
         {
