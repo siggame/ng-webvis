@@ -96,9 +96,9 @@ define ()->
             else
                 throw new PluginError("No plugin selected")
 
-        @loadGame = (gamedata, renderer) ->
+        @loadGame = (gamedata, renderer, inputManager) ->
             if @currentPlugin != null
-                @currentPlugin.loadGame(gamedata, renderer)
+                @currentPlugin.loadGame(gamedata, renderer, inputManager)
             else
                 throw new PluginError("No plugin selected")
 
