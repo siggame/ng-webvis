@@ -94,9 +94,39 @@ define [
 
             resize: (renderer) ->
 
-            loadGame: (@gamedata, renderer) ->
+            loadGame: (@gamedata, renderer, inputManager) ->
                 animations = []
                 j = 0
+
+                @centerCamera = new Renderer.Camera()
+
+                inputManager.setMouseAction("wheelUp", "zoomin", ()=>
+                    zoomFactor = @centerCamera.getZoomFactor()
+                    zoomFactor = zoomFactor + Math.pow(0.05, 1/ zoomFactor)
+                    @centerCamera.setZoomFactor(zoomFactor)
+                )
+                inputManager.setMouseAction("wheelDown", "zoomout", ()=>
+                    zoomFactor = @centerCamera.getZoomFactor()
+                    zoomFactor = zoomFactor - Math.pow(0.05, 1/ zoomFactor)
+                    if zoomFactor < 1
+                        @centerCamera.setZoomFactor(1)
+                    else
+                        @centerCamera.setZoomFactor(zoomFactor)
+
+                    [x, y] = inputManager.getMousePosition()
+                    [canvasWidth, canvasHeight] = renderer.getScreenSize()
+
+                    canvasToScreen = new Renderer.Matrix3x3()
+                    canvasToScreen.set(0, 0, @centerCamera.transform.get(0, 0)/canvasWidth)
+                    canvasToScreen.set(1, 1, @centerCamera.transform.get(1, 1)/canvasHeight)
+                    canvasToScreen.set(2, 0, @centerCamera.transform.get(2, 0))
+                    canvasToScreen.set(2, 1, @centerCamera.transform.get(2, 1))
+                    [screenX, screenY] = canvasToScreen.mul(x, y)
+                    console.log x + " " + y
+                    console.log screenX + " " + screenY
+                )
+
+                renderer.setCamera(@centerCamera)
 
                 console.log "starting the loadgame function"
                 for turn in @gamedata.turns
@@ -106,8 +136,7 @@ define [
                         @mapHeight = turn.game.mapHeight
 
                         @worldMat = new Renderer.Matrix3x3()
-                        @worldMat.copy(renderer.getProjection())
-                        @worldMat.scale(100/@mapWidth, 100/@mapHeight)
+                        @worldMat.scale(1/@mapWidth, 1/@mapHeight)
 
                         map = []
                         for i in [0..@mapWidth-1]
@@ -285,7 +314,7 @@ define [
                                         isbuildingEast = newRoad.sideWalkE
                                         isbuildingWest = newRoad.sideWalkW
                                         if isbuildingEast != true and isbuildingWest != true
-                                            if north3 == 3 
+                                            if north3 == 3
                                                 newRoad.sideWalkN = true
                                             if south3 == 3
                                                 newRoad.sideWalkS = true
