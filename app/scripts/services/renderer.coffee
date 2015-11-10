@@ -330,6 +330,24 @@ define ()->
                 @size = 0
                 @color = new Color(0, 0, 0, 0)
 
+        @Camera = class Camera
+            constructor: () ->
+                @transform = new Matrix3x3()
+                @transform.set(0, 0, 2)
+                @transform.set(1, 1, -2)
+                @transform.set(2, 0, -1)
+                @transform.set(2, 1, 1)
+                @zoom = 1
+
+            setZoomFactor: (factor) ->
+                @zoom = factor
+                @transform.set(0, 0, 2 * @zoom)
+                @transform.set(1, 1, -2 * @zoom)
+                @transform.set(2, 0, -1 * @zoom)
+                @transform.set(2, 1, @zoom)
+
+            getZoomFactor: () -> @zoom
+
         ###
          # Renderer::BaseRenderer
          # This is the interface that all renderers must adhere to.
@@ -350,6 +368,12 @@ define ()->
                 throw {errorStr: "Function not implemented"}
 
             getWorldSize: () ->
+                throw {errorStr: "Function not implemented"}
+
+            setCamera: (camera) ->
+                throw {errorStr: "Function not implemented"}
+
+            resetCamera: () ->
                 throw {errorStr: "Function not implemented"}
 
             getScreenSize: () ->
@@ -720,9 +744,9 @@ define ()->
 
         @WebGLRenderer = class WebGLRenderer extends @BaseRenderer
             constructor: (@canvas, @worldWidth, @worldHeight) ->
-                @gl = canvas.getContext "webgl", {antialias : false, depth: false}
+                @gl = @canvas.getContext "webgl", {antialias : false, depth: false}
                 if !context?
-                    @gl = canvas.getContext "experimental-webgl"
+                    @gl = @canvas.getContext "experimental-webgl"
 
                 @gl.enable(@gl.BLEND)
                 @gl.blendFunc(@gl.SRC_ALPHA, @gl.ONE_MINUS_SRC_ALPHA)
@@ -730,7 +754,13 @@ define ()->
                 @gl.clearColor(1.0, 1.0, 1.0, 1.0)
                 @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
 
-                @Projection = new Matrix3x3
+                @Projection = new Matrix3x3()
+                @Projection.set(0, 0, 2)
+                @Projection.set(2, 0, -1)
+                @Projection.set(2, 1, 1)
+                @Projection.set(1, 1, -2)
+                @currentCamera = null
+
                 @resizeWorld(@worldWidth, @worldHeight)
 
                 @_texturesLoaded = false
@@ -890,16 +920,18 @@ define ()->
             # param worldHeight (real) - the height bound of the coordinate system
             resizeWorld: (@worldWidth, @worldHeight) ->
                 @gl.viewport( 0, 0, @canvas.width, @canvas.height)
-                @Projection.set(0, 0, 2/@worldWidth)
-                @Projection.set(2, 0, -1)
-                @Projection.set(2, 1, 1)
-                @Projection.set(1, 1, -2/@worldHeight)
 
             getProjection: () -> @Projection
 
             getWorldSize: () -> [@worldWidth, @worldHeight]
 
-            getScreenSize: () -> [@canvas.width, @canvas.height]
+            getScreenSize: () -> [@canvas.clientWidth, @canvas.clientHeight]
+
+            setCamera: (camera) ->
+                @currentCamera = camera
+
+            resetCamera: () ->
+                @currentCamera = null
 
             loadTextures: (pluginName, onloadCallback) ->
                 @_texturesLoaded= false
@@ -1058,8 +1090,7 @@ define ()->
                             u2, v2
                         ]))
 
-                    mvmat = new Matrix3x3
-
+                    mvmat = new Matrix3x3(sprite.transform)
                     mvmat.translate(sprite.position.x, sprite.position.y)
                     mvmat.scale(sprite.width, sprite.height)
 
@@ -1085,10 +1116,10 @@ define ()->
                     @gl.uniform1i(@texProg.samplerUniform, 0)
                     @gl.uniform4fv(@texProg.tintUniform, colArray)
 
-                    if sprite.transform != null
-                        @gl.uniformMatrix3fv(@texProg.pMatrixUniform, false, sprite.transform.elements)
-                    else
+                    if @currentCamera == null
                         @gl.uniformMatrix3fv(@texProg.pMatrixUniform, false, @Projection.elements)
+                    else
+                        @gl.uniformMatrix3fv(@texProg.pMatrixUniform, false, @currentCamera.transform.elements)
 
                     @gl.uniformMatrix3fv(@texProg.mvMatrixUniform, false, mvmat.elements)
                     @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
