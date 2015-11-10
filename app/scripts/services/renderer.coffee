@@ -274,7 +274,7 @@ define ()->
                 @tileHeight = 0.0
                 @tileOffsetX = 0.0
                 @tileOffsetY = 0.0
-                @color = new Color(0, 0, 0, 0)
+                @color = new Color(1.0, 1.0, 1.0, 1.0)
 
         ###
          # Renderer::Rect
@@ -840,9 +840,10 @@ define ()->
                     varying vec2 vTexCoord;
 
                     uniform sampler2D uSampler;
+                    uniform vec4 tint;
 
                     void main(void) {
-                        gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t));
+                        gl_FragColor = texture2D(uSampler, vec2(vTexCoord.s, vTexCoord.t)) * tint;
                     }
                 "
 
@@ -877,6 +878,7 @@ define ()->
                 @texProg.pMatrixUniform = @gl.getUniformLocation(@texProg, "uPMatrix")
                 @texProg.mvMatrixUniform = @gl.getUniformLocation(@texProg, "uMVMatrix")
                 @texProg.samplerUniform = @gl.getUniformLocation(@texProg, "uSampler")
+                @texProg.tintUniform = @gl.getUniformLocation(@texProg, "tint");
 
                 @begin()
 
@@ -982,11 +984,11 @@ define ()->
                 @gl.disableVertexAttribArray(1)
 
                 mvmat = new Matrix3x3
-                color = new Float32Array(4)
-                color[0] = line.color.r
-                color[1] = line.color.g
-                color[2] = line.color.b
-                color[3] = line.color.a
+                colArray = new Float32Array(4)
+                colArray[0] = color.r
+                colArray[1] = color.g
+                colArray[2] = color.b
+                colArray[3] = color.a
 
                 @gl.bindBuffer(@gl.ARRAY_BUFFER, @baseLine)
                 @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
@@ -1061,6 +1063,12 @@ define ()->
                     mvmat.translate(sprite.position.x, sprite.position.y)
                     mvmat.scale(sprite.width, sprite.height)
 
+                    colArray = new Float32Array(4)
+                    colArray[0] = sprite.color.r
+                    colArray[1] = sprite.color.g
+                    colArray[2] = sprite.color.b
+                    colArray[3] = sprite.color.a
+
                     @gl.useProgram(@texProg)
                     @gl.enableVertexAttribArray(1)
 
@@ -1075,6 +1083,7 @@ define ()->
                     @gl.activeTexture(@gl.TEXTURE0)
                     @gl.bindTexture(@gl.TEXTURE_2D, t)
                     @gl.uniform1i(@texProg.samplerUniform, 0)
+                    @gl.uniform4fv(@texProg.tintUniform, colArray)
 
                     if sprite.transform != null
                         @gl.uniformMatrix3fv(@texProg.pMatrixUniform, false, sprite.transform.elements)
@@ -1099,12 +1108,6 @@ define ()->
 
                 mvmat = new Matrix3x3
 
-                color = new Float32Array(4)
-                color[0] = rect.fillColor.r
-                color[1] = rect.fillColor.g
-                color[2] = rect.fillColor.b
-                color[3] = rect.fillColor.a
-
                 mvmat.translate(rect.position.x, rect.position.y)
                 mvmat.scale(rect.width, rect.height)
 
@@ -1118,7 +1121,7 @@ define ()->
                     @gl.uniformMatrix3fv(@colorProg.pMatrixUniform, false, @Projection.elements)
 
                 @gl.uniformMatrix3fv(@colorProg.mvMatrixUniform, false, mvmat.elements)
-                @gl.uniform4fv(@colorProg.color, color)
+                @gl.uniform4fv(@colorProg.color, rect.fillColor)
                 @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
 
             drawText: (text) ->
