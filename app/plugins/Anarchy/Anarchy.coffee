@@ -144,6 +144,28 @@ define [
                     else
                         @centerCamera.setZoomFactor(zoomFactor)
                 )
+                pressed = false
+                lastx = 0
+                lasty = 0
+                inputManager.setMouseAction("press", "grab", (e) =>
+                    pressed = true
+                    lastx = e.pageX
+                    lasty = e.pageY
+                )
+                inputManager.setMouseAction("release", "release", (e) =>
+                    pressed = false
+                )
+                inputManager.setMouseAction("move", "translate", (e) =>
+                    if pressed
+                        [canvasWidth, canvasHeight] = renderer.getScreenSize()
+                        deltax = (e.pageX - lastx) / canvasWidth
+                        deltay = (e.pageY - lasty) / canvasHeight
+                        lastx = e.pageX
+                        lasty = e.pageY
+
+                        @centerCamera.setTransX( @centerCamera.getTransX() - deltax)
+                        @centerCamera.setTransY( @centerCamera.getTransY() + deltay)
+                )
 
                 renderer.setCamera(@centerCamera)
 
