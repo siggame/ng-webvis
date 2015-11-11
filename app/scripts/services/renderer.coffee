@@ -338,15 +338,27 @@ define ()->
                 @transform.set(2, 0, -1)
                 @transform.set(2, 1, 1)
                 @zoom = 1
+                @transX = 0
+                @transY = 0
 
             setZoomFactor: (factor) ->
                 @zoom = factor
                 @transform.set(0, 0, 2 * @zoom)
                 @transform.set(1, 1, -2 * @zoom)
-                @transform.set(2, 0, -1 * @zoom)
-                @transform.set(2, 1, @zoom)
+                @transform.set(2, 0, -@zoom - (@transX * @zoom))
+                @transform.set(2, 1, @zoom - (@transY * @zoom))
+
+            setTransX: (x) ->
+                @transX = x
+                @transform.set(2, 0, -@zoom - (@transX * @zoom))
+
+            setTransY: (y) ->
+                @transY = y
+                @transform.set(2, 1, @zoom - (@transY  * @zoom))
 
             getZoomFactor: () -> @zoom
+            getTransX: () -> @transX
+            getTransY: () -> @transY
 
         ###
          # Renderer::BaseRenderer
