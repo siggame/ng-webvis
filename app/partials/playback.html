@@ -10,18 +10,18 @@
       <div class="col-xs-12 playback-controls">
         <div class="btn-group pull-left">
           <!-- Step back button -->
-          <button class="btn btn-default" ng-click="playback.stepBack()">
+          <button class="btn btn-default" ng-click="stepBack()">
             <i class="fa fa-backward"></i>
           </button>
 
           <!-- Play/pause buttons -->
-          <button class="btn btn-default" ng-click="playback.playPause()">
-            <span ng-hide="playback.isPlaying()"><i class="fa fa-play"></i></span>
-            <span ng-show="playback.isPlaying()"><i class="fa fa-pause"></i></span>
+          <button class="btn btn-default" ng-click="playPause()">
+            <span ng-hide="isPlaying()"><i class="fa fa-play"></i></span>
+            <span ng-show="isPlaying()"><i class="fa fa-pause"></i></span>
           </button>
 
           <!-- Step forward button -->
-          <button class="btn btn-default" ng-click="playback.stepForward()">
+          <button class="btn btn-default" ng-click="stepForward()">
             <i class="fa fa-forward"></i>
           </button>
         </div>
@@ -36,7 +36,7 @@
           <p>Time:</p>
           <slider max-value="10" current-value="timeDt" live-value="timeDt"></slider>
           <p style="width:40px;">x{{timeDt/4}}</p>
-          <button class="btn btn-default" ng-click="playback.fullscreen()">
+          <button class="btn btn-default" ng-click="fullscreen()">
               <i class="fa fa-desktop"></i>
           </button>
         </div>

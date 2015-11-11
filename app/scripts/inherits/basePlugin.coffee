@@ -80,7 +80,7 @@ define () ->
         resize: (renderer) ->
             throw new PluginError("resize not implemented")
 
-        loadGame: (gamedata, renderer) ->
+        loadGame: (gamedata, renderer, inputManager) ->
             throw new PluginError("loadGame not implemented")
 
         getSexpScheme: () ->
