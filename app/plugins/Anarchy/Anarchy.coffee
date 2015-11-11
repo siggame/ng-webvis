@@ -104,26 +104,45 @@ define [
                     zoomFactor = @centerCamera.getZoomFactor()
                     zoomFactor = zoomFactor + Math.pow(0.05, 1/ zoomFactor)
                     @centerCamera.setZoomFactor(zoomFactor)
+
+                    [x, y] = inputManager.getMousePosition()
+                    [canvasWidth, canvasHeight] = renderer.getScreenSize()
+
+                    canvasToScreen = new Renderer.Matrix3x3()
+                    canvasToScreen.set(0, 0, 2/canvasWidth)
+                    canvasToScreen.set(1, 1, -2/canvasHeight)
+                    canvasToScreen.set(2, 0, -1)
+                    canvasToScreen.set(2, 1, 1)
+                    [screenX, screenY] = canvasToScreen.mul(x, y)
+                    console.log screenX + " " + screenY
+
+                    screenX *= 1/zoomFactor
+                    screenY *= 1/zoomFactor
+                    console.log "adjustment: " + screenX + " " + screenY
+
+                    realx = @centerCamera.getTransX() + screenX
+                    realy = @centerCamera.getTransY() + screenY
+
+                    vecx = realx - @centerCamera.getTransX()
+                    vecy = realy - @centerCamera.getTransY()
+
+                    console.log "realx " + realx  + " currentx " + @centerCamera.getTransX()
+                    console.log "realy " + realy  + " currenty " + @centerCamera.getTransY()
+
+                    newx = @centerCamera.getTransX() + ((1/10) * vecx)
+                    newy = @centerCamera.getTransY() + ((1/10) * vecy)
+
+                    @centerCamera.setTransX(newx)
+                    @centerCamera.setTransY(newy)
                 )
                 inputManager.setMouseAction("wheelDown", "zoomout", ()=>
                     zoomFactor = @centerCamera.getZoomFactor()
                     zoomFactor = zoomFactor - Math.pow(0.05, 1/ zoomFactor)
                     if zoomFactor < 1
                         @centerCamera.setZoomFactor(1)
+                        zoomFactor = 1
                     else
                         @centerCamera.setZoomFactor(zoomFactor)
-
-                    [x, y] = inputManager.getMousePosition()
-                    [canvasWidth, canvasHeight] = renderer.getScreenSize()
-
-                    canvasToScreen = new Renderer.Matrix3x3()
-                    canvasToScreen.set(0, 0, @centerCamera.transform.get(0, 0)/canvasWidth)
-                    canvasToScreen.set(1, 1, @centerCamera.transform.get(1, 1)/canvasHeight)
-                    canvasToScreen.set(2, 0, @centerCamera.transform.get(2, 0))
-                    canvasToScreen.set(2, 1, @centerCamera.transform.get(2, 1))
-                    [screenX, screenY] = canvasToScreen.mul(x, y)
-                    console.log x + " " + y
-                    console.log screenX + " " + screenY
                 )
 
                 renderer.setCamera(@centerCamera)
