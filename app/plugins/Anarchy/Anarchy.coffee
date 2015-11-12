@@ -25,24 +25,24 @@ define [
                 @fire = new Renderer.Sprite()
                 #setup fire sprite
                 @ignite = new Renderer.Sprite()
+
                 #setup ignite sprite
                 @id = -1
-                                
-   
+
+
             getAnimations: () -> @animations
-            
+
             idle: (renderer, turnNum, turnProgress) ->
-                if @startTurn <= turnNum < @endTurn
-                    console.log "drawing building sprite"
+                if @sprite.texture != null
                     renderer.drawSprite(@sprite)
                     renderer.drawSprite(@team)
-                    
-            setFire: (entity) =>
+
+            @setFire: (entity) =>
                 (renderer, turnNum, turnProgress) =>
                     renderer.drawSprite(entity.sprite)
-                    renderer.drawSprite(@team)
-                    entity.ignite.frame = entity.Math.floor(turnProgress * 8)
-                    renderer.drawSprite(entity.ignite) 
+                    renderer.drawSprite(entity.team)
+                    entity.ignite.frame = Math.floor(turnProgress * 8)
+                    renderer.drawSprite(entity.ignite)
 
         class Road extends BasePlugin.Entity
             constructor: () ->
@@ -61,23 +61,21 @@ define [
                 @sideWalkS = false
                 @sideWalkE = false
                 @sideWalkW = false
-                
+
             getAnimations: () -> @animations
-            
+
             idle: (renderer, turnNum, turnProgress) ->
-                if @startTurn <= turnNum < @endTurn
-                    console.log "drawing road sprite"
-                    renderer.drawSprite(@sprite)
-                    if @sprite.texture == "road"
-                        #@TODO, change sprite or rotate based on which sidewalk needs to be drawn
-                        if @sideWalkN == true
-                            renderer.drawSprite(@sideWalkSpriteN)
-                        if @sideWalkS == true
-                            renderer.drawSprite(@sideWalkSpriteS)
-                        if @sideWalkE == true
-                            renderer.drawSprite(@sideWalkSpriteE)
-                        if @sideWalkW == true
-                            renderer.drawSprite(@sideWalkSpriteW)
+                renderer.drawSprite(@sprite)
+                if @sprite.texture == "road"
+                    #@TODO, change sprite or rotate based on which sidewalk needs to be drawn
+                    if @sideWalkN == true
+                        renderer.drawSprite(@sideWalkSpriteN)
+                    if @sideWalkS == true
+                        renderer.drawSprite(@sideWalkSpriteS)
+                    if @sideWalkE == true
+                        renderer.drawSprite(@sideWalkSpriteE)
+                    if @sideWalkW == true
+                        renderer.drawSprite(@sideWalkSpriteW)
 
         class Anarchy extends BasePlugin.Plugin
             constructor: () ->
@@ -90,19 +88,97 @@ define [
 
             getName: () -> 'Anarchy'
 
-            preDraw: (turn, dt, renderer) ->  
-          
+            preDraw: (turn, dt, renderer) ->
+
             postDraw: (turn, dt, renderer) ->
-        
+
             resize: (renderer) ->
 
-            loadGame: (@gamedata, renderer) ->
+            loadGame: (@gamedata, renderer, inputManager) ->
                 animations = []
+                j = 0
+
+                @centerCamera = new Renderer.Camera()
+
+                inputManager.setMouseAction("wheelUp", "zoomin", ()=>
+                    zoomFactor = @centerCamera.getZoomFactor()
+                    zoomFactor = zoomFactor + Math.pow(0.05, 1/ zoomFactor)
+                    @centerCamera.setZoomFactor(zoomFactor)
+
+                    [x, y] = inputManager.getMousePosition()
+                    [canvasWidth, canvasHeight] = renderer.getScreenSize()
+
+                    canvasToScreen = new Renderer.Matrix3x3()
+                    canvasToScreen.set(0, 0, 2/canvasWidth)
+                    canvasToScreen.set(1, 1, -2/canvasHeight)
+                    canvasToScreen.set(2, 0, -1)
+                    canvasToScreen.set(2, 1, 1)
+                    [screenX, screenY] = canvasToScreen.mul(x, y)
+                    console.log screenX + " " + screenY
+
+                    screenX *= 1/zoomFactor
+                    screenY *= 1/zoomFactor
+                    console.log "adjustment: " + screenX + " " + screenY
+
+                    realx = @centerCamera.getTransX() + screenX
+                    realy = @centerCamera.getTransY() + screenY
+
+                    vecx = realx - @centerCamera.getTransX()
+                    vecy = realy - @centerCamera.getTransY()
+
+                    console.log "realx " + realx  + " currentx " + @centerCamera.getTransX()
+                    console.log "realy " + realy  + " currenty " + @centerCamera.getTransY()
+
+                    newx = @centerCamera.getTransX() + ((1/10) * vecx)
+                    newy = @centerCamera.getTransY() + ((1/10) * vecy)
+
+                    @centerCamera.setTransX(newx)
+                    @centerCamera.setTransY(newy)
+                )
+                inputManager.setMouseAction("wheelDown", "zoomout", ()=>
+                    zoomFactor = @centerCamera.getZoomFactor()
+                    zoomFactor = zoomFactor - Math.pow(0.05, 1/ zoomFactor)
+                    if zoomFactor < 1
+                        @centerCamera.setZoomFactor(1)
+                        zoomFactor = 1
+                    else
+                        @centerCamera.setZoomFactor(zoomFactor)
+                )
+                pressed = false
+                lastx = 0
+                lasty = 0
+                inputManager.setMouseAction("press", "grab", (e) =>
+                    pressed = true
+                    lastx = e.pageX
+                    lasty = e.pageY
+                )
+                inputManager.setMouseAction("release", "release", (e) =>
+                    pressed = false
+                )
+                inputManager.setMouseAction("move", "translate", (e) =>
+                    if pressed
+                        [canvasWidth, canvasHeight] = renderer.getScreenSize()
+                        deltax = (e.pageX - lastx) / canvasWidth
+                        deltay = (e.pageY - lasty) / canvasHeight
+                        lastx = e.pageX
+                        lasty = e.pageY
+
+                        @centerCamera.setTransX( @centerCamera.getTransX() - deltax)
+                        @centerCamera.setTransY( @centerCamera.getTransY() + deltay)
+                )
+
+                renderer.setCamera(@centerCamera)
+
+                console.log "starting the loadgame function"
                 for turn in @gamedata.turns
-                    if turn.type = "start"
+                    if turn.type == "start"
                         animations.push []
-                        @mapWidth = turn.game.gameWidth
-                        @mapHeight = turn.game.gameHeight
+                        @mapWidth = turn.game.mapWidth
+                        @mapHeight = turn.game.mapHeight
+
+                        @worldMat = new Renderer.Matrix3x3()
+                        @worldMat.scale(1/@mapWidth, 1/@mapHeight)
+
                         map = []
                         for i in [0..@mapWidth-1]
                             temp = []
@@ -110,28 +186,46 @@ define [
                                 temp.push null
                             map.push temp
                         for id, obj of turn.game.gameObjects
-                            if obj.type != "Warehouse" and obj.type != "WeatherStation" and obj.type != "PoliceStation" and obj.type != "FireDepartment"
+                            type = obj.gameObjectName
+
+                            if type != "Warehouse" and type != "WeatherStation" and type != "PoliceDepartment" and type != "FireDepartment"
                                 continue
+
+                            console.log "found a building"
                             map[obj.x][obj.y] = newBldg = new Building
-                            newBldg.team = if obj.owner = 0 then "graffiti1" else "graffiti2"
-                            switch obj.type
+
+                            if obj.owner.id == "0"
+                                newBldg.team.texture = "graffiti1"
+                            else
+                                newBldg.team.texture = "graffiti2"
+
+                            #newBldg.team.texture = if obj.owner == 0 then "graffiti1" else "graffiti2"
+                            switch type
                                 when "Warehouse"
                                     newBldg.type = "Warehouse"
                                     newBldg.sprite.texture = "building"
                                 when "WeatherStation"
                                     newBldg.type = "WeatherStation"
-                                    newBldg.sprite.texture = "building"
-                                when "PoliceStation"
-                                    newBldg.type = "PoliceStation"
+                                    newBldg.sprite.texture = "weatherstation"
+                                when "PoliceDepartment"
+                                    newBldg.type = "PoliceDepartment"
                                     newBldg.sprite.texture = "policestation"
                                 when "FireDepartment"
                                     newBldg.type = "FireDepartment"
                                     newBldg.sprite.texture = "firehouse"
-                            newBldg.id = id 
+                            newBldg.id = obj.id
+                            newBldg.sprite.transform = @worldMat
                             newBldg.sprite.position.x = obj.x
-                            newBldg.sprite.position.y = obj.y 
+                            newBldg.sprite.position.y = obj.y
                             newBldg.sprite.width = 1
                             newBldg.sprite.height = 1
+
+                            newBldg.team.transform = @worldMat
+                            newBldg.team.position.x = obj.x
+                            newBldg.team.position.y = obj.y
+                            newBldg.team.width = 1
+                            newBldg.team.height = 1
+
                         # logic for tiles
                         isRoad = false
                         north3 = 0
@@ -142,126 +236,181 @@ define [
                             for j in [0..@mapHeight-1]
                                 if map[i][j] == null
                                     map[i][j] = newRoad = new Road
-                                    if i > 0 
-                                        #North
-                                        if map[i-1][j] != null and map[i-1][j].type != "Road" 
-                                            newRoad.sideWalkN = true
-                                            isRoad = true
-                                        else 
-                                            north3 += 1
-                                    #North West
-                                    else if j > 0
-                                        if map[i-1][j-1] != null and map[i-1][j].type != "Road" 
-                                            isRoad = true
-                                        else
-                                            north3 += 1
-                                            west3 += 1
-                                    #North East
-                                    else if j < @mapWidth - 1
-                                        if map[i-1][j+1] != null and map[i-1][j].type != "Road" 
-                                            isRoad = true
-                                        else
-                                            north3 += 1
-                                            east3 += 1
-                                    else 
-                                        newRoad.sideWalkN = true
-                                        isRoad = true
-                                        
-                                    if i < @mapHeight-1
-                                        #South
-                                        if map[i+1][j] != null and map[i-1][j].type != "Road" 
-                                            newRoad.sideWalkS = true  
-                                            isRoad = true
-                                        else
-                                            south3 += 1
-                                    #South West
-                                    else if j > 0
-                                        if map[i+1][j-1] != null and map[i-1][j].type != "Road" 
-                                            isRoad = true
-                                        else
-                                            south3 += 1
-                                            west3 += 1
-                                    #South East
-                                    else if j < @mapWidth - 1
-                                        if map[i+1][j+1] != null and map[i-1][j].type != "Road" 
-                                            isRoad = true
-                                        else
-                                            south3 += 1
-                                            east3 += 1
-                                        
-                                    else 
-                                        newRoad.sideWalkS = true 
-                                        isRoad = true
-                                        
-                                    if j > 0
-                                        #West
-                                        if map[i][j-1] != null and map[i-1][j].type != "Road" 
+                                    newRoad.sprite.transform = @worldMat
+                                    newRoad.id = "road" + i + " " + j
+                                    if i > 0
+                                        # West
+                                        if map[i-1][j] != null and map[i-1][j].type != "Road"
                                             newRoad.sideWalkW = true
+                                            isRoad = true
                                         else
                                             west3 += 1
+
+                                        #North West
+                                        if j > 0
+                                            if map[i-1][j-1] != null and map[i-1][j-1].type != "Road"
+                                                isRoad = true
+                                            else
+                                                north3 += 1
+                                                west3 += 1
+
+                                        #South West
+                                        if j < @mapHeight - 1
+                                            if map[i-1][j+1] != null and map[i-1][j+1].type != "Road"
+                                                isRoad = true
+                                            else
+                                                south3 += 1
+                                                west3 += 1
                                     else
                                         newRoad.sideWalkW = true
                                         isRoad = true
-                                        
+
                                     if i < @mapWidth-1
                                         #East
-                                        if map[i][j+1] != null and map[i-1][j].type != "Road" 
+                                        if map[i+1][j] != null and map[i+1][j].type != "Road"
                                             newRoad.sideWalkE = true
                                             isRoad = true
                                         else
                                             east3 += 1
+
+                                        #North East
+                                        if j > 0
+                                            if map[i+1][j-1] != null and map[i+1][j-1].type != "Road"
+                                                isRoad = true
+                                            else
+                                                north3 += 1
+                                                east3 += 1
+
+                                        #South East
+                                        if j < @mapHeight - 1
+                                            if map[i+1][j+1] != null and map[i+1][j+1].type != "Road"
+                                                isRoad = true
+                                            else
+                                                south3 += 1
+                                                east3 += 1
+
                                     else
                                         newRoad.sideWalkE = true
                                         isRoad = true
-                                        
-                                        
+
+                                    if j > 0
+                                        #North
+                                        if map[i][j-1] != null and map[i][j-1].type != "Road"
+                                            newRoad.sideWalkN = true
+                                            isRoad = true
+                                        else
+                                            north3 += 1
+                                    else
+                                        newRoad.sideWalkN = true
+                                        isRoad = true
+
+                                    if j < @mapHeight-1
+                                        #South
+                                        if map[i][j+1] != null and map[i][j+1].type != "Road"
+                                            newRoad.sideWalkS = true
+                                            isRoad = true
+                                        else
+                                            south3 += 1
+                                    else
+                                        newRoad.sideWalkS = true
+                                        isRoad = true
+
+
                                     #replacing the road with building
                                     if isRoad == false
-                                        newRoad.sprite.texture = "building"
+                                        newRoad.sprite.texture = "drab"
                                     #if adjacent/diagonal building, keeping it road
                                     else
                                         newRoad.sideWalkSpriteN.texture = "sidewalkn"
+                                        newRoad.sideWalkSpriteN.transform = @worldMat
+                                        newRoad.sideWalkSpriteN.position.x = i
+                                        newRoad.sideWalkSpriteN.position.y = j
+                                        newRoad.sideWalkSpriteN.width = 1
+                                        newRoad.sideWalkSpriteN.height = 1
+
                                         newRoad.sideWalkSpriteS.texture = "sidewalks"
+                                        newRoad.sideWalkSpriteS.transform = @worldMat
+                                        newRoad.sideWalkSpriteS.position.x = i
+                                        newRoad.sideWalkSpriteS.position.y = j
+                                        newRoad.sideWalkSpriteS.width = 1
+                                        newRoad.sideWalkSpriteS.height = 1
+
                                         newRoad.sideWalkSpriteE.texture = "sidewalke"
+                                        newRoad.sideWalkSpriteE.transform = @worldMat
+                                        newRoad.sideWalkSpriteE.position.x = i
+                                        newRoad.sideWalkSpriteE.position.y = j
+                                        newRoad.sideWalkSpriteE.width = 1
+                                        newRoad.sideWalkSpriteE.height = 1
+
                                         newRoad.sideWalkSpriteW.texture = "sidewalkw"
+                                        newRoad.sideWalkSpriteW.transform = @worldMat
+                                        newRoad.sideWalkSpriteW.position.x = i
+                                        newRoad.sideWalkSpriteW.position.y = j
+                                        newRoad.sideWalkSpriteW.width = 1
+                                        newRoad.sideWalkSpriteW.height = 1
+
                                         newRoad.sprite.texture = "road"
-                                        if north3 == 3
-                                            newRoad.sideWalkN = true
-                                        if south3 == 3
-                                            newRoad.sideWalkS = true
-                                        if east3 == 3
-                                            newRoad.sideWalkE = true
-                                        if west3 == 3
-                                            newRoad.sideWalkW = true
-                                    
-                                     
+                                        isbuildingNorth = newRoad.sideWalkN
+                                        isbuildingSouth = newRoad.sideWalkS
+                                        isbuildingEast = newRoad.sideWalkE
+                                        isbuildingWest = newRoad.sideWalkW
+                                        if isbuildingEast != true and isbuildingWest != true
+                                            if north3 == 3
+                                                newRoad.sideWalkN = true
+                                            if south3 == 3
+                                                newRoad.sideWalkS = true
+                                        if isbuildingNorth != true and isbuildingSouth != true
+                                            if east3 == 3
+                                                newRoad.sideWalkE = true
+                                            if west3 == 3
+                                                newRoad.sideWalkW = true
+
+                                    newRoad.sprite.transform = @worldMat
+                                    newRoad.sprite.position.x = i
+                                    newRoad.sprite.position.y = j
+                                    newRoad.sprite.width = 1
+                                    newRoad.sprite.height = 1
+
                                 isRoad = false
                                 north3 = 0
                                 south3 = 0
                                 east3 = 0
-                                west3 = 0           
+                                west3 = 0
+
                         for row in map
                             for ent in row
-                                @entities[ent.id] = ent
-                    
+                                type = ent.type
+                                if ent != null
+                                    @entities[ent.id] = ent
+
+
                     else if turn.type == "ran"
                         animations[animations.length - 1].push turn
-                        if turn.data.run.functionName == "ignite"
-                            burnie = turn.data.run.args.building.id
-                            bribed = turn.data.run.caller.id                       
-                        
+
                     else if turn.type == "finished"
+                        console.log "current turn " + j
+                        j++
                         @gamestates.push(turn.game)
                         animations.push []
-                        
-                            
+
+                    @maxTurn = animations.length - 1
+                ###
                 for i in [0..animations.length - 1]
                     for anim in animations[i]
-                        
-                        f = Building.setFire(@entities[data.run.args.building.id])
-                        a = new BasePlugin.Animation(i, i+1, f)
-                        @entities[data.run.args.building.id].animations.push a
-                            
+                        if anim.data.run.functionName == "ignite"
+                            burnie = anim.data.run.args.building.id
+                            bribed = anim.data.run.caller.id
+
+                            f = Building.setFire(@entities[burnie])
+                            a = new BasePlugin.Animation(i, i+1, f)
+
+                            console.log @entities
+                            ent = @entities[burnie]
+                            if ent?
+                              ent.animations.push a
+                ###
+
+
             getSexpScheme: () -> null
 
         return Anarchy

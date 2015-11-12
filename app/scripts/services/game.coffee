@@ -13,6 +13,74 @@ define ()->
         @frames = 0
         @currentSelection = []
 
+        @inputManager = {
+            _keyActions : {}
+            _mouseActions : {}
+            _currentX : 0
+            _currentY : 0
+
+            setKeyAction: (key, name, callback) ->
+                if !@_keyActions[key]?
+                    @_keyActions[key] = {}
+
+                @_keyActions[key][name] = callback
+
+            setMouseAction: (mbutton, name, callback) ->
+                if !@_mouseActions[mbutton]?
+                    @_mouseActions[mbutton] = {}
+
+                @_mouseActions[mbutton][name] = callback
+
+            getMousePosition: () -> [@_currentX, @_currentY]
+
+
+        }
+
+        $(document).keydown((e) =>
+            console.log e.keyCode
+            if @inputManager._keyActions[e.keyCode]?
+                for name, callback of @inputManager._keyActions[e.keyCode]
+                    callback()
+        )
+
+        $(document).ready(()=>
+            $('#main-view').bind('mousewheel', (e)=>
+                if e.originalEvent.wheelDelta/120 > 0
+                    console.log "wheel up"
+                    if @inputManager._mouseActions["wheelUp"]?
+                        for name, callback of @inputManager._mouseActions["wheelUp"]
+                            callback()
+                else
+                    if @inputManager._mouseActions["wheelDown"]?
+                        for name, callback of @inputManager._mouseActions["wheelDown"]
+                            callback()
+            )
+
+            $('#main-view').mousedown( (e)=>
+                if @inputManager._mouseActions["press"]?
+                    for name, callback of @inputManager._mouseActions["press"]
+                        callback(e)
+            )
+
+            $('#main-view').mouseup( (e)=>
+                if @inputManager._mouseActions["release"]?
+                    for name, callback of @inputManager._mouseActions["release"]
+                        callback(e)
+            )
+
+            $('#main-view').click( (e) =>
+                if @inputManager._mouseActions["click"]?
+                    for name, callback of @inputManager._mouseActions["click"]
+                        callback(e)
+            )
+
+            $('#main-view').mousemove( (e)=>
+                if @inputManager._mouseActions["move"]?
+                    for name, callback of @inputManager._mouseActions["move"]
+                        callback(e)
+            )
+        )
+
         @getCurrentTurn = () -> @currentTurn
 
         @getMaxTurn = () -> @maxTurn
@@ -114,7 +182,7 @@ define ()->
             return dtSeconds
 
         @fileLoaded = (gameObject) =>
-            PluginManager.loadGame gameObject, @renderer
+            PluginManager.loadGame gameObject, @renderer, @inputManager
 
             @currentTurn = 0
             @playing = false
