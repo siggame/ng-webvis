@@ -28,10 +28,10 @@ define [
                 #setup fire sprite
                 #@fire_added = null
                 #@ignited = null
-                @fire = null
-                @health = null
-                @exposure = null
-                @bribed = null
+                @fire = []
+                @health = []
+                @exposure = []
+                @bribed = []
 
                 @ignite = new Renderer.Sprite()
 
@@ -107,7 +107,7 @@ define [
 
             loadGame: (@gamedata, renderer, inputManager) ->
                 animations = []
-                j = 0
+                turnNum = 0
 
                 @centerCamera = new Renderer.Camera()
 
@@ -237,6 +237,11 @@ define [
                             newBldg.team.position.y = obj.y
                             newBldg.team.width = 1
                             newBldg.team.height = 1
+
+                            #initialize start states
+                            newBldg.fire.push obj.fire
+                            newBldg.health.push obj.health
+                            newBldg.exposure.push obj.exposure
 
                         # logic for tiles
                         isRoad = false
@@ -400,39 +405,48 @@ define [
                         animations[animations.length - 1].push turn
 
                     else if turn.type == "finished"
-                        console.log "current turn " + j
-                        j++
+                        console.log "current turn " + turnNum
+                        turnNum++
                         @gamestates.push(turn.game)
-                        i = 0
-                        for id, obj of @entitites
-                            if @entities.classType == "Building"
-                                state = turn.game.gameObjects[id]
-                                if state?
+
+                        for own eid, eobj of @entities
+                            if eobj.classType == "Building"
+                                if turn.game.gameObjects[eid]?
+                                    state = turn.game.gameObjects[eid]
                                     #setting fire array state for building entity
                                     if state.fire?
-                                        obj.fire.push state.fire
+                                        eobj.fire.push state.fire
                                     else
-                                        obj.fire.push object.fire[object.fire.length - 1]
+                                        eobj.fire.push eobj.fire[eobj.fire.length - 1]
                                     #setting health array state for building entity
                                     if state.health?
-                                        obj.health.push state.health
+                                        eobj.health.push state.health
                                     else
-                                        obj.health.push object.health[object.health.length - 1]
+                                        eobj.health.push eobj.health[eobj.health.length - 1]
                                     #setting exposure array state for building entity
                                     if state.exposure?
-                                        obj.exposure.push state.exposure
+                                        eobj.exposure.push state.exposure
                                     else
-                                        obj.exposure.push object.exposure[object.exposure.length - 1]
+                                        eobj.exposure.push eobj.exposure[eobj.exposure.length - 1]
                                     #setting bribed array state for building entity
                                     if state.bribed?
-                                        obj.bribed.push state.bribed
+                                        eobj.bribed.push state.bribed
                                     else
-                                        obj.bribed.push object.bribed[object.bribed.length - 1]
-
+                                        eobj.bribed.push eobj.bribed[eobj.bribed.length - 1]
+                                else
+                                    eobj.fire.push eobj.fire[eobj.fire.length - 1]
+                                    eobj.health.push eobj.health[eobj.health.length - 1]
+                                    eobj.exposure.push eobj.exposure[eobj.exposure.length - 1]
+                                    eobj.bribed.push eobj.bribed[eobj.bribed.length - 1]
 
                         animations.push []
 
                     @maxTurn = animations.length - 1
+
+                for id, obj of @entities
+                    if obj.classType == "Building" and obj.fire != null
+                        console.log id + " " + obj.fire.length
+                        console.log obj.fire
                 ###
                 for i in [0..animations.length - 1]
                     for anim in animations[i]
