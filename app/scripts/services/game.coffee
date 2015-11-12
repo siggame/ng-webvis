@@ -55,6 +55,30 @@ define ()->
                         for name, callback of @inputManager._mouseActions["wheelDown"]
                             callback()
             )
+
+            $('#main-view').mousedown( (e)=>
+                if @inputManager._mouseActions["press"]?
+                    for name, callback of @inputManager._mouseActions["press"]
+                        callback(e)
+            )
+
+            $('#main-view').mouseup( (e)=>
+                if @inputManager._mouseActions["release"]?
+                    for name, callback of @inputManager._mouseActions["release"]
+                        callback(e)
+            )
+
+            $('#main-view').click( (e) =>
+                if @inputManager._mouseActions["click"]?
+                    for name, callback of @inputManager._mouseActions["click"]
+                        callback(e)
+            )
+
+            $('#main-view').mousemove( (e)=>
+                if @inputManager._mouseActions["move"]?
+                    for name, callback of @inputManager._mouseActions["move"]
+                        callback(e)
+            )
         )
 
         @getCurrentTurn = () -> @currentTurn
