@@ -24,6 +24,10 @@
             "image": "WeatherStation.png",
             "spriteSheet": null
         },
+        { "id": "rubble",
+            "image": "rubble.png",
+            "spriteSheet": null
+        },
         { "id": "drab",
             "image": "drab.png",
             "spriteSheet": null
@@ -75,6 +79,11 @@
           "id": "explosion",
           "image": "explosion.png",
           "spriteSheet": "Anim8x1.json"
+        },
+        {
+          "id": "fire",
+          "image": "fire.png",
+          "spriteSheet": "Anim5x1.json"
         }
     ]
 }
