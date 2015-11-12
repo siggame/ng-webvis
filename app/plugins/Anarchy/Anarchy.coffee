@@ -15,7 +15,9 @@ define [
         class Building extends BasePlugin.Entity
             constructor: () ->
                 super()
+                @classType = "Building"
                 @type = "Building"
+
                 @animations = []
                 @startTurn = 0
                 @endTurn = 0
@@ -24,6 +26,13 @@ define [
                 @team.color.a = 0.5
                 @fire = new Renderer.Sprite()
                 #setup fire sprite
+                #@fire_added = null
+                #@ignited = null
+                @fire = null
+                @health = null
+                @exposure = null
+                @bribed = null
+
                 @ignite = new Renderer.Sprite()
 
                 #setup ignite sprite
@@ -37,6 +46,7 @@ define [
                     renderer.drawSprite(@sprite)
                     renderer.drawSprite(@team)
 
+            @fire: (entity)
             @setFire: (entity) =>
                 (renderer, turnNum, turnProgress) =>
                     renderer.drawSprite(entity.sprite)
@@ -193,6 +203,7 @@ define [
 
                             console.log "found a building"
                             map[obj.x][obj.y] = newBldg = new Building
+
 
                             if obj.owner.id == "0"
                                 newBldg.team.texture = "graffiti1"
@@ -391,6 +402,33 @@ define [
                         console.log "current turn " + j
                         j++
                         @gamestates.push(turn.game)
+                        i = 0
+                        for id, obj of @entitites
+                            if @entities.classType == "Building"
+                                state = turn.game.gameObjects[id]
+                                if state?
+                                    #setting fire array state for building entity
+                                    if state.fire?
+                                        obj.fire.push state.fire
+                                    else
+                                        obj.fire.push object.fire[object.fire.length - 1]
+                                    #setting health array state for building entity
+                                    if state.health?
+                                        obj.health.push state.health
+                                    else
+                                        obj.health.push object.health[object.health.length - 1]
+                                    #setting exposure array state for building entity
+                                    if state.exposure?
+                                        obj.exposure.push state.exposure
+                                    else
+                                        obj.exposure.push object.exposure[object.exposure.length - 1]
+                                    #setting bribed array state for building entity
+                                    if state.bribed?
+                                        obj.bribed.push state.bribed
+                                    else
+                                        obj.bribed.push object.bribed[object.bribed.length - 1]
+
+
                         animations.push []
 
                     @maxTurn = animations.length - 1
