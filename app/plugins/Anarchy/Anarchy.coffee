@@ -46,7 +46,8 @@ define [
                     renderer.drawSprite(@sprite)
                     renderer.drawSprite(@team)
 
-            @fire: (entity)
+            @fire: (entity) ->
+
             @setFire: (entity) =>
                 (renderer, turnNum, turnProgress) =>
                     renderer.drawSprite(entity.sprite)
