@@ -1023,16 +1023,16 @@ define ()->
             # Draws the line object to the screen.
             # param line (Renderer::Line) - The line to be drawn
             # param color (Renderer::Color) - the color the drawn line will be.
-            drawLine: (line, color) ->
+            drawLine: (line) ->
                 @gl.useProgram(@colorProg)
                 @gl.disableVertexAttribArray(1)
 
-                mvmat = new Matrix3x3
+                mvmat = new Matrix3x3(line.transform)
                 colArray = new Float32Array(4)
-                colArray[0] = color.r
-                colArray[1] = color.g
-                colArray[2] = color.b
-                colArray[3] = color.a
+                colArray[0] = line.color.r
+                colArray[1] = line.color.g
+                colArray[2] = line.color.b
+                colArray[3] = line.color.a
 
                 @gl.bindBuffer(@gl.ARRAY_BUFFER, @baseLine)
                 @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
@@ -1044,12 +1044,13 @@ define ()->
                 @gl.vertexAttribPointer(@colorProg.vertexPositionAttribute,
                     @baseLine.itemSize, @gl.FLOAT, false, 0, 0)
 
-                if line.transform != null
-                    @gl.uniformMatrix3fv(@colorProg.pMatrixUniform, false, line.transform.elements)
-                else
+                if @currentCamera == null
                     @gl.uniformMatrix3fv(@colorProg.pMatrixUniform, false, @Projection.elements)
+                else
+                    @gl.uniformMatrix3fv(@colorProg.pMatrixUniform, false, @currentCamera.transform.elements)
+
                 @gl.uniformMatrix3fv(@colorProg.mvMatrixUniform, false, mvmat.elements)
-                @gl.uniform4fv(@colorProg.color, color)
+                @gl.uniform4fv(@colorProg.color, colArray)
                 @gl.drawArrays(@gl.LINES, 0, @baseLine.numItems)
 
 
