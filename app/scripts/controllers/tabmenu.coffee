@@ -36,8 +36,16 @@ define ()->
             url = Options.get 'Webvis', 'Arena Url'
             FileLoader.loadFromUrl(url.text + "/api/next_game")
 
-        $scope.$on 'selection:updated', (event, data) ->
-            $scope.currentSelection = Game.getCurrentSelection()
+        $scope.$watch(
+            () =>
+                return Object.keys(Game.getCurrentSelection())
+            (newval, oldval) ->
+                $scope.currentSelection = Game.getCurrentSelection()
+                if Object.keys(Game.getCurrentSelection()).length > 0
+                    firstid = Object.keys(Game.getCurrentSelection())[0]
+                    $scope.focusData = $scope.currentSelection[firstid]
+            true
+        )
 
     TabmenuCtrl.$inject = ['$scope', 'Game', 'FileLoader', 'Options']
     return TabmenuCtrl
