@@ -26,6 +26,7 @@ define [
                 @health = []
                 @exposure = null
                 @maxHealth = 100
+                @maxFire = 0
 
                 @sprite = new Renderer.Sprite()
                 @sprite.texture = "building"
@@ -70,9 +71,35 @@ define [
                 @ignite.transform = transform
 
             idle: (renderer, turnNum, turnProgress) ->
-                if @sprite.texture != null
-                    renderer.drawSprite(@sprite)
-                    renderer.drawSprite(@team)
+                if @health[turnNum] <= 0
+                    @sprite.texture = "rubble"
+                else
+                    switch @type
+                        when "Warehouse"
+                            @sprite.texture = "building"
+                        when "WeatherStation"
+                            @sprite.texture = "weatherstation"
+                        when "PoliceDepartment"
+                            @sprite.texture = "policestation"
+                        when "FireDepartment"
+                            @sprite.texture = "firehouse"
+
+                renderer.drawSprite(@sprite)
+
+                if @fire[turnNum] > 0
+                    if 0 < @fire[turnNum] < 0.25 * @maxFire
+                        @fireSprite.frame = 0
+                    else if 0.25 * @maxFire < @fire[turnNum] < 0.5 * @maxFire
+                        @fireSprite.frame = 1
+                    else if 0.5 * @maxFire < @fire[turnNum] < 0.75 * @maxFire
+                        @fireSprite.frame = 2
+                    else if 0.75 * @maxFire < @fire[turnNum] < @maxFire
+                        @fireSprite.frame = 3
+                    else if @fire[turnNum] >= @maxFire
+                        @fireSprite.frame = 4
+
+                renderer.drawSprite(@fireSprite)
+                renderer.drawSprite(@team)
 
             @setFire: (entity) =>
                 (renderer, turnNum, turnProgress) =>
@@ -202,7 +229,7 @@ define [
 
 
             verifyEntities:(renderer, turn, selection) ->
-                return selections
+                return selection
 
             getName: () -> 'Anarchy'
 
@@ -322,9 +349,7 @@ define [
                     if type != "Warehouse" and type != "WeatherStation" and type != "PoliceDepartment" and type != "FireDepartment"
                         continue
 
-                    console.log "found a building"
                     map[obj.x][obj.y] = newBldg = new Building
-
 
                     if obj.owner.id == "0"
                         newBldg.team.texture = "graffiti1"
@@ -349,6 +374,7 @@ define [
                     newBldg.setTransform(@worldMat)
                     newBldg.setx(obj.x)
                     newBldg.sety(obj.y)
+                    newBldg.maxFire = turn.game.maxFire
 
                     #initialize start states
                     newBldg.fire.push obj.fire
