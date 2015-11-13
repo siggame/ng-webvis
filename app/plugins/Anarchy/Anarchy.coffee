@@ -54,6 +54,8 @@ define [
                 @healthBar.fillColor = new Renderer.Color(0.0, 1.0, 0.0, 1.0)
                 @healthBar.height = 0.1
 
+
+
             getAnimations: () -> @animations
 
             setx: (x) ->
@@ -111,7 +113,7 @@ define [
                     @healthBar.width = @health[turnNum]/@maxHealth
 
                     renderer.drawRect(@healthBar)
-                    
+
                 renderer.drawSprite(@team)
 
             @setFire: (entity, anim) =>
@@ -384,7 +386,7 @@ define [
                 renderer.drawRect(@guiPlayer1HQHealthBar)
 
                 hq2 = @entities[@player2HQid]
-                @guiPlayer2HQHealthBar.width = (hq1.health[turn] / 1000) * 38
+                @guiPlayer2HQHealthBar.width = (hq2.health[turn] / 1000) * 38
                 renderer.drawRect(@guiPlayer2HQHealthBar)
 
                 @guiPlayer1BuildingText.text = "Buildings Left: " + @player1BuildingsLeft[turn]
