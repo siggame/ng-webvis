@@ -158,6 +158,7 @@ define [
             constructor: () ->
                 super()
                 @gamestates = []
+                @centerCamera = new Renderer.Camera()
 
             selectEntities: (renderer, turn, x, y) ->
                 selections = {}
@@ -215,47 +216,12 @@ define [
                 animations = []
                 turnNum = 0
 
-                @centerCamera = new Renderer.Camera()
+                renderer.setCamera(@centerCamera)
 
-                inputManager.setMouseAction("wheelUp", "zoomin", ()=>
-                    zoomFactor = @centerCamera.getZoomFactor()
-                    zoomFactor = zoomFactor + Math.pow(0.05, 1/ zoomFactor)
-                    @centerCamera.setZoomFactor(zoomFactor)
+                zoominAction = @_zoomIn(renderer, inputManager)
+                inputManager.setMouseAction("wheelUp", "zoomin", zoominAction)
+                inputManager.setMouseAction("wheelDown", "zoomout", @_zoomOut())
 
-                    [x, y] = inputManager.getMousePosition()
-                    [canvasWidth, canvasHeight] = renderer.getScreenSize()
-
-                    canvasToScreen = new Renderer.Matrix3x3()
-                    canvasToScreen.set(0, 0, 2/canvasWidth)
-                    canvasToScreen.set(1, 1, -2/canvasHeight)
-                    canvasToScreen.set(2, 0, -1)
-                    canvasToScreen.set(2, 1, 1)
-                    [screenX, screenY] = canvasToScreen.mul(x, y)
-
-                    screenX *= 1/zoomFactor
-                    screenY *= 1/zoomFactor
-
-                    realx = @centerCamera.getTransX() + screenX
-                    realy = @centerCamera.getTransY() + screenY
-
-                    vecx = realx - @centerCamera.getTransX()
-                    vecy = realy - @centerCamera.getTransY()
-
-                    newx = @centerCamera.getTransX() + ((1/10) * vecx)
-                    newy = @centerCamera.getTransY() + ((1/10) * vecy)
-
-                    @centerCamera.setTransX(newx)
-                    @centerCamera.setTransY(newy)
-                )
-                inputManager.setMouseAction("wheelDown", "zoomout", ()=>
-                    zoomFactor = @centerCamera.getZoomFactor()
-                    zoomFactor = zoomFactor - Math.pow(0.05, 1/ zoomFactor)
-                    if zoomFactor < 1
-                        @centerCamera.setZoomFactor(1)
-                        zoomFactor = 1
-                    else
-                        @centerCamera.setZoomFactor(zoomFactor)
-                )
                 pressed = false
                 lastx = 0
                 lasty = 0
@@ -279,9 +245,6 @@ define [
                         @centerCamera.setTransY( @centerCamera.getTransY() + deltay)
                 )
 
-                renderer.setCamera(@centerCamera)
-
-                console.log "starting the loadgame function"
                 for turn in @gamedata.turns
                     if turn.type == "start"
                         animations.push []
@@ -513,6 +476,45 @@ define [
                         south3 = 0
                         east3 = 0
                         west3 = 0
+
+            _zoomIn: (renderer, inputManager) -> () =>
+                zoomFactor = @centerCamera.getZoomFactor()
+                zoomFactor = zoomFactor + Math.pow(0.05, 1/ zoomFactor)
+                @centerCamera.setZoomFactor(zoomFactor)
+
+                [x, y] = inputManager.getMousePosition()
+                [canvasWidth, canvasHeight] = renderer.getScreenSize()
+
+                canvasToScreen = new Renderer.Matrix3x3()
+                canvasToScreen.set(0, 0, 2/canvasWidth)
+                canvasToScreen.set(1, 1, -2/canvasHeight)
+                canvasToScreen.set(2, 0, -1)
+                canvasToScreen.set(2, 1, 1)
+                [screenX, screenY] = canvasToScreen.mul(x, y)
+
+                screenX *= 1/zoomFactor
+                screenY *= 1/zoomFactor
+
+                realx = @centerCamera.getTransX() + screenX
+                realy = @centerCamera.getTransY() + screenY
+
+                vecx = realx - @centerCamera.getTransX()
+                vecy = realy - @centerCamera.getTransY()
+
+                newx = @centerCamera.getTransX() + ((1/10) * vecx)
+                newy = @centerCamera.getTransY() + ((1/10) * vecy)
+
+                @centerCamera.setTransX(newx)
+                @centerCamera.setTransY(newy)
+
+            _zoomOut: () -> () =>
+                zoomFactor = @centerCamera.getZoomFactor()
+                zoomFactor = zoomFactor - Math.pow(0.05, 1/ zoomFactor)
+                if zoomFactor < 1
+                    @centerCamera.setZoomFactor(1)
+                    zoomFactor = 1
+                else
+                    @centerCamera.setZoomFactor(zoomFactor)
 
         return Anarchy
 
