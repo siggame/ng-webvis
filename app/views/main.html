@@ -2,7 +2,14 @@
   <div id="fullscreen-container" class="col-xs-12 fullscreen-container well well-sm">
     <div id="stage-container" class="row-fluid" ng-controller="StageCtrl as stage" style="height:100%;">
       <div class="col-xs-12" style="padding:0px;height:100%;">
-        <stage style="width:100%; height:100%" width="800" height="600" ng-click="click($event);" ng-mousemove="mousemove($event)" class="stage"></stage>
+        <stage style="width:100%; height:100%"
+               width="800"
+               height="600"
+               ng-click="click($event);"
+               ng-mousemove="mousemove($event)"
+               ng-mouseup="mouseup($event)"
+               ng-mousedown="mousedown($event)"
+               class="stage"></stage>
       </div>
     </div>
 
