@@ -10,8 +10,6 @@ define [
     # The explicit block lists the angular services/factories you need
     # all game logic/entity classes go inside this block
     explicit = (Options, Renderer) ->
-
-
         class Building extends BasePlugin.Entity
             constructor: () ->
                 super()
@@ -87,19 +85,59 @@ define [
             constructor: () ->
                 super()
                 @type = "Road"
+                @id = -1
                 @animations = []
                 @startTurn = 0
                 @endTurn = 0
-                @sprite = new Renderer.Sprite()
-                @sideWalkSpriteN = new Renderer.Sprite()
-                @sideWalkSpriteS = new Renderer.Sprite()
-                @sideWalkSpriteE = new Renderer.Sprite()
-                @sideWalkSpriteW = new Renderer.Sprite()
-                @id = -1
                 @sideWalkN = false
                 @sideWalkS = false
                 @sideWalkE = false
                 @sideWalkW = false
+
+                @sprite = new Renderer.Sprite()
+                @sprite.width = 1
+                @sprite.height = 1
+
+                @sideWalkSpriteN = new Renderer.Sprite()
+                @sideWalkSpriteN.texture = "sidewalkn"
+                @sideWalkSpriteN.width = 1
+                @sideWalkSpriteN.height = 1
+
+                @sideWalkSpriteS = new Renderer.Sprite()
+                @sideWalkSpriteS.texture = "sidewalks"
+                @sideWalkSpriteS.width = 1
+                @sideWalkSpriteS.height = 1
+
+                @sideWalkSpriteE = new Renderer.Sprite()
+                @sideWalkSpriteE.texture = "sidewalke"
+                @sideWalkSpriteE.width = 1
+                @sideWalkSpriteE.height = 1
+
+                @sideWalkSpriteW = new Renderer.Sprite()
+                @sideWalkSpriteW.texture = "sidewalkw"
+                @sideWalkSpriteW.width = 1
+                @sideWalkSpriteW.height = 1
+
+            setx: (x) ->
+                @sprite.position.x = x
+                @sideWalkSpriteN.position.x = x
+                @sideWalkSpriteS.position.x = x
+                @sideWalkSpriteE.position.x = x
+                @sideWalkSpriteW.position.x = x
+
+            sety: (y) ->
+                @sprite.position.y = y
+                @sideWalkSpriteN.position.y = y
+                @sideWalkSpriteS.position.y = y
+                @sideWalkSpriteE.position.y = y
+                @sideWalkSpriteW.position.y = y
+
+            setTransform: (transform) ->
+                @sprite.transform = transform
+                @sideWalkSpriteN.transform = transform
+                @sideWalkSpriteS.transform = transform
+                @sideWalkSpriteE.transform = transform
+                @sideWalkSpriteW.transform = transform
 
             getAnimations: () -> @animations
 
@@ -310,8 +348,10 @@ define [
                             for j in [0..@mapHeight-1]
                                 if map[i][j] == null
                                     map[i][j] = newRoad = new Road
-                                    newRoad.sprite.transform = @worldMat
+                                    newRoad.setTransform(@worldMat)
                                     newRoad.id = "road" + i + " " + j
+                                    newRoad.setx(i)
+                                    newRoad.sety(j)
                                     if i > 0
                                         # West
                                         if map[i-1][j] != null and map[i-1][j].type != "Road"
@@ -395,34 +435,6 @@ define [
                                         newRoad.sprite.texture = "drab"
                                     #if adjacent/diagonal building, keeping it road
                                     else
-                                        newRoad.sideWalkSpriteN.texture = "sidewalkn"
-                                        newRoad.sideWalkSpriteN.transform = @worldMat
-                                        newRoad.sideWalkSpriteN.position.x = i
-                                        newRoad.sideWalkSpriteN.position.y = j
-                                        newRoad.sideWalkSpriteN.width = 1
-                                        newRoad.sideWalkSpriteN.height = 1
-
-                                        newRoad.sideWalkSpriteS.texture = "sidewalks"
-                                        newRoad.sideWalkSpriteS.transform = @worldMat
-                                        newRoad.sideWalkSpriteS.position.x = i
-                                        newRoad.sideWalkSpriteS.position.y = j
-                                        newRoad.sideWalkSpriteS.width = 1
-                                        newRoad.sideWalkSpriteS.height = 1
-
-                                        newRoad.sideWalkSpriteE.texture = "sidewalke"
-                                        newRoad.sideWalkSpriteE.transform = @worldMat
-                                        newRoad.sideWalkSpriteE.position.x = i
-                                        newRoad.sideWalkSpriteE.position.y = j
-                                        newRoad.sideWalkSpriteE.width = 1
-                                        newRoad.sideWalkSpriteE.height = 1
-
-                                        newRoad.sideWalkSpriteW.texture = "sidewalkw"
-                                        newRoad.sideWalkSpriteW.transform = @worldMat
-                                        newRoad.sideWalkSpriteW.position.x = i
-                                        newRoad.sideWalkSpriteW.position.y = j
-                                        newRoad.sideWalkSpriteW.width = 1
-                                        newRoad.sideWalkSpriteW.height = 1
-
                                         newRoad.sprite.texture = "road"
                                         isbuildingNorth = newRoad.sideWalkN
                                         isbuildingSouth = newRoad.sideWalkS
@@ -438,12 +450,6 @@ define [
                                                 newRoad.sideWalkE = true
                                             if west3 == 3
                                                 newRoad.sideWalkW = true
-
-                                    newRoad.sprite.transform = @worldMat
-                                    newRoad.sprite.position.x = i
-                                    newRoad.sprite.position.y = j
-                                    newRoad.sprite.width = 1
-                                    newRoad.sprite.height = 1
 
                                 isRoad = false
                                 north3 = 0
