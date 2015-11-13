@@ -206,6 +206,7 @@ define ()->
         @Line = class Line
             constructor: (@x1, @y1, @x2, @y2) ->
                 @transform = null
+                @update = false
                 @color = new Color
                 @z1 = 0.0
                 @z2 = 0.0
@@ -257,6 +258,7 @@ define ()->
         @Sprite = class Sprite
             constructor: () ->
                 @transform = null
+                @update = false
                 @texture = null
                 @frame = 0
                 @position = new Point(0, 0, 0)
@@ -283,6 +285,7 @@ define ()->
         @Rect = class Rect
             constructor: () ->
                 @transform = null
+                @update = false
                 @position = new Point(0, 0, 0)
                 @width = 0.0
                 @height = 0.0
@@ -298,6 +301,7 @@ define ()->
         @Path = class Path
             constructor: () ->
                 @transform = null
+                @update = false
                 @curPos = new Point(0, 0, 0)
                 @points = []
                 @strokeColor = new Color(0, 0, 0, 0)
@@ -323,6 +327,7 @@ define ()->
         @Text = class Text
             constructor: () ->
                 @transform = null
+                @update = false
                 @text = ""
                 @alignment = "left"
                 @position = new Point(0, 0, 0)
@@ -922,6 +927,15 @@ define ()->
                 @texProg.samplerUniform = @gl.getUniformLocation(@texProg, "uSampler")
                 @texProg.tintUniform = @gl.getUniformLocation(@texProg, "tint");
 
+                @layers = []
+                @layerDrawFlags = []
+
+                @lineBuffer = []
+                @spriteBuffer = []
+                @pathBuffer = []
+                @rectBuffer = []
+                @textBuffer = []
+
                 @begin()
 
             # BaseRenderer::resizeWorld(worldWidth, worldHeight)
@@ -932,6 +946,8 @@ define ()->
             # param worldHeight (real) - the height bound of the coordinate system
             resizeWorld: (@worldWidth, @worldHeight) ->
                 @gl.viewport( 0, 0, @canvas.width, @canvas.height)
+                @canvas.width = @canvas.clientWidth
+                @canvas.height = @canvas.clientHeight
 
             getProjection: () -> @Projection
 
@@ -970,8 +986,8 @@ define ()->
                             func = (t) => () =>
                                 @gl.bindTexture(@gl.TEXTURE_2D, t)
                                 @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @gl.RGBA, @gl.UNSIGNED_BYTE, t.img)
-                                @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.LINEAR)
-                                @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.LINEAR)
+                                @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
+                                @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.NEAREST)
                                 @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_S, @gl.REPEAT)
                                 @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_T, @gl.REPEAT)
                                 @gl.bindTexture(@gl.TEXTURE_2D, null)
@@ -1014,16 +1030,152 @@ define ()->
              # param color (Renderer::Color) - The color that the drawing area
              #   will be cleared to.
             begin: (color) ->
-                @gl.viewport( 0, 0, @canvas.width, @canvas.height)
                 @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
+                @gl.viewport(0, 0, @canvas.width, @canvas.height)
 
             end: () ->
+                # clear layers that are flagged to be redrawn
+                for flag, index in @layerDrawFlags
+                    if flag
+                        console.log index + " " + flag
+                        layer = @_getFrameBuffer(index)
+                        @gl.bindFramebuffer(@gl.FRAMEBUFFER, layer.fb)
+                        @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
+                        @gl.bindFramebuffer(@gl.FRAMEBUFFER, layer.fb)
+
+                # perform the actual rendering to the layers
+                for entry in @lineBuffer
+                    if @layerDrawFlags[entry.layer]
+                        @_drawLine(entry.obj, entry.layer)
+
+                for entry in @spriteBuffer
+                    if @layerDrawFlags[entry.layer]
+                        @_drawSprite(entry.obj, entry.layer)
+
+                for entry in @pathBuffer
+                    if @layerDrawFlags[entry.layer]
+                        @_drawPath(entry.obj, entry.layer)
+
+                for entry in @rectBuffer
+                    if @layerDrawFlags[entry.layer]
+                        @_drawRect(entry.obj, entry.layer)
+
+                for entry in @textBuffer
+                    if @layerDrawFlags[entry.layer]
+                        @_drawText(entry.obj, entry.layer)
+
+                # raster layers onto main canvas
+                for layer in @layers
+                    if !layer? then continue
+                    mvmat = new Matrix3x3()
+
+                    proj = new Matrix3x3()
+                    proj.set(0, 0, 2)
+                    proj.set(1, 1, -2)
+                    proj.set(2, 0, -1)
+                    proj.set(2, 1, 1)
+
+                    @gl.bindBuffer(@gl.ARRAY_BUFFER, @texCoords)
+                    @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
+                        0.0, 1.0,
+                        1.0, 1.0,
+                        0.0, 0.0,
+                        1.0, 0.0
+                    ]))
+
+                    colArray = new Float32Array(4)
+                    colArray[0] = 1.0
+                    colArray[1] = 1.0
+                    colArray[2] = 1.0
+                    colArray[3] = 1.0
+
+                    @gl.useProgram(@texProg)
+                    @gl.enableVertexAttribArray(1)
+
+                    @gl.bindBuffer(@gl.ARRAY_BUFFER, @baseRect)
+                    @gl.vertexAttribPointer(@texProg.vertexPositionAttribute,
+                        @baseRect.itemSize, @gl.FLOAT, false, 0, 0)
+
+                    @gl.bindBuffer(@gl.ARRAY_BUFFER, @texCoords)
+                    @gl.vertexAttribPointer(@texProg.texCoordAttribute,
+                        @texCoords.itemSize, @gl.FLOAT, false, 0, 0)
+
+                    @gl.activeTexture(@gl.TEXTURE0)
+                    @gl.bindTexture(@gl.TEXTURE_2D, layer.tex)
+                    @gl.uniform1i(@texProg.samplerUniform, 0)
+                    @gl.uniform4fv(@texProg.tintUniform, colArray)
+
+                    @gl.uniformMatrix3fv(@texProg.pMatrixUniform, false, proj.elements)
+                    @gl.uniformMatrix3fv(@texProg.mvMatrixUniform, false, mvmat.elements)
+
+                    @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
+                    @gl.bindTexture(@gl.TEXTURE_2D, null)
+
+                for flag, index in @layerDrawFlags
+                    @layerDrawFlags[index] = false
+
+            drawLine: (line, layer) ->
+                if line.update then @layerDrawFlags[layer] = true
+                @lineBuffer.push {obj: line, layer: layer}
+
+            drawSprite: (sprite, layer) ->
+                if sprite.update then @layerDrawFlags[layer] = true
+                @spriteBuffer.push {obj: sprite, layer: layer}
+
+            drawPath: (path, layer) ->
+                if path.update then @layerDrawFlags[layer] = true
+                @pathBuffer.push {obj: path, layer: layer}
+
+            drawRect: (rect, layer) ->
+                if rect.update then @layerDrawFlags[layer] = true
+                @rectBuffer.push {obj: rect, layer: layer}
+
+            drawText: (text, layer) ->
+                if text.update then @layerDrawFlags[layer] = true
+                @textBuffer.push {obj: text, layer: layer}
+
+            _getFrameBuffer: (layer) ->
+                if !@layers[layer]?
+                    newfb = {}
+                    newfb.fb = @gl.createFramebuffer()
+                    @gl.bindFramebuffer(@gl.FRAMEBUFFER, newfb.fb)
+                    newfb.fb.width = @canvas.width
+                    newfb.fb.height = @canvas.height
+
+                    newfb.tex = @gl.createTexture();
+                    @gl.bindTexture(@gl.TEXTURE_2D, newfb.tex);
+                    @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.LINEAR);
+                    @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.LINEAR);
+                    @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_S, @gl.CLAMP_TO_EDGE);
+                    @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_T, @gl.CLAMP_TO_EDGE);
+                    @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, newfb.fb.width, newfb.fb.height, 0, @gl.RGBA, @gl.UNSIGNED_BYTE, null);
+
+                    newfb.rb = @gl.createRenderbuffer();
+                    @gl.bindRenderbuffer(@gl.RENDERBUFFER, newfb.rb);
+                    @gl.renderbufferStorage(@gl.RENDERBUFFER, @gl.DEPTH_COMPONENT16, newfb.fb.width, newfb.fb.height);
+
+                    @gl.framebufferTexture2D(@gl.FRAMEBUFFER, @gl.COLOR_ATTACHMENT0, @gl.TEXTURE_2D, newfb.tex, 0);
+                    @gl.framebufferRenderbuffer(@gl.FRAMEBUFFER, @gl.DEPTH_ATTACHMENT, @gl.RENDERBUFFER, newfb.rb);
+
+                    @gl.bindTexture(@gl.TEXTURE_2D, null);
+                    @gl.bindRenderbuffer(@gl.RENDERBUFFER, null);
+                    @gl.bindFramebuffer(@gl.FRAMEBUFFER, null);
+
+                    @layers[layer] = newfb
+                    @layerDrawFlags[layer] = true
+
+
+                return @layers[layer]
+
 
             # BaseRenderer::drawLine(line, color)
             # Draws the line object to the screen.
             # param line (Renderer::Line) - The line to be drawn
             # param color (Renderer::Color) - the color the drawn line will be.
-            drawLine: (line) ->
+            _drawLine: (line, layer) ->
+                if !layer? then layer = 0
+                line.update = false
+
                 @gl.useProgram(@colorProg)
                 @gl.disableVertexAttribArray(1)
 
@@ -1034,6 +1186,8 @@ define ()->
                 colArray[2] = line.color.b
                 colArray[3] = line.color.a
 
+                layer = @_getFrameBuffer(layer)
+                @gl.bindFramebuffer(@gl.FRAMEBUFFER, layer.fb)
                 @gl.bindBuffer(@gl.ARRAY_BUFFER, @baseLine)
                 @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
                     line.x1, line.y1,
@@ -1052,12 +1206,16 @@ define ()->
                 @gl.uniformMatrix3fv(@colorProg.mvMatrixUniform, false, mvmat.elements)
                 @gl.uniform4fv(@colorProg.color, colArray)
                 @gl.drawArrays(@gl.LINES, 0, @baseLine.numItems)
+                @gl.bindFramebuffer(@gl.FRAMEBUFFER, null)
 
 
             # BaseRenderer::drawSprite(sprite)
             # Draws the sprite object to the screen.
             # param line (Renderer::Sprite) - the sprite to be drawn
-            drawSprite: (sprite) ->
+            _drawSprite: (sprite, layer) ->
+                if !layer? then layer = 0
+                sprite.update = false
+
                 t = null
                 if sprite.texture != null
                     t = @_getTexture sprite.texture
@@ -1113,6 +1271,8 @@ define ()->
                     colArray[2] = sprite.color.b
                     colArray[3] = sprite.color.a
 
+                    layer = @_getFrameBuffer(layer)
+                    @gl.bindFramebuffer(@gl.FRAMEBUFFER, layer.fb)
                     @gl.useProgram(@texProg)
                     @gl.enableVertexAttribArray(1)
 
@@ -1137,16 +1297,20 @@ define ()->
                     @gl.uniformMatrix3fv(@texProg.mvMatrixUniform, false, mvmat.elements)
                     @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
                     @gl.bindTexture(@gl.TEXTURE_2D, null)
+                    @gl.bindFramebuffer(@gl.FRAMEBUFFER, null)
 
             # BaseRenderer::drawSprite(sprite)
             # Draws the path object to the screen.
             # param line (Renderer::Path) - the path to be drawn
-            drawPath: (path) ->
+            _drawPath: (path) ->
 
             # BaseRenderer::drawRect(sprite)
             # Draws the Rectangle to the screen.
             # param line (Renderer::Rect) - the rectangle to be drawn.
-            drawRect: (rect) ->
+            _drawRect: (rect) ->
+                if !layer? then layer = 0
+                rect.update = false
+
                 @gl.useProgram(@colorProg)
                 @gl.disableVertexAttribArray(1)
 
@@ -1160,6 +1324,8 @@ define ()->
                 colArray[2] = rect.fillColor.b
                 colArray[3] = rect.fillColor.a
 
+                layer = @_getFrameBuffer(layer)
+                @gl.bindFramebuffer(@gl.FRAMEBUFFER, layer.fb)
                 @gl.bindBuffer(@gl.ARRAY_BUFFER, @baseRect)
                 @gl.vertexAttribPointer(@colorProg.vertexPositionAttribute,
                     @baseRect.itemSize, @gl.FLOAT, false, 0, 0)
@@ -1172,8 +1338,12 @@ define ()->
                 @gl.uniformMatrix3fv(@colorProg.mvMatrixUniform, false, mvmat.elements)
                 @gl.uniform4fv(@colorProg.color, colArray)
                 @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
+                @gl.bindFramebuffer(@gl.FRAMEBUFFER, null)
 
-            drawText: (text) ->
+            _drawText: (text) ->
+                if !layer? then layer = 0
+                text.update = false
+
                 textCanvas = document.createElement 'canvas'
                 ctx = textCanvas.getContext '2d'
 
@@ -1247,6 +1417,8 @@ define ()->
                 @gl.bindTexture(@gl.TEXTURE_2D, textTexture)
                 @gl.uniform1i(@texProg.samplerUniform, 0)
 
+                layer = @_getFrameBuffer(layer)
+                @gl.bindFramebuffer(@gl.FRAMEBUFFER, layer.fb)
                 if @currentCamera == null
                     @gl.uniformMatrix3fv(@texProg.pMatrixUniform, false, @Projection.elements)
                 else
@@ -1256,6 +1428,7 @@ define ()->
                 @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
                 @gl.deleteTexture(textTexture)
                 @gl.bindTexture(@gl.TEXTURE_2D, null)
+                @gl.bindFramebuffer(@gl.FRAMEBUFFER, null)
 
         @autoDetectRenderer = (canvas, worldWidth, worldHeight) ->
             context = canvas.getContext "webgl"
