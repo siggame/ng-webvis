@@ -22,31 +22,59 @@ define [
                 @startTurn = 0
                 @endTurn = 0
                 @clickable = true
-                @sprite = new Renderer.Sprite()
-                @team = new Renderer.Sprite()
-                @team.color.a = 0.5
-                @fire = new Renderer.Sprite()
-                #setup fire sprite
-                #@fire_added = null
-                #@ignited = null
+
+                @id = -1
                 @fire = []
                 @health = []
                 @exposure = null
+                @maxHealth = 100
+
+                @sprite = new Renderer.Sprite()
+                @sprite.texture = "building"
+                @sprite.width = 1
+                @sprite.height = 1
+
+                @team = new Renderer.Sprite()
+                @team.texture = "graffiti1"
+                @team.width = 1
+                @team.height = 1
+                @team.color.a = 0.5
+
+                @fireSprite = new Renderer.Sprite()
+                @fireSprite.texture = "fire"
+                @fireSprite.width = 1
+                @fireSprite.height = 1
 
                 @ignite = new Renderer.Sprite()
-
-                #setup ignite sprite
-                @id = -1
+                @ignite.texture = "explosion"
+                @ignite.width = 1
+                @ignite.height = 1
 
 
             getAnimations: () -> @animations
+
+            setx: (x) ->
+                @sprite.position.x = x
+                @team.position.x = x
+                @fireSprite.position.x = x
+                @ignite.position.x = x
+
+            sety: (y) ->
+                @sprite.position.y = y
+                @team.position.y = y
+                @fireSprite.position.y = y
+                @ignite.position.y = y
+
+            setTransform: (transform) ->
+                @sprite.transform = transform
+                @team.transform = transform
+                @fireSprite.transform = transform
+                @ignite.transform = transform
 
             idle: (renderer, turnNum, turnProgress) ->
                 if @sprite.texture != null
                     renderer.drawSprite(@sprite)
                     renderer.drawSprite(@team)
-
-            @fire: (entity) ->
 
             @setFire: (entity) =>
                 (renderer, turnNum, turnProgress) =>
@@ -261,17 +289,9 @@ define [
                                     newBldg.type = "FireDepartment"
                                     newBldg.sprite.texture = "firehouse"
                             newBldg.id = obj.id
-                            newBldg.sprite.transform = @worldMat
-                            newBldg.sprite.position.x = obj.x
-                            newBldg.sprite.position.y = obj.y
-                            newBldg.sprite.width = 1
-                            newBldg.sprite.height = 1
-
-                            newBldg.team.transform = @worldMat
-                            newBldg.team.position.x = obj.x
-                            newBldg.team.position.y = obj.y
-                            newBldg.team.width = 1
-                            newBldg.team.height = 1
+                            newBldg.setTransform(@worldMat)
+                            newBldg.setx(obj.x)
+                            newBldg.sety(obj.y)
 
                             #initialize start states
                             newBldg.fire.push obj.fire
