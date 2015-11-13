@@ -21,6 +21,7 @@ define [
                 @animations = []
                 @startTurn = 0
                 @endTurn = 0
+                @clickable = true
                 @sprite = new Renderer.Sprite()
                 @team = new Renderer.Sprite()
                 @team.color.a = 0.5
@@ -30,8 +31,7 @@ define [
                 #@ignited = null
                 @fire = []
                 @health = []
-                @exposure = []
-                @bribed = []
+                @exposure = null
 
                 @ignite = new Renderer.Sprite()
 
@@ -94,8 +94,48 @@ define [
                 @gamestates = []
 
             selectEntities: (renderer, turn, x, y) ->
+                selections = {}
+                [canvasWidth, canvasHeight] = renderer.getScreenSize()
+
+                canvasToScreen = new Renderer.Matrix3x3()
+                canvasToScreen.set(0, 0, 2/canvasWidth)
+                canvasToScreen.set(1, 1, -2/canvasHeight)
+                canvasToScreen.set(2, 0, -1)
+                canvasToScreen.set(2, 1, 1)
+
+                [sw, sh] = canvasToScreen.mul(x, y)
+                sw = ((1/@centerCamera.getZoomFactor()) * sw) + @centerCamera.getTransX()
+                sh = ((1/@centerCamera.getZoomFactor()) * sh) + @centerCamera.getTransY()
+
+                screenToWorld = new Renderer.Matrix3x3()
+                screenToWorld.set(0, 0, @mapWidth/2)
+                screenToWorld.set(1, 1, -@mapHeight/2)
+                screenToWorld.set(2, 0, @mapWidth/2)
+                screenToWorld.set(2, 1, @mapHeight/2)
+
+                [newx, newy] = screenToWorld.mul(sw, sh)
+
+                for id, e of @entities
+                    if e.classType == "Building"
+
+                        if e.sprite.position.x <= newx <= e.sprite.position.x + e.sprite.width and
+                            e.sprite.position.y <= newy <= e.sprite.position.y + e.sprite.height and
+                            e.clickable
+                                newSelection = {}
+                                newSelection.id = id
+                                newSelection.x = e.sprite.position.x
+                                newSelection.y = e.sprite.position.y
+                                newSelection.fire = e.fire[turn]
+                                if e.exposure != null
+                                    newSelection.exposure = e.exposure[turn]
+                                newSelection.health = e.health[turn]
+                                selections[id] = newSelection
+
+                return selections
+
 
             verifyEntities:(renderer, turn, selection) ->
+                return selections
 
             getName: () -> 'Anarchy'
 
@@ -125,20 +165,15 @@ define [
                     canvasToScreen.set(2, 0, -1)
                     canvasToScreen.set(2, 1, 1)
                     [screenX, screenY] = canvasToScreen.mul(x, y)
-                    console.log screenX + " " + screenY
 
                     screenX *= 1/zoomFactor
                     screenY *= 1/zoomFactor
-                    console.log "adjustment: " + screenX + " " + screenY
 
                     realx = @centerCamera.getTransX() + screenX
                     realy = @centerCamera.getTransY() + screenY
 
                     vecx = realx - @centerCamera.getTransX()
                     vecy = realy - @centerCamera.getTransY()
-
-                    console.log "realx " + realx  + " currentx " + @centerCamera.getTransX()
-                    console.log "realy " + realy  + " currenty " + @centerCamera.getTransY()
 
                     newx = @centerCamera.getTransX() + ((1/10) * vecx)
                     newy = @centerCamera.getTransY() + ((1/10) * vecy)
@@ -241,7 +276,9 @@ define [
                             #initialize start states
                             newBldg.fire.push obj.fire
                             newBldg.health.push obj.health
-                            newBldg.exposure.push obj.exposure
+                            if obj.exposure?
+                                newBldg.exposure = []
+                                newBldg.exposure.push obj.exposure
 
                         # logic for tiles
                         isRoad = false
@@ -423,30 +460,22 @@ define [
                                         eobj.health.push state.health
                                     else
                                         eobj.health.push eobj.health[eobj.health.length - 1]
+
+                                    if eobj.exposure == null then continue
                                     #setting exposure array state for building entity
                                     if state.exposure?
                                         eobj.exposure.push state.exposure
                                     else
                                         eobj.exposure.push eobj.exposure[eobj.exposure.length - 1]
-                                    #setting bribed array state for building entity
-                                    if state.bribed?
-                                        eobj.bribed.push state.bribed
-                                    else
-                                        eobj.bribed.push eobj.bribed[eobj.bribed.length - 1]
                                 else
                                     eobj.fire.push eobj.fire[eobj.fire.length - 1]
                                     eobj.health.push eobj.health[eobj.health.length - 1]
-                                    eobj.exposure.push eobj.exposure[eobj.exposure.length - 1]
-                                    eobj.bribed.push eobj.bribed[eobj.bribed.length - 1]
+                                    if eobj.exposure != null
+                                        eobj.exposure.push eobj.exposure[eobj.exposure.length - 1]
 
                         animations.push []
 
                     @maxTurn = animations.length - 1
-
-                for id, obj of @entities
-                    if obj.classType == "Building" and obj.fire != null
-                        console.log id + " " + obj.fire.length
-                        console.log obj.fire
                 ###
                 for i in [0..animations.length - 1]
                     for anim in animations[i]
