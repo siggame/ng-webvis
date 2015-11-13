@@ -1202,7 +1202,7 @@ define ()->
                     1.0, 1.0
                     ]))
 
-                mvmat = new Matrix3x3
+                mvmat = new Matrix3x3(text.transform)
 
                 wtos = @worldWidth/@canvas.width
                 w = if (textCanvas.width*wtos < text.width)
@@ -1246,10 +1246,10 @@ define ()->
                 @gl.bindTexture(@gl.TEXTURE_2D, textTexture)
                 @gl.uniform1i(@texProg.samplerUniform, 0)
 
-                if text.transform != null
-                    @gl.uniformMatrix3fv(@texProg.pMatrixUniform, false, text.transform.elements)
-                else
+                if @currentCamera == null
                     @gl.uniformMatrix3fv(@texProg.pMatrixUniform, false, @Projection.elements)
+                else
+                    @gl.uniformMatrix3fv(@texProg.pMatrixUniform, false, @currentCamera.transform.elements)
 
                 @gl.uniformMatrix3fv(@texProg.mvMatrixUniform, false, mvmat.elements)
                 @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
