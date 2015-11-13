@@ -22,6 +22,7 @@ define [
                 @clickable = true
 
                 @id = -1
+                @owner = -1
                 @fire = []
                 @health = []
                 @exposure = null
@@ -104,7 +105,7 @@ define [
                     else if @fire[turnNum] >= @maxFire
                         @fireSprite.frame = 4
 
-                renderer.drawSprite(@fireSprite)
+                    renderer.drawSprite(@fireSprite)
 
                 if @health[turnNum] < @maxHealth
                     @healthBar.width = @health[turnNum]/@maxHealth
@@ -112,7 +113,7 @@ define [
                 renderer.drawRect(@healthBar)
                 renderer.drawSprite(@team)
 
-            @setFire: (entity) =>
+            @setFire: (entity, anim) =>
                 (renderer, turnNum, turnProgress) =>
                     renderer.drawSprite(entity.sprite)
                     renderer.drawSprite(entity.team)
@@ -197,6 +198,101 @@ define [
                 super()
                 @gamestates = []
                 @centerCamera = new Renderer.Camera()
+                @player1BuildingsLeft = []
+                @player2BuildingsLeft = []
+                @forecasts = {}
+                @player1HQid = -1
+                @player2HQid = -1
+
+                @guiMat = new Renderer.Matrix3x3()
+                @guiMat.scale(1/100, 1/100)
+
+                @bottomRect = new Renderer.Rect()
+                @bottomRect.transform = @guiMat
+                @bottomRect.position.x = 0
+                @bottomRect.position.y = 80
+                @bottomRect.width = 100
+                @bottomRect.height = 20
+                @bottomRect.fillColor = new Renderer.Color(1.0, 1.0, 1.0, 1.0)
+
+                @guiPlayer1 = new Renderer.Text()
+                @guiPlayer1.transform = @guiMat
+                @guiPlayer1.position.x = 5
+                @guiPlayer1.position.y = 82
+                @guiPlayer1.width = 38
+                @guiPlayer1.size = 25
+
+                @guiPlayer2 = new Renderer.Text()
+                @guiPlayer2.transform = @guiMat
+                @guiPlayer2.position.x = 55
+                @guiPlayer2.position.y = 82
+                @guiPlayer2.alignment = "left"
+                @guiPlayer2.width = 38
+                @guiPlayer2.size = 25
+
+                @guiPlayer1BuildingText = new Renderer.Text()
+                @guiPlayer1BuildingText.transform = @guiMat
+                @guiPlayer1BuildingText.position.x = 5
+                @guiPlayer1BuildingText.position.y = 95
+                @guiPlayer1BuildingText.width = 20
+                @guiPlayer1BuildingText.size = 20
+
+                @guiPlayer2BuildingText = new Renderer.Text()
+                @guiPlayer2BuildingText.transform = @guiMat
+                @guiPlayer2BuildingText.position.x = 55
+                @guiPlayer2BuildingText.position.y = 95
+                @guiPlayer2BuildingText.alignment = "right"
+                @guiPlayer2BuildingText.width = 20
+                @guiPlayer2BuildingText.size = 20
+
+                @guiPlayer1HQHealthText = new Renderer.Text()
+                @guiPlayer1HQHealthText.transform = @guiMat
+                @guiPlayer1HQHealthText.position.x = 5
+                @guiPlayer1HQHealthText.position.y = 86
+                @guiPlayer1HQHealthText.width = 12
+                @guiPlayer1HQHealthText.size = 20
+                @guiPlayer1HQHealthText.text = "HQ Health"
+
+                @guiPlayer1HQHealthBar = new Renderer.Rect()
+                @guiPlayer1HQHealthBar.transform = @guiMat
+                @guiPlayer1HQHealthBar.position.x = 5
+                @guiPlayer1HQHealthBar.position.y = 90
+                @guiPlayer1HQHealthBar.width = 38
+                @guiPlayer1HQHealthBar.height = 3
+                @guiPlayer1HQHealthBar.fillColor = new Renderer.Color(0.0, 1.0, 0.0, 1.0)
+
+                @guiPlayer1HQHealthBarBack = new Renderer.Rect()
+                @guiPlayer1HQHealthBarBack.transform = @guiMat
+                @guiPlayer1HQHealthBarBack.position.x = 5
+                @guiPlayer1HQHealthBarBack.position.y = 90
+                @guiPlayer1HQHealthBarBack.width = 38
+                @guiPlayer1HQHealthBarBack.height = 3
+                @guiPlayer1HQHealthBarBack.fillColor = new Renderer.Color(1.0, 0.0, 0.0, 1.0)
+
+                @guiPlayer2HQHealthText = new Renderer.Text()
+                @guiPlayer2HQHealthText.transform = @guiMat
+                @guiPlayer2HQHealthText.position.x = 55
+                @guiPlayer2HQHealthText.position.y = 86
+                @guiPlayer2HQHealthText.width = 12
+                @guiPlayer2HQHealthText.size = 20
+                @guiPlayer2HQHealthText.text = "HQ Health"
+
+                @guiPlayer2HQHealthBar = new Renderer.Rect()
+                @guiPlayer2HQHealthBar.transform = @guiMat
+                @guiPlayer2HQHealthBar.position.x = 55
+                @guiPlayer2HQHealthBar.position.y = 90
+                @guiPlayer2HQHealthBar.width = 38
+                @guiPlayer2HQHealthBar.height = 3
+                @guiPlayer2HQHealthBar.fillColor = new Renderer.Color(0.0, 1.0, 0.0, 1.0)
+
+                @guiPlayer2HQHealthBarBack = new Renderer.Rect()
+                @guiPlayer2HQHealthBarBack.transform = @guiMat
+                @guiPlayer2HQHealthBarBack.position.x = 55
+                @guiPlayer2HQHealthBarBack.position.y = 90
+                @guiPlayer2HQHealthBarBack.width = 38
+                @guiPlayer2HQHealthBarBack.height = 3
+                @guiPlayer2HQHealthBarBack.fillColor = new Renderer.Color(1.0, 0.0, 0.0, 1.0)
+
 
             selectEntities: (renderer, turn, x, y) ->
                 selections = {}
@@ -245,8 +341,33 @@ define [
             getName: () -> 'Anarchy'
 
             preDraw: (turn, dt, renderer) ->
+                renderer.setCamera(@centerCamera)
 
             postDraw: (turn, dt, renderer) ->
+                renderer.resetCamera()
+                renderer.drawRect(@bottomRect)
+                renderer.drawText(@guiPlayer1)
+                renderer.drawText(@guiPlayer2)
+
+                renderer.drawText(@guiPlayer1HQHealthText)
+                renderer.drawText(@guiPlayer2HQHealthText)
+
+                renderer.drawRect(@guiPlayer1HQHealthBarBack)
+                renderer.drawRect(@guiPlayer2HQHealthBarBack)
+
+                hq1 = @entities[@player1HQid]
+                @guiPlayer1HQHealthBar.width = (hq1.health[turn]  / 1000) * 38
+                renderer.drawRect(@guiPlayer1HQHealthBar)
+
+                hq2 = @entities[@player2HQid]
+                @guiPlayer2HQHealthBar.width = (hq1.health[turn] / 1000) * 38
+                renderer.drawRect(@guiPlayer2HQHealthBar)
+
+                @guiPlayer1BuildingText.text = "Buildings Left: " + @player1BuildingsLeft[turn]
+                renderer.drawText(@guiPlayer1BuildingText)
+
+                @guiPlayer2BuildingText.text = "Buildings Left: " + @player2BuildingsLeft[turn]
+                renderer.drawText(@guiPlayer2BuildingText)
 
             resize: (renderer) ->
 
@@ -290,7 +411,13 @@ define [
                         @mapHeight = turn.game.mapHeight
 
                         @worldMat = new Renderer.Matrix3x3()
-                        @worldMat.scale(1/@mapWidth, 1/@mapHeight)
+                        @worldMat.scale(1/@mapWidth, 1/(@mapHeight + ((1/5) * @mapHeight) + 1))
+
+                        @guiPlayer1.text = turn.game.gameObjects[turn.game.players[0].id].name
+                        @guiPlayer2.text = turn.game.gameObjects[turn.game.players[1].id].name
+
+                        @player1HQid = turn.game.gameObjects[turn.game.players[0].id].headquarters.id
+                        @player2HQid = turn.game.gameObjects[turn.game.players[1].id].headquarters.id
 
                         # initialize 2d array of entities to null
                         map = []
@@ -302,6 +429,10 @@ define [
 
                         @_initBuildings(turn, map)
                         @_initRoads(map)
+
+                        for id, obj of turn.game.gameObjects
+                            if obj.gameObjectName == "Forecast"
+                                @forecasts.push obj
 
                         # insert all entities into the entity pool
                         for row in map
@@ -348,7 +479,27 @@ define [
 
                         animations.push []
 
+
+
                 @maxTurn = animations.length - 1
+
+                for i in [0..@maxTurn]
+                    p1 = 0
+                    p2 = 0
+                    for id, obj of @entities
+                        if obj.classType == "Building"
+                            if obj.owner == "0" and obj.health[i] > 0
+                                p1++
+                            if obj.owner == "1" and obj.health[i] > 0
+                                p2++
+
+                    @player1BuildingsLeft.push p1
+                    @player2BuildingsLeft.push p2
+
+                meh = 6
+                meh = 7
+
+
 
 
             getSexpScheme: () -> null
@@ -382,6 +533,7 @@ define [
                             newBldg.type = "FireDepartment"
                             newBldg.sprite.texture = "firehouse"
                     newBldg.id = obj.id
+                    newBldg.owner = obj.owner.id
                     newBldg.setTransform(@worldMat)
                     newBldg.setx(obj.x)
                     newBldg.sety(obj.y)
