@@ -65,6 +65,22 @@ define [
                 @ignite.position.x = x
                 @healthBar.position.x = x
 
+                if @hqnorth?
+                    @hqnorth.x1 = x
+                    @hqnorth.x2 = x + 1
+
+                if @hqwest?
+                    @hqwest.x1 = x
+                    @hqwest.x2 = x
+
+                if @hqeast?
+                    @hqeast.x1 = x + 1
+                    @hqeast.x2 = x + 1
+
+                if @hqsouth?
+                    @hqsouth.x1 = x
+                    @hqsouth.x2 = x + 1
+
             sety: (y) ->
                 @sprite.position.y = y
                 @team.position.y = y
@@ -72,12 +88,46 @@ define [
                 @ignite.position.y = y
                 @healthBar.position.y = y
 
+                if @hqnorth?
+                    @hqnorth.y1 = y
+                    @hqnorth.y2 = y
+
+                if @hqwest?
+                    @hqwest.y1 = y
+                    @hqwest.y2 = y + 1
+
+                if @hqeast?
+                    @hqeast.y1 = y
+                    @hqeast.y2 = y + 1
+
+                if @hqsouth?
+                    @hqsouth.y1 = y + 1
+                    @hqsouth.y2 = y + 1
+
             setTransform: (transform) ->
                 @sprite.transform = transform
                 @team.transform = transform
                 @fireSprite.transform = transform
                 @ignite.transform = transform
                 @healthBar.transform = transform
+
+                if @hqnorth? then @hqnorth.transform = transform
+                if @hqwest? then @hqwest.transform = transform
+                if @hqeast? then @hqeast.transform = transform
+                if @hqsouth? then @hqsouth.transform = transform
+
+            makeHeadquarters: () ->
+                @hqnorth = new Renderer.Line(0, 0, 0, 0)
+                @hqnorth.color = new Renderer.Color(0.0, 1.0, 0.0, 1.0)
+
+                @hqwest = new Renderer.Line(0, 0, 0, 0)
+                @hqwest.color = new Renderer.Color(0.0, 1.0, 0.0, 1.0)
+
+                @hqeast = new Renderer.Line(0, 0, 0, 0)
+                @hqeast.color = new Renderer.Color(0.0, 1.0, 0.0, 1.0)
+
+                @hqsouth = new Renderer.Line(0, 0, 0, 0)
+                @hqsouth.color = new Renderer.Color(0.0, 1.0, 0.0, 1.0)
 
             idle: (renderer, turnNum, turnProgress) ->
                 if @health[turnNum] <= 0
@@ -113,6 +163,13 @@ define [
                     @healthBar.width = @health[turnNum]/@maxHealth
 
                     renderer.drawRect(@healthBar)
+
+                if @hqnorth?
+                    console.log "drawing line"
+                    renderer.drawLine(@hqnorth)
+                    renderer.drawLine(@hqeast)
+                    renderer.drawLine(@hqwest)
+                    renderer.drawLine(@hqsouth)
 
                 renderer.drawSprite(@team)
 
@@ -336,11 +393,12 @@ define [
 
                 screenToWorld = new Renderer.Matrix3x3()
                 screenToWorld.set(0, 0, @mapWidth/2)
-                screenToWorld.set(1, 1, -@mapHeight/2)
+                screenToWorld.set(1, 1, -(@mapHeight + ((1/5) * @mapHeight) + 1)/2)
                 screenToWorld.set(2, 0, @mapWidth/2)
-                screenToWorld.set(2, 1, @mapHeight/2)
+                screenToWorld.set(2, 1, (@mapHeight + ((1/5) * @mapHeight) + 1)/2)
 
                 [newx, newy] = screenToWorld.mul(sw, sh)
+                console.log newx + " " + newy
 
                 for id, e of @entities
                     if e.classType == "Building"
@@ -353,6 +411,7 @@ define [
                                 newSelection.x = e.sprite.position.x
                                 newSelection.y = e.sprite.position.y
                                 newSelection.fire = e.fire[turn]
+                                newSelection.owner = e.owner
                                 if e.exposure != null
                                     newSelection.exposure = e.exposure[turn]
                                 newSelection.health = e.health[turn]
@@ -585,10 +644,15 @@ define [
                             newBldg.sprite.texture = "firehouse"
                     newBldg.id = obj.id
                     newBldg.owner = obj.owner.id
+                    if obj.isHeadquarters
+                        newBldg.makeHeadquarters()
+
                     newBldg.setTransform(@worldMat)
                     newBldg.setx(obj.x)
                     newBldg.sety(obj.y)
                     newBldg.maxFire = turn.game.maxFire
+
+
 
                     #initialize start states
                     newBldg.fire.push obj.fire
