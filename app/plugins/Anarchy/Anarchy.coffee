@@ -49,6 +49,9 @@ define [
                 @ignite.width = 1
                 @ignite.height = 1
 
+                @healthBar = new Renderer.Rect()
+                @healthBar.fillColor = new Renderer.Color(0.0, 1.0, 0.0, 1.0)
+                @healthBar.height = 0.1
 
             getAnimations: () -> @animations
 
@@ -57,18 +60,21 @@ define [
                 @team.position.x = x
                 @fireSprite.position.x = x
                 @ignite.position.x = x
+                @healthBar.position.x = x
 
             sety: (y) ->
                 @sprite.position.y = y
                 @team.position.y = y
                 @fireSprite.position.y = y
                 @ignite.position.y = y
+                @healthBar.position.y = y
 
             setTransform: (transform) ->
                 @sprite.transform = transform
                 @team.transform = transform
                 @fireSprite.transform = transform
                 @ignite.transform = transform
+                @healthBar.transform = transform
 
             idle: (renderer, turnNum, turnProgress) ->
                 if @health[turnNum] <= 0
@@ -99,6 +105,11 @@ define [
                         @fireSprite.frame = 4
 
                 renderer.drawSprite(@fireSprite)
+
+                if @health[turnNum] < @maxHealth
+                    @healthBar.width = @health[turnNum]/@maxHealth
+
+                renderer.drawRect(@healthBar)
                 renderer.drawSprite(@team)
 
             @setFire: (entity) =>
