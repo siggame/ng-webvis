@@ -110,7 +110,8 @@ define [
                 if @health[turnNum] < @maxHealth
                     @healthBar.width = @health[turnNum]/@maxHealth
 
-                renderer.drawRect(@healthBar)
+                    renderer.drawRect(@healthBar)
+                    
                 renderer.drawSprite(@team)
 
             @setFire: (entity, anim) =>
