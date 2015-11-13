@@ -130,9 +130,12 @@ define [
                 @hqsouth.color = new Renderer.Color(0.0, 1.0, 0.0, 1.0)
 
             idle: (renderer, turnNum, turnProgress) ->
+                spriteChanged = false
                 if @health[turnNum] <= 0
+                    if @sprite.texture != "rubble" then @sprite.update = true
                     @sprite.texture = "rubble"
                 else
+                    if @sprite.texture == "rubble" then @sprite.update = true
                     switch @type
                         when "Warehouse"
                             @sprite.texture = "building"
@@ -143,29 +146,36 @@ define [
                         when "FireDepartment"
                             @sprite.texture = "firehouse"
 
+
                 renderer.drawSprite(@sprite)
 
                 if @fire[turnNum] > 0
                     if 0 < @fire[turnNum] < 0.25 * @maxFire
+                        if @fireSprite.frame != 0 then @fireSprite.update = true
                         @fireSprite.frame = 0
                     else if 0.25 * @maxFire < @fire[turnNum] < 0.5 * @maxFire
+                        if @fireSprite.frame != 1 then @fireSprite.update = true
                         @fireSprite.frame = 1
                     else if 0.5 * @maxFire < @fire[turnNum] < 0.75 * @maxFire
+                        if @fireSprite.frame != 2 then @fireSprite.update = true
                         @fireSprite.frame = 2
                     else if 0.75 * @maxFire < @fire[turnNum] < @maxFire
+                        if @fireSprite.frame != 3 then @fireSprite.update = true
                         @fireSprite.frame = 3
                     else if @fire[turnNum] >= @maxFire
+                        if @fireSprite.frame != 4 then @fireSprite.update = true
                         @fireSprite.frame = 4
 
-                    renderer.drawSprite(@fireSprite)
+                    renderer.drawSprite(@fireSprite, 2)
 
                 if @health[turnNum] < @maxHealth
+                    if @healthBar.width != @health[turnNum]/@maxHealth
+                        @healthBar.update = true
                     @healthBar.width = @health[turnNum]/@maxHealth
 
-                    renderer.drawRect(@healthBar)
+                    renderer.drawRect(@healthBar, 2)
 
                 if @hqnorth?
-                    console.log "drawing line"
                     renderer.drawLine(@hqnorth)
                     renderer.drawLine(@hqeast)
                     renderer.drawLine(@hqwest)
@@ -412,6 +422,7 @@ define [
                                 newSelection.y = e.sprite.position.y
                                 newSelection.fire = e.fire[turn]
                                 newSelection.owner = e.owner
+                                newSelection.type = e.type
                                 if e.exposure != null
                                     newSelection.exposure = e.exposure[turn]
                                 newSelection.health = e.health[turn]
@@ -421,6 +432,13 @@ define [
 
 
             verifyEntities:(renderer, turn, selection) ->
+                for s in selection
+                    s.fire = e.fire[turn]
+                    if e.exposure != null
+                        s.exposure = e.exposure[turn]
+                    s.health = e.health[turn]
+                    selections[id] = newSelection
+
                 return selection
 
             getName: () -> 'Anarchy'
@@ -430,34 +448,35 @@ define [
 
             postDraw: (turn, dt, renderer) ->
                 renderer.resetCamera()
-                renderer.drawRect(@bottomRect)
-                renderer.drawText(@guiPlayer1)
-                renderer.drawText(@guiPlayer2)
+                renderer.drawRect(@bottomRect, 1)
+                @bottomRect.update = true
+                renderer.drawText(@guiPlayer1, 1)
+                renderer.drawText(@guiPlayer2, 1)
 
-                renderer.drawText(@guiPlayer1HQHealthText)
-                renderer.drawText(@guiPlayer2HQHealthText)
+                renderer.drawText(@guiPlayer1HQHealthText, 1)
+                renderer.drawText(@guiPlayer2HQHealthText, 1)
 
-                renderer.drawRect(@guiPlayer1HQHealthBarBack)
-                renderer.drawRect(@guiPlayer2HQHealthBarBack)
+                renderer.drawRect(@guiPlayer1HQHealthBarBack, 1)
+                renderer.drawRect(@guiPlayer2HQHealthBarBack, 1)
 
                 hq1 = @entities[@player1HQid]
                 @guiPlayer1HQHealthBar.width = (hq1.health[turn]  / 1000) * 38
-                renderer.drawRect(@guiPlayer1HQHealthBar)
+                renderer.drawRect(@guiPlayer1HQHealthBar, 1)
 
                 hq2 = @entities[@player2HQid]
                 @guiPlayer2HQHealthBar.width = (hq2.health[turn] / 1000) * 38
-                renderer.drawRect(@guiPlayer2HQHealthBar)
+                renderer.drawRect(@guiPlayer2HQHealthBar, 1)
 
                 @guiPlayer1BuildingText.text = "Buildings Left: " + @player1BuildingsLeft[turn]
-                renderer.drawText(@guiPlayer1BuildingText)
+                renderer.drawText(@guiPlayer1BuildingText, 1)
 
                 @guiPlayer2BuildingText.text = "Buildings Left: " + @player2BuildingsLeft[turn]
-                renderer.drawText(@guiPlayer2BuildingText)
+                renderer.drawText(@guiPlayer2BuildingText, 1)
 
                 if turn == @maxTurn
-                    renderer.drawRect @endScreen
-                    renderer.drawText @endText
-                    renderer.drawText @endReason
+                    renderer.drawRect(@endScreen, 1)
+                    renderer.drawText(@endText, 1)
+                    renderer.drawText(@endReason, 1)
 
             resize: (renderer) ->
 
