@@ -293,6 +293,29 @@ define [
                 @guiPlayer2HQHealthBarBack.height = 3
                 @guiPlayer2HQHealthBarBack.fillColor = new Renderer.Color(1.0, 0.0, 0.0, 1.0)
 
+                @endScreen = new Renderer.Rect()
+                @endScreen.transform = @guiMat
+                @endScreen.fillColor.setColor(1.0, 1.0, 1.0, 0.4)
+                @endScreen.position.x = 0
+                @endScreen.position.y = 0
+                @endScreen.width = 100
+                @endScreen.height = 100
+
+                @endText = new Renderer.Text()
+                @endText.transform = @guiMat
+                @endText.alignment = "center"
+                @endText.position.x = 20
+                @endText.position.y = 40
+                @endText.width = 60
+                @endText.size = 50
+
+                @endReason = new Renderer.Text()
+                @endReason.transform = @guiMat
+                @endReason.alignment = "center"
+                @endReason.position.x = 20
+                @endReason.position.y = 55
+                @endReason.width = 60
+                @endReason.size = 35
 
             selectEntities: (renderer, turn, x, y) ->
                 selections = {}
@@ -369,6 +392,11 @@ define [
                 @guiPlayer2BuildingText.text = "Buildings Left: " + @player2BuildingsLeft[turn]
                 renderer.drawText(@guiPlayer2BuildingText)
 
+                if turn == @maxTurn
+                    renderer.drawRect @endScreen
+                    renderer.drawText @endText
+                    renderer.drawText @endReason
+
             resize: (renderer) ->
 
             loadGame: (@gamedata, renderer, inputManager) ->
@@ -404,6 +432,9 @@ define [
                         @centerCamera.setTransY( @centerCamera.getTransY() + deltay)
                 )
 
+                player1id = -1
+                player2id = -1
+
                 for turn in @gamedata.turns
                     if turn.type == "start"
                         animations.push []
@@ -416,8 +447,10 @@ define [
                         @guiPlayer1.text = turn.game.gameObjects[turn.game.players[0].id].name
                         @guiPlayer2.text = turn.game.gameObjects[turn.game.players[1].id].name
 
-                        @player1HQid = turn.game.gameObjects[turn.game.players[0].id].headquarters.id
-                        @player2HQid = turn.game.gameObjects[turn.game.players[1].id].headquarters.id
+                        player1id = turn.game.players[0].id
+                        player2id = turn.game.players[1].id
+                        @player1HQid = turn.game.gameObjects[player1id].headquarters.id
+                        @player2HQid = turn.game.gameObjects[player2id].headquarters.id
 
                         # initialize 2d array of entities to null
                         map = []
@@ -432,7 +465,7 @@ define [
 
                         for id, obj of turn.game.gameObjects
                             if obj.gameObjectName == "Forecast"
-                                @forecasts.push obj
+                                @forecasts[id] = obj
 
                         # insert all entities into the entity pool
                         for row in map
@@ -449,6 +482,21 @@ define [
                         console.log "current turn " + turnNum
                         turnNum++
                         @gamestates.push(turn.game)
+
+                        if turn.game.gameObjects[player1id]?
+                            player1 = turn.game.gameObjects[player1id]
+                            if player1.won?
+                                if player1.won
+                                    @endText.text = "Winner: " + @guiPlayer1.text
+                                    @endReason.text = player1.reasonWon
+
+                        if turn.game.gameObjects[player2id]?
+                            player2 = turn.game.gameObjects[player2id]
+                            if player2.won?
+                                if player2.won
+                                    @endText.text = "Winner: " + @guiPlayer2.text
+                                    @endReason.text = player2.reasonWon
+
 
                         for own eid, eobj of @entities
                             if eobj.classType == "Building"
