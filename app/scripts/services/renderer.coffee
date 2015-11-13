@@ -1061,7 +1061,7 @@ define ()->
                 if sprite.texture != null
                     t = @_getTexture sprite.texture
                 else
-                    console.info "cannot draw a null or undefined texture"
+                    return
 
                 if t?
                     sheetData = @_getSheetData sprite.texture
@@ -1149,22 +1149,27 @@ define ()->
                 @gl.useProgram(@colorProg)
                 @gl.disableVertexAttribArray(1)
 
-                mvmat = new Matrix3x3
-
+                mvmat = new Matrix3x3(rect.transform)
                 mvmat.translate(rect.position.x, rect.position.y)
                 mvmat.scale(rect.width, rect.height)
+
+                colArray = new Float32Array(4)
+                colArray[0] = rect.fillColor.r
+                colArray[1] = rect.fillColor.g
+                colArray[2] = rect.fillColor.b
+                colArray[3] = rect.fillColor.a
 
                 @gl.bindBuffer(@gl.ARRAY_BUFFER, @baseRect)
                 @gl.vertexAttribPointer(@colorProg.vertexPositionAttribute,
                     @baseRect.itemSize, @gl.FLOAT, false, 0, 0)
 
-                if rect.transform != null
-                    @gl.uniformMatrix3fv(@colorProg.pMatrixUniform, false, rect.transform.elements)
-                else
+                if @currentCamera == null
                     @gl.uniformMatrix3fv(@colorProg.pMatrixUniform, false, @Projection.elements)
+                else
+                    @gl.uniformMatrix3fv(@colorProg.pMatrixUniform, false, @currentCamera.transform.elements)
 
                 @gl.uniformMatrix3fv(@colorProg.mvMatrixUniform, false, mvmat.elements)
-                @gl.uniform4fv(@colorProg.color, rect.fillColor)
+                @gl.uniform4fv(@colorProg.color, colArray)
                 @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
 
             drawText: (text) ->
