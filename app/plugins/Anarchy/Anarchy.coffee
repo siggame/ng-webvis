@@ -291,172 +291,18 @@ define [
                         @worldMat = new Renderer.Matrix3x3()
                         @worldMat.scale(1/@mapWidth, 1/@mapHeight)
 
+                        # initialize 2d array of entities to null
                         map = []
                         for i in [0..@mapWidth-1]
                             temp = []
                             for j in [0..@mapHeight-1]
                                 temp.push null
                             map.push temp
-                        for id, obj of turn.game.gameObjects
-                            type = obj.gameObjectName
 
-                            if type != "Warehouse" and type != "WeatherStation" and type != "PoliceDepartment" and type != "FireDepartment"
-                                continue
+                        @_initBuildings(turn, map)
+                        @_initRoads(map)
 
-                            console.log "found a building"
-                            map[obj.x][obj.y] = newBldg = new Building
-
-
-                            if obj.owner.id == "0"
-                                newBldg.team.texture = "graffiti1"
-                            else
-                                newBldg.team.texture = "graffiti2"
-
-                            #newBldg.team.texture = if obj.owner == 0 then "graffiti1" else "graffiti2"
-                            switch type
-                                when "Warehouse"
-                                    newBldg.type = "Warehouse"
-                                    newBldg.sprite.texture = "building"
-                                when "WeatherStation"
-                                    newBldg.type = "WeatherStation"
-                                    newBldg.sprite.texture = "weatherstation"
-                                when "PoliceDepartment"
-                                    newBldg.type = "PoliceDepartment"
-                                    newBldg.sprite.texture = "policestation"
-                                when "FireDepartment"
-                                    newBldg.type = "FireDepartment"
-                                    newBldg.sprite.texture = "firehouse"
-                            newBldg.id = obj.id
-                            newBldg.setTransform(@worldMat)
-                            newBldg.setx(obj.x)
-                            newBldg.sety(obj.y)
-
-                            #initialize start states
-                            newBldg.fire.push obj.fire
-                            newBldg.health.push obj.health
-                            if obj.exposure?
-                                newBldg.exposure = []
-                                newBldg.exposure.push obj.exposure
-
-                        # logic for tiles
-                        isRoad = false
-                        north3 = 0
-                        south3 = 0
-                        east3 = 0
-                        west3 = 0
-                        for i in [0..@mapWidth-1]
-                            for j in [0..@mapHeight-1]
-                                if map[i][j] == null
-                                    map[i][j] = newRoad = new Road
-                                    newRoad.setTransform(@worldMat)
-                                    newRoad.id = "road" + i + " " + j
-                                    newRoad.setx(i)
-                                    newRoad.sety(j)
-                                    if i > 0
-                                        # West
-                                        if map[i-1][j] != null and map[i-1][j].type != "Road"
-                                            newRoad.sideWalkW = true
-                                            isRoad = true
-                                        else
-                                            west3 += 1
-
-                                        #North West
-                                        if j > 0
-                                            if map[i-1][j-1] != null and map[i-1][j-1].type != "Road"
-                                                isRoad = true
-                                            else
-                                                north3 += 1
-                                                west3 += 1
-
-                                        #South West
-                                        if j < @mapHeight - 1
-                                            if map[i-1][j+1] != null and map[i-1][j+1].type != "Road"
-                                                isRoad = true
-                                            else
-                                                south3 += 1
-                                                west3 += 1
-                                    else
-                                        newRoad.sideWalkW = true
-                                        isRoad = true
-
-                                    if i < @mapWidth-1
-                                        #East
-                                        if map[i+1][j] != null and map[i+1][j].type != "Road"
-                                            newRoad.sideWalkE = true
-                                            isRoad = true
-                                        else
-                                            east3 += 1
-
-                                        #North East
-                                        if j > 0
-                                            if map[i+1][j-1] != null and map[i+1][j-1].type != "Road"
-                                                isRoad = true
-                                            else
-                                                north3 += 1
-                                                east3 += 1
-
-                                        #South East
-                                        if j < @mapHeight - 1
-                                            if map[i+1][j+1] != null and map[i+1][j+1].type != "Road"
-                                                isRoad = true
-                                            else
-                                                south3 += 1
-                                                east3 += 1
-
-                                    else
-                                        newRoad.sideWalkE = true
-                                        isRoad = true
-
-                                    if j > 0
-                                        #North
-                                        if map[i][j-1] != null and map[i][j-1].type != "Road"
-                                            newRoad.sideWalkN = true
-                                            isRoad = true
-                                        else
-                                            north3 += 1
-                                    else
-                                        newRoad.sideWalkN = true
-                                        isRoad = true
-
-                                    if j < @mapHeight-1
-                                        #South
-                                        if map[i][j+1] != null and map[i][j+1].type != "Road"
-                                            newRoad.sideWalkS = true
-                                            isRoad = true
-                                        else
-                                            south3 += 1
-                                    else
-                                        newRoad.sideWalkS = true
-                                        isRoad = true
-
-
-                                    #replacing the road with building
-                                    if isRoad == false
-                                        newRoad.sprite.texture = "drab"
-                                    #if adjacent/diagonal building, keeping it road
-                                    else
-                                        newRoad.sprite.texture = "road"
-                                        isbuildingNorth = newRoad.sideWalkN
-                                        isbuildingSouth = newRoad.sideWalkS
-                                        isbuildingEast = newRoad.sideWalkE
-                                        isbuildingWest = newRoad.sideWalkW
-                                        if isbuildingEast != true and isbuildingWest != true
-                                            if north3 == 3
-                                                newRoad.sideWalkN = true
-                                            if south3 == 3
-                                                newRoad.sideWalkS = true
-                                        if isbuildingNorth != true and isbuildingSouth != true
-                                            if east3 == 3
-                                                newRoad.sideWalkE = true
-                                            if west3 == 3
-                                                newRoad.sideWalkW = true
-
-                                isRoad = false
-                                north3 = 0
-                                south3 = 0
-                                east3 = 0
-                                west3 = 0
-
+                        # insert all entities into the entity pool
                         for row in map
                             for ent in row
                                 type = ent.type
@@ -501,25 +347,172 @@ define [
 
                         animations.push []
 
-                    @maxTurn = animations.length - 1
-                ###
-                for i in [0..animations.length - 1]
-                    for anim in animations[i]
-                        if anim.data.run.functionName == "ignite"
-                            burnie = anim.data.run.args.building.id
-                            bribed = anim.data.run.caller.id
-
-                            f = Building.setFire(@entities[burnie])
-                            a = new BasePlugin.Animation(i, i+1, f)
-
-                            console.log @entities
-                            ent = @entities[burnie]
-                            if ent?
-                              ent.animations.push a
-                ###
+                @maxTurn = animations.length - 1
 
 
             getSexpScheme: () -> null
+
+            _initBuildings: (turn, map) ->
+                for id, obj of turn.game.gameObjects
+                    type = obj.gameObjectName
+
+                    if type != "Warehouse" and type != "WeatherStation" and type != "PoliceDepartment" and type != "FireDepartment"
+                        continue
+
+                    console.log "found a building"
+                    map[obj.x][obj.y] = newBldg = new Building
+
+
+                    if obj.owner.id == "0"
+                        newBldg.team.texture = "graffiti1"
+                    else
+                        newBldg.team.texture = "graffiti2"
+
+                    #newBldg.team.texture = if obj.owner == 0 then "graffiti1" else "graffiti2"
+                    switch type
+                        when "Warehouse"
+                            newBldg.type = "Warehouse"
+                            newBldg.sprite.texture = "building"
+                        when "WeatherStation"
+                            newBldg.type = "WeatherStation"
+                            newBldg.sprite.texture = "weatherstation"
+                        when "PoliceDepartment"
+                            newBldg.type = "PoliceDepartment"
+                            newBldg.sprite.texture = "policestation"
+                        when "FireDepartment"
+                            newBldg.type = "FireDepartment"
+                            newBldg.sprite.texture = "firehouse"
+                    newBldg.id = obj.id
+                    newBldg.setTransform(@worldMat)
+                    newBldg.setx(obj.x)
+                    newBldg.sety(obj.y)
+
+                    #initialize start states
+                    newBldg.fire.push obj.fire
+                    newBldg.health.push obj.health
+                    if obj.exposure?
+                        newBldg.exposure = []
+                        newBldg.exposure.push obj.exposure
+
+            _initRoads: (map) ->
+                # logic for tiles
+                isRoad = false
+                north3 = 0
+                south3 = 0
+                east3 = 0
+                west3 = 0
+                for i in [0..@mapWidth-1]
+                    for j in [0..@mapHeight-1]
+                        if map[i][j] == null
+                            map[i][j] = newRoad = new Road
+                            newRoad.setTransform(@worldMat)
+                            newRoad.id = "road" + i + " " + j
+                            newRoad.setx(i)
+                            newRoad.sety(j)
+                            if i > 0
+                                # West
+                                if map[i-1][j] != null and map[i-1][j].type != "Road"
+                                    newRoad.sideWalkW = true
+                                    isRoad = true
+                                else
+                                    west3 += 1
+
+                                #North West
+                                if j > 0
+                                    if map[i-1][j-1] != null and map[i-1][j-1].type != "Road"
+                                        isRoad = true
+                                    else
+                                        north3 += 1
+                                        west3 += 1
+
+                                #South West
+                                if j < @mapHeight - 1
+                                    if map[i-1][j+1] != null and map[i-1][j+1].type != "Road"
+                                        isRoad = true
+                                    else
+                                        south3 += 1
+                                        west3 += 1
+                            else
+                                newRoad.sideWalkW = true
+                                isRoad = true
+
+                            if i < @mapWidth-1
+                                #East
+                                if map[i+1][j] != null and map[i+1][j].type != "Road"
+                                    newRoad.sideWalkE = true
+                                    isRoad = true
+                                else
+                                    east3 += 1
+
+                                #North East
+                                if j > 0
+                                    if map[i+1][j-1] != null and map[i+1][j-1].type != "Road"
+                                        isRoad = true
+                                    else
+                                        north3 += 1
+                                        east3 += 1
+
+                                #South East
+                                if j < @mapHeight - 1
+                                    if map[i+1][j+1] != null and map[i+1][j+1].type != "Road"
+                                        isRoad = true
+                                    else
+                                        south3 += 1
+                                        east3 += 1
+
+                            else
+                                newRoad.sideWalkE = true
+                                isRoad = true
+
+                            if j > 0
+                                #North
+                                if map[i][j-1] != null and map[i][j-1].type != "Road"
+                                    newRoad.sideWalkN = true
+                                    isRoad = true
+                                else
+                                    north3 += 1
+                            else
+                                newRoad.sideWalkN = true
+                                isRoad = true
+
+                            if j < @mapHeight-1
+                                #South
+                                if map[i][j+1] != null and map[i][j+1].type != "Road"
+                                    newRoad.sideWalkS = true
+                                    isRoad = true
+                                else
+                                    south3 += 1
+                            else
+                                newRoad.sideWalkS = true
+                                isRoad = true
+
+
+                            #replacing the road with building
+                            if isRoad == false
+                                newRoad.sprite.texture = "drab"
+                            #if adjacent/diagonal building, keeping it road
+                            else
+                                newRoad.sprite.texture = "road"
+                                isbuildingNorth = newRoad.sideWalkN
+                                isbuildingSouth = newRoad.sideWalkS
+                                isbuildingEast = newRoad.sideWalkE
+                                isbuildingWest = newRoad.sideWalkW
+                                if isbuildingEast != true and isbuildingWest != true
+                                    if north3 == 3
+                                        newRoad.sideWalkN = true
+                                    if south3 == 3
+                                        newRoad.sideWalkS = true
+                                if isbuildingNorth != true and isbuildingSouth != true
+                                    if east3 == 3
+                                        newRoad.sideWalkE = true
+                                    if west3 == 3
+                                        newRoad.sideWalkW = true
+
+                        isRoad = false
+                        north3 = 0
+                        south3 = 0
+                        east3 = 0
+                        west3 = 0
 
         return Anarchy
 
