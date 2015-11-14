@@ -38,7 +38,7 @@ define [
                 @team.texture = "graffiti1"
                 @team.width = 1
                 @team.height = 1
-                @team.color.a = 0.3
+                @team.color.a = 0.4
 
                 @fireSprite = new Renderer.Sprite()
                 @fireSprite.texture = "fire"
@@ -288,10 +288,10 @@ define [
                 @bottomRect.height = 20
                 @bottomRect.fillColor = new Renderer.Color(0.2, 0.2, 0.2, 1.0)
 
-                @P1Color1 = new Renderer.Color(1.0, 0.1, 0.9, 1.0)
+                @P1Color1 = new Renderer.Color(1.0, 0.2, 0.6, 1.0)
                 @P1Color2 = new Renderer.Color(0.0, 0.8, 0.9, 1.0)
                 @P2Color1 = new Renderer.Color(1.0, 0.8, 0.2, 1.0)
-                @P2Color2 = new Renderer.Color(1.0, 0.2, 0.4, 1.0)
+                @P2Color2 = new Renderer.Color(0.8, 0.1, 0.9, 1.0)
                 
                 @guiPlayer1 = new Renderer.Text()
                 @guiPlayer1.color = @P1Color1
