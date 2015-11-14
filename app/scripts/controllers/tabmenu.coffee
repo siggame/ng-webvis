@@ -37,12 +37,18 @@ TabmenuCtrl = ($scope, Game, FileLoader, Options) ->
 
     $scope.$watch(
         () =>
-            return Object.keys(Game.getCurrentSelection())
+            if Game.getCurrentSelection()?
+                return Object.keys(Game.getCurrentSelection())
+            else
+                return {}
         (newval, oldval) ->
-            $scope.currentSelection = Game.getCurrentSelection()
-            if Object.keys(Game.getCurrentSelection()).length > 0
-                firstid = Object.keys(Game.getCurrentSelection())[0]
-                $scope.focusData = $scope.currentSelection[firstid]
+            if Game.getCurrentSelection()?
+                $scope.currentSelection = Game.getCurrentSelection()
+                if Object.keys(Game.getCurrentSelection()).length > 0
+                    firstid = Object.keys(Game.getCurrentSelection())[0]
+                    $scope.focusData = $scope.currentSelection[firstid]
+            else
+                $scope.currentSelection = {}
         true
     )
 
