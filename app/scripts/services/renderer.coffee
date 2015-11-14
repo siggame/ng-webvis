@@ -1086,6 +1086,7 @@ Renderer = () ->
                             u2, v2
                         ]))
                 else
+<<<<<<< HEAD
                     useg = 1/sheetData.width
                     vseg = 1/sheetData.height
                     row = parseInt(sprite.frame / sheetData.width)
@@ -1100,6 +1101,43 @@ Renderer = () ->
                         u2, v1,
                         u1, v2,
                         u2, v2
+=======
+                    @gl.uniformMatrix3fv(@colorProg.pMatrixUniform, false, @currentCamera.transform.elements)
+
+                @gl.uniformMatrix3fv(@colorProg.mvMatrixUniform, false, mvmat.elements)
+                @gl.uniform4fv(@colorProg.color, colArray)
+                @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @baseRect.numItems)
+
+            drawText: (text) ->
+                textCanvas = document.createElement 'canvas'
+                ctx = textCanvas.getContext '2d'
+
+                `var getPowerOfTwo = function(value){
+                    var p = 1
+                  	while(p<value) {
+                  		  p *= 2;
+                    }
+                  	return p;
+                }`
+
+                ctx.font = "bold " + text.size + "px Verdana"
+                metrics = ctx.measureText(text.text)
+                textCanvas.width = getPowerOfTwo(metrics.width)
+                textCanvas.height = getPowerOfTwo(text.size)
+
+                ctx.font = "bold " + text.size + "px Verdana"
+                #ctx.fillStyle = "#000000"
+                ctx.fillStyle = text.color.toCSS()
+                ctx.textBaseline = 'top'
+                ctx.fillText(text.text, 0, 0, textCanvas.width)
+
+                @gl.bindBuffer(@gl.ARRAY_BUFFER, @texCoords)
+                @gl.bufferSubData(@gl.ARRAY_BUFFER, 0, new Float32Array([
+                    0.0, 0.0,
+                    1.0, 0.0,
+                    0.0, 1.0,
+                    1.0, 1.0
+>>>>>>> d086f70b415d84691e8fd930003d0c9e005ac7c3
                     ]))
 
                 mvmat = new Matrix3x3(sprite.transform)

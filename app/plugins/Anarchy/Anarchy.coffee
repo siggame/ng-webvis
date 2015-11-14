@@ -36,12 +36,17 @@ define () ->
                 @team.texture = "graffiti1"
                 @team.width = 1
                 @team.height = 1
-                @team.color.a = 0.5
+                @team.color.a = 0.4
 
                 @fireSprite = new Renderer.Sprite()
                 @fireSprite.texture = "fire"
                 @fireSprite.width = 1
                 @fireSprite.height = 1
+                
+                @bribeSprite = new Renderer.Sprite()
+                @bribeSprite.texture = "bribed"
+                @bribeSprite.width = 1
+                @bribeSprite.height = 1
 
                 @ignite = new Renderer.Sprite()
                 @ignite.texture = "explosion"
@@ -60,6 +65,7 @@ define () ->
                 @sprite.position.x = x
                 @team.position.x = x
                 @fireSprite.position.x = x
+                @bribeSprite.position.x = x
                 @ignite.position.x = x
                 @healthBar.position.x = x
 
@@ -83,6 +89,7 @@ define () ->
                 @sprite.position.y = y
                 @team.position.y = y
                 @fireSprite.position.y = y
+                @bribeSprite.position.y = y
                 @ignite.position.y = y
                 @healthBar.position.y = y
 
@@ -106,6 +113,7 @@ define () ->
                 @sprite.transform = transform
                 @team.transform = transform
                 @fireSprite.transform = transform
+                @bribeSprite.transform = transform
                 @ignite.transform = transform
                 @healthBar.transform = transform
 
@@ -169,7 +177,12 @@ define () ->
                     renderer.drawLine(@hqwest)
                     renderer.drawLine(@hqsouth)
 
-                renderer.drawSprite(@team)
+                if @health[turnNum] > 0 then renderer.drawSprite(@team)
+                
+                if @bribed
+                    @bribeSprite.frame = Math.floor(turnProgress * 8)
+                    @bribeSprite.color.a = turnProgress
+                    renderer.drawSprite(@bribeSprite)
 
             @setFire: (entity, anim) =>
                 (renderer, turnNum, turnProgress) =>
@@ -271,16 +284,23 @@ define () ->
                 @bottomRect.position.y = 80
                 @bottomRect.width = 100
                 @bottomRect.height = 20
-                @bottomRect.fillColor = new Renderer.Color(1.0, 1.0, 1.0, 1.0)
+                @bottomRect.fillColor = new Renderer.Color(0.2, 0.2, 0.2, 1.0)
 
+                @P1Color1 = new Renderer.Color(1.0, 0.2, 0.6, 1.0)
+                @P1Color2 = new Renderer.Color(0.0, 0.8, 0.9, 1.0)
+                @P2Color1 = new Renderer.Color(1.0, 0.8, 0.2, 1.0)
+                @P2Color2 = new Renderer.Color(0.8, 0.1, 0.9, 1.0)
+                
                 @guiPlayer1 = new Renderer.Text()
+                @guiPlayer1.color = @P1Color1
                 @guiPlayer1.transform = @guiMat
                 @guiPlayer1.position.x = 5
                 @guiPlayer1.position.y = 82
                 @guiPlayer1.width = 38
                 @guiPlayer1.size = 25
 
-                @guiPlayer2 = new Renderer.Text()
+                @guiPlayer2 = new Renderer.Text()               
+                @guiPlayer2.color = @P2Color1
                 @guiPlayer2.transform = @guiMat
                 @guiPlayer2.position.x = 55
                 @guiPlayer2.position.y = 82
@@ -289,6 +309,7 @@ define () ->
                 @guiPlayer2.size = 25
 
                 @guiPlayer1BuildingText = new Renderer.Text()
+                @guiPlayer1BuildingText.color = @P1Color2
                 @guiPlayer1BuildingText.transform = @guiMat
                 @guiPlayer1BuildingText.position.x = 5
                 @guiPlayer1BuildingText.position.y = 95
@@ -296,6 +317,7 @@ define () ->
                 @guiPlayer1BuildingText.size = 20
 
                 @guiPlayer2BuildingText = new Renderer.Text()
+                @guiPlayer2BuildingText.color = @P2Color2
                 @guiPlayer2BuildingText.transform = @guiMat
                 @guiPlayer2BuildingText.position.x = 55
                 @guiPlayer2BuildingText.position.y = 95
@@ -304,6 +326,7 @@ define () ->
                 @guiPlayer2BuildingText.size = 20
 
                 @guiPlayer1HQHealthText = new Renderer.Text()
+                @guiPlayer1HQHealthText.color = @P1Color2
                 @guiPlayer1HQHealthText.transform = @guiMat
                 @guiPlayer1HQHealthText.position.x = 5
                 @guiPlayer1HQHealthText.position.y = 86
@@ -325,9 +348,10 @@ define () ->
                 @guiPlayer1HQHealthBarBack.position.y = 90
                 @guiPlayer1HQHealthBarBack.width = 38
                 @guiPlayer1HQHealthBarBack.height = 3
-                @guiPlayer1HQHealthBarBack.fillColor = new Renderer.Color(1.0, 0.0, 0.0, 1.0)
+                @guiPlayer1HQHealthBarBack.fillColor = new Renderer.Color(0.0, 0.0, 0.0, 1.0)
 
                 @guiPlayer2HQHealthText = new Renderer.Text()
+                @guiPlayer2HQHealthText.color = @P2Color2
                 @guiPlayer2HQHealthText.transform = @guiMat
                 @guiPlayer2HQHealthText.position.x = 55
                 @guiPlayer2HQHealthText.position.y = 86
@@ -349,11 +373,11 @@ define () ->
                 @guiPlayer2HQHealthBarBack.position.y = 90
                 @guiPlayer2HQHealthBarBack.width = 38
                 @guiPlayer2HQHealthBarBack.height = 3
-                @guiPlayer2HQHealthBarBack.fillColor = new Renderer.Color(1.0, 0.0, 0.0, 1.0)
+                @guiPlayer2HQHealthBarBack.fillColor = new Renderer.Color(0.0, 0.0, 0.0, 1.0)
 
                 @endScreen = new Renderer.Rect()
                 @endScreen.transform = @guiMat
-                @endScreen.fillColor.setColor(1.0, 1.0, 1.0, 0.4)
+                @endScreen.fillColor.setColor(0, 0, 0, 0.9)
                 @endScreen.position.x = 0
                 @endScreen.position.y = 0
                 @endScreen.width = 100
@@ -363,15 +387,15 @@ define () ->
                 @endText.transform = @guiMat
                 @endText.alignment = "center"
                 @endText.position.x = 20
-                @endText.position.y = 40
+                @endText.position.y = 30
                 @endText.width = 60
-                @endText.size = 50
+                @endText.size = 60
 
                 @endReason = new Renderer.Text()
                 @endReason.transform = @guiMat
                 @endReason.alignment = "center"
                 @endReason.position.x = 20
-                @endReason.position.y = 55
+                @endReason.position.y = 45
                 @endReason.width = 60
                 @endReason.size = 35
 
@@ -440,10 +464,14 @@ define () ->
 
                 hq1 = @entities[@player1HQid]
                 @guiPlayer1HQHealthBar.width = (hq1.health[turn]  / 1000) * 38
+                @guiPlayer1HQHealthBar.fillColor.r = 1.0 - (hq1.health[turn]  / 1000)
+                @guiPlayer1HQHealthBar.fillColor.g = hq1.health[turn]  / 1000
                 renderer.drawRect(@guiPlayer1HQHealthBar)
 
                 hq2 = @entities[@player2HQid]
                 @guiPlayer2HQHealthBar.width = (hq2.health[turn] / 1000) * 38
+                @guiPlayer2HQHealthBar.fillColor.r = 1.0 - (hq2.health[turn] / 1000)
+                @guiPlayer2HQHealthBar.fillColor.g = hq2.health[turn] / 1000
                 renderer.drawRect(@guiPlayer2HQHealthBar)
 
                 @guiPlayer1BuildingText.text = "Buildings Left: " + @player1BuildingsLeft[turn]
@@ -548,14 +576,18 @@ define () ->
                             if player1.won?
                                 if player1.won
                                     @endText.text = "Winner: " + @guiPlayer1.text
+                                    @endText.color = @P1Color1
                                     @endReason.text = player1.reasonWon
+                                    @endReason.color = @P1Color2
 
                         if turn.game.gameObjects[player2id]?
                             player2 = turn.game.gameObjects[player2id]
                             if player2.won?
                                 if player2.won
                                     @endText.text = "Winner: " + @guiPlayer2.text
+                                    @endText.color = @P2Color1
                                     @endReason.text = player2.reasonWon
+                                    @endReason.color = @P2Color2
 
 
                         for own eid, eobj of @entities
@@ -754,7 +786,14 @@ define () ->
 
                             #replacing the road with building
                             if isRoad == false
-                                newRoad.sprite.texture = "drab"
+                                if Math.random() >= 0.5
+                                    newRoad.sprite.texture = "drab"
+                                else
+                                    if Math.random() >= 0.5
+                                        newRoad.sprite.texture = "drab2"
+                                    else 
+                                        newRoad.sprite.texture = "grass"
+                                
                             #if adjacent/diagonal building, keeping it road
                             else
                                 newRoad.sprite.texture = "road"

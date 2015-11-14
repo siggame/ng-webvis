@@ -36,6 +36,11 @@
             "spriteSheet": null
         },
         {
+            "id": "drab2",
+            "image": "drab2.png",
+            "spriteSheet": null
+        },
+        {
             "id": "graffiti1",
             "image": "graffiti1.png",
             "spriteSheet": null
@@ -76,6 +81,11 @@
             "spriteSheet": null
         },
         {
+            "id": "manhole",
+            "image": "ManholeCover.png",
+            "spriteSheet": null
+        },
+        {
             "id": "grass",
             "image": "Grass.png",
             "spriteSheet": null
@@ -89,6 +99,21 @@
             "id": "fire",
             "image": "fire.png",
             "spriteSheet": "Anim4x2.json"
+        },
+        {
+            "id": "bribed",
+            "image": "dollar.png",
+            "spriteSheet": "Anim8x1.json"
+        },
+        {
+            "id": "arrows",
+            "image": "Arrows.png",
+            "spriteSheet": "Anim4x1.json"
+        },
+        {
+            "id": "concretebg",
+            "image": "concreteBackground.png",
+            "spriteSheet": "null"
         }
     ]
 }
