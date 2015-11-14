@@ -359,7 +359,7 @@ define () ->
                 @guiPlayer1HQHealthBarBack.position.y = 90
                 @guiPlayer1HQHealthBarBack.width = 38
                 @guiPlayer1HQHealthBarBack.height = 3
-                @guiPlayer1HQHealthBarBack.fillColor = new Renderer.Color(0.0, 0.0, 0.0, 1.0)
+                @guiPlayer1HQHealthBarBack.fillColor = new Renderer.Color(0.5, 0.5, 0.5, 1.0)
 
                 @guiPlayer2HQHealthText = new Renderer.Text()
                 @guiPlayer2HQHealthText.color = @P2Color2
