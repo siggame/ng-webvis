@@ -468,6 +468,22 @@ define () ->
 
 
             verifyEntities:(renderer, turn, selection) ->
+                if !selection? then return {}
+
+                size = 0
+                for key, obj of selection
+                    size++
+
+                if size == 0 then return {}
+
+                focus = null
+                for id, obj of selection
+                    focus = id
+
+                selection[focus].fire = @entities[focus].fire[turn]
+                if @entities[focus].exposure != null
+                    selection[focus].exposure = @entities[focus].exposure[turn]
+                selection[focus].health = @entities[focus].health[turn]
                 return selection
 
             getName: () -> 'Anarchy'
@@ -510,7 +526,7 @@ define () ->
                 renderer.drawText(@guiPlayer2BuildingText)
 
                 # current forcast
-                if @forecasts[turn] != null
+                if @forecasts[turn]? and @forecasts[turn] != null
                     switch @forecasts[turn].direction
                         when "north"
                             @weatherIndicator.frame = 3
