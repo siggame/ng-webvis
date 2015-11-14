@@ -308,6 +308,7 @@ define () ->
                 @guiPlayer1BackGraffiti.position.y = 78
                 @guiPlayer1BackGraffiti.width = 32
                 @guiPlayer1BackGraffiti.height = 20
+                #@guiPlayer1BackGraffiti.color.a = 0.7
 
                 @guiPlayer2BackGraffiti = new Renderer.Sprite()
                 @guiPlayer2BackGraffiti.transform = @guiMat
@@ -316,6 +317,7 @@ define () ->
                 @guiPlayer2BackGraffiti.position.y = 78
                 @guiPlayer2BackGraffiti.width = 32
                 @guiPlayer2BackGraffiti.height = 20
+                #@guiPlayer2BackGraffiti.color.a = 0.7
 
                 @guiPlayer1BuildingText = new Renderer.Text()
                 @guiPlayer1BuildingText.color = @P1Color2
@@ -402,7 +404,7 @@ define () ->
 
                 @endScreen = new Renderer.Rect()
                 @endScreen.transform = @guiMat
-                @endScreen.fillColor.setColor(0.5, 0.5, 0.5, 0.9)
+                @endScreen.fillColor.setColor(0.0, 0.0, 0.0, 0.9)
                 @endScreen.position.x = 0
                 @endScreen.position.y = 0
                 @endScreen.width = 100
