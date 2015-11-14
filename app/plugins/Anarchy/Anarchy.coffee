@@ -179,7 +179,7 @@ define [
                     renderer.drawLine(@hqwest)
                     renderer.drawLine(@hqsouth)
 
-                renderer.drawSprite(@team)
+                if @health[turnNum] > 0 then renderer.drawSprite(@team)
                 
                 if @bribed
                     @bribeSprite.frame = Math.floor(turnProgress * 8)
