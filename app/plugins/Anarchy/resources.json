@@ -113,7 +113,7 @@
         {
             "id": "concretebg",
             "image": "concreteBackground.png",
-            "spriteSheet": "null"
+            "spriteSheet": null
         }
     ]
 }
