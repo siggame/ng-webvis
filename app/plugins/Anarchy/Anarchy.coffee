@@ -4,9 +4,7 @@
 
 # define block lists out the modules you'll need
 # in this case it is the basePlugin class to extend
-define [
-    'scripts/inherits/basePlugin'
-], (BasePlugin) ->
+define () ->
     # The explicit block lists the angular services/factories you need
     # all game logic/entity classes go inside this block
     explicit = (Options, Renderer) ->
