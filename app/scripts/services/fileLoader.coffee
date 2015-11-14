@@ -95,7 +95,7 @@ FileLoader = ($rootScope, $log, $injector, alert, Game,
             when "json"
                 parser = Parser.JsonParser
             else
-                throw message: "No parser available for file type of file"
+                parser = Parser.JsonParser
 
         parser.parse file.data
 
