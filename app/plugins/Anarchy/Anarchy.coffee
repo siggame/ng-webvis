@@ -492,15 +492,15 @@ define () ->
                 renderer.drawRect(@guiPlayer2HQHealthBarBack)
 
                 hq1 = @entities[@player1HQid]
-                @guiPlayer1HQHealthBar.width = (hq1.health[turn]  / 1000) * 38
-                @guiPlayer1HQHealthBar.fillColor.r = 1.0 - (hq1.health[turn]  / 1000)
-                @guiPlayer1HQHealthBar.fillColor.g = hq1.health[turn]  / 1000
+                @guiPlayer1HQHealthBar.width = (hq1.health[turn]  / hq1.maxHealth) * 38
+                @guiPlayer1HQHealthBar.fillColor.r = 1.0 - (hq1.health[turn]  / hq1.maxHealth)
+                @guiPlayer1HQHealthBar.fillColor.g = hq1.health[turn]  / hq1.maxHealth
                 renderer.drawRect(@guiPlayer1HQHealthBar)
 
                 hq2 = @entities[@player2HQid]
-                @guiPlayer2HQHealthBar.width = (hq2.health[turn] / 1000) * 38
-                @guiPlayer2HQHealthBar.fillColor.r = 1.0 - (hq2.health[turn] / 1000)
-                @guiPlayer2HQHealthBar.fillColor.g = hq2.health[turn] / 1000
+                @guiPlayer2HQHealthBar.width = (hq2.health[turn] / hq2.maxHealth) * 38
+                @guiPlayer2HQHealthBar.fillColor.r = 1.0 - (hq2.health[turn] / hq2.maxHealth)
+                @guiPlayer2HQHealthBar.fillColor.g = hq2.health[turn] / hq1.maxHealth
                 renderer.drawRect(@guiPlayer2HQHealthBar)
 
                 @guiPlayer1BuildingText.text = "Buildings Left: " + @player1BuildingsLeft[turn]
@@ -756,11 +756,10 @@ define () ->
                     newBldg.sety(obj.y)
                     newBldg.maxFire = turn.game.maxFire
 
-
-
                     #initialize start states
                     newBldg.fire.push obj.fire
                     newBldg.health.push obj.health
+                    newBldg.maxHealth = obj.health
                     if obj.exposure?
                         newBldg.exposure = []
                         newBldg.exposure.push obj.exposure
