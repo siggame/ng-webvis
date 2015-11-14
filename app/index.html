@@ -11,11 +11,11 @@
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
     <!-- endbower -->
+    <link rel="stylesheet" href="bower_components/jquery-ui/themes/smoothness/jquery-ui.css" type="text/css"/>
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
-    <link rel="stylesheet" href="bower_components/jquery-ui/themes/smoothness/jquery-ui.css" type="text/css"/>
   </head>
   <body dropzone>
     <!--[if lte IE 8]>
@@ -67,12 +67,30 @@
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/depends/require.js"></script>
-    <script>
-    (function(){
-        require(['scripts/main'], function(){});
-    }());
-    </script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/controllers/alert.js"></script>
+    <script src="scripts/controllers/navbar.js"></script>
+    <script src="scripts/controllers/playback.js"></script>
+    <script src="scripts/controllers/stageCtrl.js"></script>
+    <script src="scripts/controllers/tabmenu.js"></script>
+    <script src="scripts/services/alert.js"></script>
+    <script src="scripts/services/config.js"></script>
+    <script src="scripts/services/fileLoader.js"></script>
+    <script src="scripts/services/game.js"></script>
+    <script src="scripts/services/options.js"></script>
+    <script src="scripts/services/parser.js"></script>
+    <script src="scripts/services/pluginmanager.js"></script>
+    <script src="scripts/services/renderer.js"></script>
+    <script src="scripts/directives/dropzone.js"></script>
+    <script src="scripts/directives/fileDialog.js"></script>
+    <script src="scripts/directives/game-option.js"></script>
+    <script src="scripts/directives/slider.js"></script>
+    <script src="scripts/directives/stage.js"></script>
+    <script src="scripts/inherits/basePlugin.js"></script>
     <!-- endbuild -->
 
+    <script>
+        angular.bootstrap(document, ['webvisApp']);
+    </script>
 </body>
 </html>

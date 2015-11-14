@@ -7,13 +7,14 @@
  # # gameOption
 ###
 
-define ()->
-    gameOption = ()->
-        templateUrl: 'views/game-option.html'
-        restrict: 'E'
-        scope: {
-            name: '='
-            option: '='
-            page: '='
-        }
-    return gameOption
+gameOption = ()->
+    templateUrl: 'views/game-option.html'
+    restrict: 'E'
+    scope: {
+        name: '='
+        option: '='
+        page: '='
+    }
+
+webvisApp = angular.module 'webvisApp'
+webvisApp.directive 'gameOption', gameOption

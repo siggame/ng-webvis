@@ -7,16 +7,17 @@
  # # AlertCtrl
  # Controller of the webvisApp
 ###
-define ()->
-    AlertCtrl = (alert) ->
-        @alert = alert
+AlertCtrl = (alert) ->
+    @alert = alert
 
-        @hasAlert = () ->
-            alerts = alert.getAlerts()
-            for a in alerts
-                if a.isVisible()
-                    return true
+    @hasAlert = () ->
+        alerts = alert.getAlerts()
+        for a in alerts
+            if a.isVisible()
+                return true
 
-        return this
-    AlertCtrl.$inject = ['alert'];
-    return AlertCtrl
+    return this
+
+AlertCtrl.$inject = ['alert'];
+webvisApp = angular.module 'webvisApp'
+webvisApp.controller 'AlertCtrl', AlertCtrl

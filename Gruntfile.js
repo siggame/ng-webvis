@@ -446,7 +446,23 @@ module.exports = function (grunt) {
           cwd: 'bower_components/bootstrap/dist',
           src: 'fonts/*',
           dest: '<%= yeoman.dist %>'
-        }]
+        }, {
+          expand: true,
+          dot: true,
+          cwd: 'bower_components/font-awesome',
+          src: ['fonts/*.*'],
+          dest: '<%= yeoman.dist %>'
+        }, {
+          expand: true,
+          cwd: '.tmp/plugins',
+          dest: '<%= yeoman.dist %>/plugins',
+          src: ["*.*", "**/*.*"]
+        }, {
+          expand: true,
+          cwd: 'app/plugins',
+          dest: '<%= yeoman.dist %>/plugins',
+          src: ["*.*", "**/*.*"]
+        } ]
       },
       styles: {
         expand: true,
