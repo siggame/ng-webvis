@@ -42,7 +42,7 @@ define () ->
                 @fireSprite.texture = "fire"
                 @fireSprite.width = 1
                 @fireSprite.height = 1
-                
+
                 @bribeSprite = new Renderer.Sprite()
                 @bribeSprite.texture = "bribed"
                 @bribeSprite.width = 1
@@ -178,7 +178,7 @@ define () ->
                     renderer.drawLine(@hqsouth)
 
                 if @health[turnNum] > 0 then renderer.drawSprite(@team)
-                
+
                 if @bribed
                     @bribeSprite.frame = Math.floor(turnProgress * 8)
                     @bribeSprite.color.a = turnProgress
@@ -278,19 +278,19 @@ define () ->
                 @guiMat = new Renderer.Matrix3x3()
                 @guiMat.scale(1/100, 1/100)
 
-                @bottomRect = new Renderer.Rect()
+                @bottomRect = new Renderer.Sprite()
                 @bottomRect.transform = @guiMat
+                @bottomRect.texture = "concretebg"
                 @bottomRect.position.x = 0
                 @bottomRect.position.y = 80
                 @bottomRect.width = 100
                 @bottomRect.height = 20
-                @bottomRect.fillColor = new Renderer.Color(0.2, 0.2, 0.2, 1.0)
 
                 @P1Color1 = new Renderer.Color(1.0, 0.2, 0.6, 1.0)
                 @P1Color2 = new Renderer.Color(0.0, 0.8, 0.9, 1.0)
                 @P2Color1 = new Renderer.Color(1.0, 0.8, 0.2, 1.0)
                 @P2Color2 = new Renderer.Color(0.8, 0.1, 0.9, 1.0)
-                
+
                 @guiPlayer1 = new Renderer.Text()
                 @guiPlayer1.color = @P1Color1
                 @guiPlayer1.transform = @guiMat
@@ -299,7 +299,7 @@ define () ->
                 @guiPlayer1.width = 38
                 @guiPlayer1.size = 25
 
-                @guiPlayer2 = new Renderer.Text()               
+                @guiPlayer2 = new Renderer.Text()
                 @guiPlayer2.color = @P2Color1
                 @guiPlayer2.transform = @guiMat
                 @guiPlayer2.position.x = 55
@@ -307,6 +307,22 @@ define () ->
                 @guiPlayer2.alignment = "left"
                 @guiPlayer2.width = 38
                 @guiPlayer2.size = 25
+
+                @guiPlayer1BackGraffiti = new Renderer.Sprite()
+                @guiPlayer1BackGraffiti.transform = @guiMat
+                @guiPlayer1BackGraffiti.texture = "graffiti1"
+                @guiPlayer1BackGraffiti.position.x = 8
+                @guiPlayer1BackGraffiti.position.y = 78
+                @guiPlayer1BackGraffiti.width = 32
+                @guiPlayer1BackGraffiti.height = 20
+
+                @guiPlayer2BackGraffiti = new Renderer.Sprite()
+                @guiPlayer2BackGraffiti.transform = @guiMat
+                @guiPlayer2BackGraffiti.texture = "graffiti2"
+                @guiPlayer2BackGraffiti.position.x = 58
+                @guiPlayer2BackGraffiti.position.y = 78
+                @guiPlayer2BackGraffiti.width = 32
+                @guiPlayer2BackGraffiti.height = 20
 
                 @guiPlayer1BuildingText = new Renderer.Text()
                 @guiPlayer1BuildingText.color = @P1Color2
@@ -452,7 +468,11 @@ define () ->
 
             postDraw: (turn, dt, renderer) ->
                 renderer.resetCamera()
-                renderer.drawRect(@bottomRect)
+                renderer.drawSprite(@bottomRect)
+
+                renderer.drawSprite(@guiPlayer1BackGraffiti)
+                renderer.drawSprite(@guiPlayer2BackGraffiti)
+
                 renderer.drawText(@guiPlayer1)
                 renderer.drawText(@guiPlayer2)
 
@@ -791,9 +811,9 @@ define () ->
                                 else
                                     if Math.random() >= 0.5
                                         newRoad.sprite.texture = "drab2"
-                                    else 
+                                    else
                                         newRoad.sprite.texture = "grass"
-                                
+
                             #if adjacent/diagonal building, keeping it road
                             else
                                 newRoad.sprite.texture = "road"
