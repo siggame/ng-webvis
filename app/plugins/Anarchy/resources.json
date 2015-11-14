@@ -81,6 +81,11 @@
             "spriteSheet": null
         },
         {
+            "id": "manhole",
+            "image": "ManholeCover.png",
+            "spriteSheet": null
+        },
+        {
             "id": "grass",
             "image": "Grass.png",
             "spriteSheet": null

@@ -1191,7 +1191,8 @@ define ()->
                 textCanvas.height = getPowerOfTwo(text.size)
 
                 ctx.font = "bold " + text.size + "px Verdana"
-                ctx.fillStyle = "#000000"
+                #ctx.fillStyle = "#000000"
+                ctx.fillStyle = text.color.toCSS()
                 ctx.textBaseline = 'top'
                 ctx.fillText(text.text, 0, 0, textCanvas.width)
 
