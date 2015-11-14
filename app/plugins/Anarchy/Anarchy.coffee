@@ -171,7 +171,6 @@ define () ->
                     renderer.drawRect(@healthBar)
 
                 if @hqnorth?
-                    console.log "drawing line"
                     renderer.drawLine(@hqnorth)
                     renderer.drawLine(@hqeast)
                     renderer.drawLine(@hqwest)
@@ -183,13 +182,6 @@ define () ->
                     @bribeSprite.frame = Math.floor(turnProgress * 8)
                     @bribeSprite.color.a = turnProgress
                     renderer.drawSprite(@bribeSprite)
-
-            @setFire: (entity, anim) =>
-                (renderer, turnNum, turnProgress) =>
-                    renderer.drawSprite(entity.sprite)
-                    renderer.drawSprite(entity.team)
-                    entity.ignite.frame = Math.floor(turnProgress * 8)
-                    renderer.drawSprite(entity.ignite)
 
         class Road extends BasePlugin.Entity
             constructor: () ->
@@ -271,7 +263,8 @@ define () ->
                 @centerCamera = new Renderer.Camera()
                 @player1BuildingsLeft = []
                 @player2BuildingsLeft = []
-                @forecasts = {}
+                @forecastRefs = {}
+                @forecasts = []
                 @player1HQid = -1
                 @player2HQid = -1
 
@@ -391,9 +384,25 @@ define () ->
                 @guiPlayer2HQHealthBarBack.height = 3
                 @guiPlayer2HQHealthBarBack.fillColor = new Renderer.Color(0.0, 0.0, 0.0, 1.0)
 
+                @weatherIntensity = new Renderer.Text()
+                @weatherIntensity.transform = @guiMat
+                @weatherIntensity.position.x = 48
+                @weatherIntensity.position.y = 81
+                @weatherIntensity.width = 5
+                @weatherIntensity.height = 10
+                @weatherIntensity.size = 20
+
+                @weatherIndicator = new Renderer.Sprite()
+                @weatherIndicator.transform = @guiMat
+                @weatherIndicator.texture = "arrows"
+                @weatherIndicator.position.x = 45
+                @weatherIndicator.position.y = 85
+                @weatherIndicator.width = 8
+                @weatherIndicator.height = 8
+
                 @endScreen = new Renderer.Rect()
                 @endScreen.transform = @guiMat
-                @endScreen.fillColor.setColor(0, 0, 0, 0.9)
+                @endScreen.fillColor.setColor(0.5, 0.5, 0.5, 0.9)
                 @endScreen.position.x = 0
                 @endScreen.position.y = 0
                 @endScreen.width = 100
@@ -500,6 +509,23 @@ define () ->
                 @guiPlayer2BuildingText.text = "Buildings Left: " + @player2BuildingsLeft[turn]
                 renderer.drawText(@guiPlayer2BuildingText)
 
+                # current forcast
+                if @forecasts[turn] != null
+                    switch @forecasts[turn].direction
+                        when "north"
+                            @weatherIndicator.frame = 3
+                        when "south"
+                            @weatherIndicator.frame = 2
+                        when "east"
+                            @weatherIndicator.frame = 0
+                        when "west"
+                            @weatherIndicator.frame = 1
+                    renderer.drawSprite(@weatherIndicator)
+                    @weatherIntensity.text = ""+ @forecasts[turn].intensity
+                else
+                    @weatherIntensity.text = 0 + ""
+                renderer.drawText(@weatherIntensity)
+
                 if turn == @maxTurn
                     renderer.drawRect @endScreen
                     renderer.drawText @endText
@@ -573,7 +599,10 @@ define () ->
 
                         for id, obj of turn.game.gameObjects
                             if obj.gameObjectName == "Forecast"
-                                @forecasts[id] = obj
+                                @forecastRefs[id] = obj
+
+                        @forecasts.push @forecastRefs[turn.game.currentForecast.id]
+                        @forecasts.push @forecastRefs[turn.game.nextForecast.id]
 
                         # insert all entities into the entity pool
                         for row in map
@@ -585,6 +614,27 @@ define () ->
 
                     else if turn.type == "ran"
                         animations[animations.length - 1].push turn
+                        if turn.game? and turn.game.gameObjects?
+                            for id, obj of turn.game.gameObjects
+                                if @entities[id]? and @entities[id].classType == "Building"
+                                    if obj.fire?
+                                        @entities[id].fire[turnNum] = obj.fire
+
+                                    if obj.health?
+                                        @entities[id].health[turnNum] = obj.health
+
+                                    if obj.exposure?
+                                        @entities[id].exposure[turnNum] = obj.exposure
+
+                                if @forecastRefs[id]?
+                                    next = @forecasts[@forecasts.length - 1]
+                                    if id == next.id
+                                        if obj.direction?
+                                            next.direction = obj.direction
+
+                                        if obj.intensity?
+                                            next.intensity = obj.intensity
+
 
                     else if turn.type == "finished"
                         console.log "current turn " + turnNum
@@ -609,6 +659,10 @@ define () ->
                                     @endReason.text = player2.reasonWon
                                     @endReason.color = @P2Color2
 
+                        if turn.game.nextForecast?
+                            @forecasts.push @forecastRefs[turn.game.nextForecast.id]
+                        else
+                            @forecasts.push null
 
                         for own eid, eobj of @entities
                             if eobj.classType == "Building"
