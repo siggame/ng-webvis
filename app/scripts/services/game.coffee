@@ -1,6 +1,6 @@
 'use strict'
 
-Game = ($rootScope, $log, PluginManager, Renderer, Options) ->
+Game = ($rootScope, $log, $timeout, PluginManager, Renderer, Options) ->
     @minTurn = 0
     @maxTurn = 0
     @playing = false
@@ -169,8 +169,9 @@ Game = ($rootScope, $log, PluginManager, Renderer, Options) ->
                 option = Options.get 'Webvis', 'Mode'
                 url = Options.get 'Webvis', 'Arena Url'
                 if option.currentValue == "arena"
-                    setTimeout($rootScope.$broadcast, 3000,
-                        'FileLoader:LoadFromUrl', url.text + "/api/next_game/")
+                    callback = ()=>
+                        $rootScope.$broadcast 'FileLoader:GetArenaGame'
+                    $timeout(callback, 3000)
 
         @lastAnimateTime = currentTime
         return dtSeconds
@@ -186,9 +187,13 @@ Game = ($rootScope, $log, PluginManager, Renderer, Options) ->
             currentDate = new Date()
             @lastAnimateTime = currentDate.getTime()
 
+        mode = Options.get 'Webvis', 'Mode'
+        if mode.currentValue == "arena"
+            @playing = true
+
     window.requestAnimationFrame @animate
     return this
 
-Game.$inject =['$rootScope', '$log', 'PluginManager', 'Renderer', 'Options']
+Game.$inject =['$rootScope', '$log', '$timeout', 'PluginManager', 'Renderer', 'Options']
 webvisApp = angular.module 'webvisApp'
 webvisApp.service 'Game', Game
