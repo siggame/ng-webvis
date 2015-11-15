@@ -279,7 +279,7 @@ define () ->
                 @bottomRect.width = 100
                 @bottomRect.height = 20
 
-                @P1Color1 = new Renderer.Color(1.0, 0.2, 0.6, 1.0)
+                @P1Color1 = new Renderer.Color(1.0, 0.3, 0.7, 1.0)
                 @P1Color2 = new Renderer.Color(0.0, 0.8, 0.9, 1.0)
                 @P2Color1 = new Renderer.Color(1.0, 0.8, 0.2, 1.0)
                 @P2Color2 = new Renderer.Color(0.8, 0.1, 0.9, 1.0)
