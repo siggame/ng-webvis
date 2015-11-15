@@ -425,7 +425,17 @@ define () ->
                 @endReason.position.x = 20
                 @endReason.position.y = 45
                 @endReason.width = 60
+                @endReason.height = 15
                 @endReason.size = 35
+
+                @lossReason = new Renderer.Text()
+                @lossReason.transform = @guiMat
+                @lossReason.alignment = "center"
+                @lossReason.position.x = 20
+                @lossReason.position.y = 60
+                @lossReason.width = 60
+                @lossReason.height = 15
+                @lossReason.size = 35
 
             selectEntities: (renderer, turn, x, y) ->
                 selections = {}
@@ -549,6 +559,7 @@ define () ->
                     renderer.drawRect @endScreen
                     renderer.drawText @endText
                     renderer.drawText @endReason
+                    renderer.drawText @lossReason
 
             resize: (renderer) ->
 
@@ -602,6 +613,31 @@ define () ->
 
                         player1id = turn.game.players[0].id
                         player2id = turn.game.players[1].id
+
+                        for id, obj of turn.game.gameObjects
+                            if id == 0
+                                if obj.reasonWon?
+                                    @endText.text = "Winner: " + @guiPlayer1.text
+                                    @endText.color = @P1Color1
+                                    @endReason.text = obj.reasonWon
+                                    @endReason.color = @P1Color2
+
+                                if obj.reasonLost?
+                                    @lossReason.text = obj.reasonLost
+                                    @lossReason.color = @P1Color2
+
+                            if id == 1
+                                if obj.reasonWon?
+                                    if obj.reasonWon?
+                                        @endText.text = "Winner: " + @guiPlayer2.text
+                                        @endText.color = @P1Color1
+                                        @endReason.text = obj.reasonWon
+                                        @endReason.color = @P1Color2
+
+                                    if obj.reasonLost?
+                                        @lossReason.text = obj.reasonLost
+                                        @lossReason.color = @P1Color2
+
                         @player1HQid = turn.game.gameObjects[player1id].headquarters.id
                         @player2HQid = turn.game.gameObjects[player2id].headquarters.id
 
@@ -655,6 +691,28 @@ define () ->
                                         if obj.intensity?
                                             next.intensity = obj.intensity
 
+                                if id == 0
+                                    if obj.reasonWon?
+                                        @endText.text = "Winner: " + @guiPlayer1.text
+                                        @endText.color = @P1Color1
+                                        @endReason.text = obj.reasonWon
+                                        @endReason.color = @P1Color2
+
+                                    if obj.reasonLost?
+                                        @lossReason.text = obj.reasonLost
+                                        @lossReason.color = @P1Color2
+
+                                if id == 1
+                                    if obj.reasonWon?
+                                        if obj.reasonWon?
+                                            @endText.text = "Winner: " + @guiPlayer2.text
+                                            @endText.color = @P1Color1
+                                            @endReason.text = obj.reasonWon
+                                            @endReason.color = @P1Color2
+
+                                        if obj.reasonLost?
+                                            @lossReason.text = obj.reasonLost
+                                            @lossReason.color = @P1Color2
 
                     else if turn.type == "finished"
                         console.log "current turn " + turnNum
@@ -664,21 +722,29 @@ define () ->
                         if turn.game? and turn.game.gameObjects?
                             if turn.game.gameObjects[player1id]?
                                 player1 = turn.game.gameObjects[player1id]
-                                if player1.won?
-                                    if player1.won
+                                if player1.won? and player1.won
                                         @endText.text = "Winner: " + @guiPlayer1.text
                                         @endText.color = @P1Color1
                                         @endReason.text = player1.reasonWon
                                         @endReason.color = @P1Color2
 
+                                if player1.lost? and player1.lost
+                                        @lossReason.text = player1.reasonLost
+                                        @lossReason.color = @P1Color2
+
+
                             if turn.game.gameObjects[player2id]?
                                 player2 = turn.game.gameObjects[player2id]
-                                if player2.won?
-                                    if player2.won
+                                if player2.won? and player2.won
                                         @endText.text = "Winner: " + @guiPlayer2.text
                                         @endText.color = @P2Color1
                                         @endReason.text = player2.reasonWon
                                         @endReason.color = @P2Color2
+
+                                if player2.lost? and player2.lost
+                                        @lossReason.text = player2.reasonLost
+                                        @lossReason.color = @P2Color2
+
 
                             if turn.game.nextForecast?
                                 @forecasts.push @forecastRefs[turn.game.nextForecast.id]
