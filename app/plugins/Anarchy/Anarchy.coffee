@@ -279,7 +279,7 @@ define () ->
                 @bottomRect.width = 100
                 @bottomRect.height = 20
 
-                @P1Color1 = new Renderer.Color(1.0, 0.2, 0.6, 1.0)
+                @P1Color1 = new Renderer.Color(1.0, 0.3, 0.7, 1.0)
                 @P1Color2 = new Renderer.Color(0.0, 0.8, 0.9, 1.0)
                 @P2Color1 = new Renderer.Color(1.0, 0.8, 0.2, 1.0)
                 @P2Color2 = new Renderer.Color(0.8, 0.1, 0.9, 1.0)
@@ -308,6 +308,7 @@ define () ->
                 @guiPlayer1BackGraffiti.position.y = 78
                 @guiPlayer1BackGraffiti.width = 32
                 @guiPlayer1BackGraffiti.height = 20
+                #@guiPlayer1BackGraffiti.color.a = 0.7
 
                 @guiPlayer2BackGraffiti = new Renderer.Sprite()
                 @guiPlayer2BackGraffiti.transform = @guiMat
@@ -316,6 +317,7 @@ define () ->
                 @guiPlayer2BackGraffiti.position.y = 78
                 @guiPlayer2BackGraffiti.width = 32
                 @guiPlayer2BackGraffiti.height = 20
+                #@guiPlayer2BackGraffiti.color.a = 0.7
 
                 @guiPlayer1BuildingText = new Renderer.Text()
                 @guiPlayer1BuildingText.color = @P1Color2
@@ -385,6 +387,7 @@ define () ->
                 @guiPlayer2HQHealthBarBack.fillColor = new Renderer.Color(0.0, 0.0, 0.0, 1.0)
 
                 @weatherIntensity = new Renderer.Text()
+                @weatherIntensity.color = new Renderer.Color(0.0, 1.0, 0.0, 1.0)
                 @weatherIntensity.transform = @guiMat
                 @weatherIntensity.position.x = 48
                 @weatherIntensity.position.y = 81
@@ -402,7 +405,7 @@ define () ->
 
                 @endScreen = new Renderer.Rect()
                 @endScreen.transform = @guiMat
-                @endScreen.fillColor.setColor(0.5, 0.5, 0.5, 0.9)
+                @endScreen.fillColor.setColor(0.0, 0.0, 0.0, 0.9)
                 @endScreen.position.x = 0
                 @endScreen.position.y = 0
                 @endScreen.width = 100
