@@ -647,6 +647,7 @@ define () ->
 
                                 if @forecastRefs[id]?
                                     next = @forecasts[@forecasts.length - 1]
+                                    if next == null then continue
                                     if id == next.id
                                         if obj.direction?
                                             next.direction = obj.direction
