@@ -657,57 +657,58 @@ define () ->
                         turnNum++
                         @gamestates.push(turn.game)
 
-                        if turn.game.gameObjects[player1id]?
-                            player1 = turn.game.gameObjects[player1id]
-                            if player1.won?
-                                if player1.won
-                                    @endText.text = "Winner: " + @guiPlayer1.text
-                                    @endText.color = @P1Color1
-                                    @endReason.text = player1.reasonWon
-                                    @endReason.color = @P1Color2
+                        if turn.game? and turn.game.gameObjects?
+                            if turn.game.gameObjects[player1id]?
+                                player1 = turn.game.gameObjects[player1id]
+                                if player1.won?
+                                    if player1.won
+                                        @endText.text = "Winner: " + @guiPlayer1.text
+                                        @endText.color = @P1Color1
+                                        @endReason.text = player1.reasonWon
+                                        @endReason.color = @P1Color2
 
-                        if turn.game.gameObjects[player2id]?
-                            player2 = turn.game.gameObjects[player2id]
-                            if player2.won?
-                                if player2.won
-                                    @endText.text = "Winner: " + @guiPlayer2.text
-                                    @endText.color = @P2Color1
-                                    @endReason.text = player2.reasonWon
-                                    @endReason.color = @P2Color2
+                            if turn.game.gameObjects[player2id]?
+                                player2 = turn.game.gameObjects[player2id]
+                                if player2.won?
+                                    if player2.won
+                                        @endText.text = "Winner: " + @guiPlayer2.text
+                                        @endText.color = @P2Color1
+                                        @endReason.text = player2.reasonWon
+                                        @endReason.color = @P2Color2
 
-                        if turn.game.nextForecast?
-                            @forecasts.push @forecastRefs[turn.game.nextForecast.id]
-                        else
-                            @forecasts.push null
+                            if turn.game.nextForecast?
+                                @forecasts.push @forecastRefs[turn.game.nextForecast.id]
+                            else
+                                @forecasts.push null
 
-                        for own eid, eobj of @entities
-                            if eobj.classType == "Building"
-                                if turn.game.gameObjects[eid]?
-                                    state = turn.game.gameObjects[eid]
-                                    #setting fire array state for building entity
-                                    if state.fire?
-                                        eobj.fire.push state.fire
+                            for own eid, eobj of @entities
+                                if eobj.classType == "Building"
+                                    if turn.game.gameObjects[eid]?
+                                        state = turn.game.gameObjects[eid]
+                                        #setting fire array state for building entity
+                                        if state.fire?
+                                            eobj.fire.push state.fire
+                                        else
+                                            eobj.fire.push eobj.fire[eobj.fire.length - 1]
+                                        #setting health array state for building entity
+                                        if state.health?
+                                            eobj.health.push state.health
+                                        else
+                                            eobj.health.push eobj.health[eobj.health.length - 1]
+
+                                        if eobj.exposure == null then continue
+                                        #setting exposure array state for building entity
+                                        if state.exposure?
+                                            eobj.exposure.push state.exposure
+                                        else
+                                            eobj.exposure.push eobj.exposure[eobj.exposure.length - 1]
                                     else
                                         eobj.fire.push eobj.fire[eobj.fire.length - 1]
-                                    #setting health array state for building entity
-                                    if state.health?
-                                        eobj.health.push state.health
-                                    else
                                         eobj.health.push eobj.health[eobj.health.length - 1]
+                                        if eobj.exposure != null
+                                            eobj.exposure.push eobj.exposure[eobj.exposure.length - 1]
 
-                                    if eobj.exposure == null then continue
-                                    #setting exposure array state for building entity
-                                    if state.exposure?
-                                        eobj.exposure.push state.exposure
-                                    else
-                                        eobj.exposure.push eobj.exposure[eobj.exposure.length - 1]
-                                else
-                                    eobj.fire.push eobj.fire[eobj.fire.length - 1]
-                                    eobj.health.push eobj.health[eobj.health.length - 1]
-                                    if eobj.exposure != null
-                                        eobj.exposure.push eobj.exposure[eobj.exposure.length - 1]
-
-                        animations.push []
+                            animations.push []
 
 
 
