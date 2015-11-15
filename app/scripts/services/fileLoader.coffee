@@ -152,6 +152,14 @@ FileLoader = ($rootScope, $log, $injector, alert, Game,
             showError error.message
 
     @loadFromUrl = (u) ->
+        urlsplit = u.split(".")
+
+        if urlsplit[urlsplit.length - 1] == "gz"
+            u = ""
+            for i in [0..urlsplit.length - 3]
+                u += urlsplit[i] + "."
+            u += urlsplit[urlsplit.length - 2]
+
         checkExtension = (url) ->
             a = url.split('.')
             if a.length == 1 or (a[1] == "")

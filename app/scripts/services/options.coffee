@@ -16,7 +16,7 @@ Options = ($rootScope, alert) ->
     @_webvisOptions = [
         [   "textbox",
             "Arena Url",
-            "arena.megaminerai.com"
+            "http://arena.megaminerai.com"
         ],
         [
             "dropdown",
