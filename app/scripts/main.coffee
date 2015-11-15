@@ -58,14 +58,7 @@ webvisApp.run ($injector) ->
             option = Options.get 'Webvis', 'Mode'
             option.currentValue = 'arena'
 
-            option = Options.get 'Webvis', 'Arena Url'
-
-            $.ajax
-                dataType: "text",
-                url: "http://" + option.text + "/api/next_game/"
-                data: null,
-                success: (data) ->
-                    FileLoader.loadFromUrl decodeURIComponent(data)
+            $rootScope.$broadcast 'FileLoader:GetArenaGame'
 
         else if params.logUrl?
             FileLoader.loadFromUrl decodeURIComponent(params.logUrl)

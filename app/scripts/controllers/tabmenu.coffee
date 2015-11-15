@@ -8,7 +8,7 @@
  # Controller of the webvisApp
 ###
 
-TabmenuCtrl = ($scope, Game, FileLoader, Options) ->
+TabmenuCtrl = ($rootScope, $scope, Game, FileLoader, Options) ->
     $scope.pages = Object.keys(Options.getOptions())
     $scope.currentPageName = $scope.pages[0]
     $scope.currentPage = Options.getOptions()[$scope.pages[0]]
@@ -31,9 +31,8 @@ TabmenuCtrl = ($scope, Game, FileLoader, Options) ->
         true
     )
 
-    $scope.$on 'Webvis:Mode:updated', (event, data) ->
-        url = Options.get 'Webvis', 'Arena Url'
-        FileLoader.loadFromUrl(url.text + "/api/next_game")
+    $scope.$on 'Webvis:Mode:updated', (event, data) =>
+        $rootScope.$broadcast 'FileLoader:GetArenaGame'
 
     $scope.$watch(
         () =>
@@ -52,6 +51,6 @@ TabmenuCtrl = ($scope, Game, FileLoader, Options) ->
         true
     )
 
-TabmenuCtrl.$inject = ['$scope', 'Game', 'FileLoader', 'Options']
+TabmenuCtrl.$inject = ['$rootScope', '$scope', 'Game', 'FileLoader', 'Options']
 webvisApp = angular.module 'webvisApp'
 webvisApp.controller 'TabmenuCtrl', TabmenuCtrl

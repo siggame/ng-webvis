@@ -211,6 +211,15 @@ FileLoader = ($rootScope, $log, $injector, alert, Game,
     $rootScope.$on 'FileLoader:LoadFromUrl', (event, data) =>
         @loadFromFile(data)
 
+    $rootScope.$on 'FileLoader:GetArenaGame', (event, data) =>
+        url = Options.get 'Webvis', 'Arena Url'
+        $.ajax
+            dataType: "text",
+            url: url.text + "/api/next_game/",
+            data: null,
+            success: (data) =>
+                @loadFromUrl decodeURIComponent(data)
+
     return this
 
 FileLoader.$inject = [
