@@ -714,6 +714,32 @@ define () ->
                                             @lossReason.text = obj.reasonLost
                                             @lossReason.color = @P1Color2
 
+                    if turn.type == "disconnect"
+                        if turn.game? and turn.game.gameObjects?
+                            for id, obj of turn.game.gameObjects
+                                if id == 0
+                                    if obj.reasonWon?
+                                        @endText.text = "Winner: " + @guiPlayer1.text
+                                        @endText.color = @P1Color1
+                                        @endReason.text = obj.reasonWon
+                                        @endReason.color = @P1Color2
+
+                                    if obj.reasonLost?
+                                        @lossReason.text = obj.reasonLost
+                                        @lossReason.color = @P1Color2
+
+                                if id == 1
+                                    if obj.reasonWon?
+                                        if obj.reasonWon?
+                                            @endText.text = "Winner: " + @guiPlayer2.text
+                                            @endText.color = @P1Color1
+                                            @endReason.text = obj.reasonWon
+                                            @endReason.color = @P1Color2
+
+                                        if obj.reasonLost?
+                                            @lossReason.text = obj.reasonLost
+                                            @lossReason.color = @P1Color2
+
                     else if turn.type == "finished"
                         console.log "current turn " + turnNum
                         turnNum++
